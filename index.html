@@ -10,8 +10,51 @@
 
 <title>BKS Community Job Center — Mine Host Community Recruitment & SLP Compliance</title>
 <meta name="description" content="BKS Community Job Center connects mine host community residents to employment in South Africa's mining sector. Bilingual, POPIA compliant, SLP Reg 46 aligned."/>
+<meta name="robots" content="index,follow"/>
+<link rel="canonical" href="https://bkscommunityjobcenter.netlify.app/"/>
+<meta name="theme-color" content="#042e24"/>
+
+<!-- Open Graph -->
+<meta property="og:type" content="website"/>
+<meta property="og:site_name" content="BKS Community Job Center"/>
+<meta property="og:title" content="BKS Community Job Center — Mine Host Community Recruitment & SLP Compliance"/>
+<meta property="og:description" content="Bilingual digital recruitment and SLP compliance platform connecting mine host communities across South Africa to fair, verifiable employment opportunities."/>
+<meta property="og:url" content="https://bkscommunityjobcenter.netlify.app/"/>
+<meta property="og:locale" content="en_ZA"/>
+<meta property="og:image" content="https://bkscommunityjobcenter.netlify.app/og-image.png"/>
+<meta property="og:image:width" content="1200"/>
+<meta property="og:image:height" content="630"/>
+
+<!-- Twitter -->
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:title" content="BKS Community Job Center — Mine Host Community Recruitment & SLP Compliance"/>
+<meta name="twitter:description" content="Bilingual digital recruitment and SLP compliance platform connecting mine host communities across South Africa to fair, verifiable employment opportunities."/>
+<meta name="twitter:image" content="https://bkscommunityjobcenter.netlify.app/og-image.png"/>
+
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link rel="preconnect" href="https://script.google.com"/>
+<link rel="preconnect" href="https://formspree.io"/>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "BKS Community Job Center",
+  "url": "https://bkscommunityjobcenter.netlify.app/",
+  "description": "Bilingual digital recruitment and SLP compliance platform connecting mine host communities across South Africa to fair, verifiable employment opportunities.",
+  "email": "laprimerathegoat@gmail.com",
+  "address": {
+    "@type": "PostalAddress",
+    "addressLocality": "Atok",
+    "addressRegion": "Limpopo",
+    "postalCode": "0749",
+    "addressCountry": "ZA"
+  },
+  "areaServed": "ZA",
+  "knowsLanguage": ["en", "nso"]
+}
+</script>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=DM+Sans:wght@300;400;500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet"/>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -471,7 +514,7 @@ footer{
     <li><a href="#how-it-works">How It Works</a></li>
     <li><a href="#platform">Platform</a></li>
     <li><a href="#contact">Contact</a></li>
-    <li><a href="https://script.google.com/macros/s/AKfycby4bJ2nO_zTQmPLe1pVVehqpHQG9uNkj_2T2iiz6-Y6mem9riZlFOukfQBDCo6A3_uW/exec" target="_blank" class="nav-cta">Visit Site</a></li>
+    <li><a href="https://script.google.com/macros/s/AKfycby4bJ2nO_zTQmPLe1pVVehqpHQG9uNkj_2T2iiz6-Y6mem9riZlFOukfQBDCo6A3_uW/exec" target="_blank" rel="noopener noreferrer" class="nav-cta">Visit Site</a></li>
   </ul>
   <button class="hamburger" id="hamburger" aria-label="Open menu">
     <span></span><span></span><span></span>
@@ -484,7 +527,7 @@ footer{
   <a href="#how-it-works" class="mm-link">How It Works</a>
   <a href="#platform" class="mm-link">Platform</a>
   <a href="#contact" class="mm-link">Contact</a>
-  <a href="https://script.google.com/macros/s/AKfycby4bJ2nO_zTQmPLe1pVVehqpHQG9uNkj_2T2iiz6-Y6mem9riZlFOukfQBDCo6A3_uW/exec" target="_blank" class="mm-link mobile-cta">Visit Site</a>
+  <a href="https://script.google.com/macros/s/AKfycby4bJ2nO_zTQmPLe1pVVehqpHQG9uNkj_2T2iiz6-Y6mem9riZlFOukfQBDCo6A3_uW/exec" target="_blank" rel="noopener noreferrer" class="mm-link mobile-cta">Visit Site</a>
 </div>
 
 <!-- HERO -->
@@ -501,7 +544,7 @@ footer{
     </h1>
     <p class="hero-body">BKS Community Job Center is a digital recruitment and SLP compliance platform connecting mine host communities across South Africa to employment in the mining sector — transparently, fairly, and in full alignment with Regulation 46.</p>
     <div class="hero-actions">
-      <a href="https://script.google.com/macros/s/AKfycby4bJ2nO_zTQmPLe1pVVehqpHQG9uNkj_2T2iiz6-Y6mem9riZlFOukfQBDCo6A3_uW/exec" target="_blank" class="btn-primary">Visit Site</a>
+      <a href="https://script.google.com/macros/s/AKfycby4bJ2nO_zTQmPLe1pVVehqpHQG9uNkj_2T2iiz6-Y6mem9riZlFOukfQBDCo6A3_uW/exec" target="_blank" rel="noopener noreferrer" class="btn-primary">Visit Site</a>
       <a href="#about" class="btn-outline">Learn More</a>
     </div>
   </div>
@@ -755,6 +798,7 @@ function mkPts(){
   }
 }
 mkPts();
+let bgRAF=null;
 function drawBg(){
   X.clearRect(0,0,C.width,C.height);
   pts.forEach(p=>{
@@ -766,9 +810,18 @@ function drawBg(){
     X.fillStyle=p.g?`rgba(201,168,76,${a})`:`rgba(29,158,117,${a*.75})`;
     X.fill();
   });
-  requestAnimationFrame(drawBg);
+  bgRAF=requestAnimationFrame(drawBg);
 }
 drawBg();
+/* Pause the particle loop when the tab is hidden — saves CPU/battery */
+document.addEventListener('visibilitychange',()=>{
+  if(document.hidden){
+    if(bgRAF)cancelAnimationFrame(bgRAF);
+    bgRAF=null;
+  } else if(!bgRAF){
+    drawBg();
+  }
+});
 
 /* SVG NETWORK */
 (function(){

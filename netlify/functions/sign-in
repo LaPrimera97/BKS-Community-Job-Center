@@ -1,0 +1,53 @@
+const { supabase } = require('./lib/supabaseClient');
+const { hashPassword } = require('./lib/auth');
+
+exports.handler = async function (event) {
+  if (event.httpMethod !== 'POST') {
+    return { statusCode: 405, body: JSON.stringify({ error: 'Method not allowed' }) };
+  }
+
+  try {
+    const { email, password } = JSON.parse(event.body || '{}');
+
+    if (!email || !password) {
+      return respond(200, { success: false, message: 'Please enter your email and password.' });
+    }
+
+    const eLow = email.toLowerCase().trim();
+
+    const { data: user, error } = await supabase
+      .from('users')
+      .select('*')
+      .eq('email', eLow)
+      .maybeSingle();
+
+    if (error) throw error;
+
+    if (!user) {
+      return respond(200, { success: false, message: 'No account found with that email address.' });
+    }
+
+    if (user.password_hash !== hashPassword(password)) {
+      return respond(200, { success: false, message: 'Incorrect password. Please try again.' });
+    }
+
+    // Update last login — non-fatal if it fails
+    await supabase.from('users').update({ last_login: new Date().toISOString() }).eq('id', user.id);
+
+    return respond(200, {
+      success: true,
+      fullName: user.full_name || eLow,
+      email: user.email,
+      phone: user.phone || '',
+      idNumber: user.id_number || ''
+    });
+
+  } catch (err) {
+    console.error('sign-in error:', err);
+    return respond(200, { success: false, message: 'Sign in failed. Please try again.' });
+  }
+};
+
+function respond(statusCode, body) {
+  return { statusCode, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) };
+}

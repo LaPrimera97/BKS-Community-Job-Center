@@ -31,7 +31,6 @@ exports.handler = async function (event) {
       return respond(200, { success: false, message: 'Incorrect password. Please try again.' });
     }
 
-    // Update last login — non-fatal if it fails
     await supabase.from('users').update({ last_login: new Date().toISOString() }).eq('id', user.id);
 
     return respond(200, {

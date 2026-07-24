@@ -1,0 +1,1890 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<link rel="icon" href="https://drive.google.com/thumbnail?id=1idJ5CgHUVJ98YP8frCLbeDexMPkmraLn&sz=w64">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<title>BKS Community Job Center</title>
+<style>
+
+:root {
+  --green-deep: #021a10;
+  --green-dark: #043b28;
+  --green-mid: #0a5c42;
+  --green-vivid: #159a6e;
+  --green-light: #d8f3e8;
+  --green-pale: #edfaf3;
+  --gold: #f5c842;
+  --gold-soft: rgba(245, 200, 66, 0.14);
+  --cream: #f7f4ef;
+  --ink: #121a14;
+  --muted: #5a6460;
+  --border: #ddd9d2;
+  --font-display: 'Playfair Display', Georgia, serif;
+  --font-body: 'DM Sans', system-ui, sans-serif;
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 22px;
+  --radius-xl: 32px;
+  --shadow-xs: 0 1px 3px rgba(4,59,40,.06), 0 1px 2px rgba(4,59,40,.04);
+  --shadow-sm: 0 2px 8px rgba(4,59,40,.08), 0 1px 3px rgba(4,59,40,.05);
+  --shadow-md: 0 8px 28px rgba(4,59,40,.12), 0 2px 8px rgba(4,59,40,.07);
+  --shadow-lg: 0 20px 56px rgba(4,59,40,.16), 0 6px 16px rgba(4,59,40,.09);
+  --shadow-xl: 0 36px 80px rgba(4,59,40,.22), 0 12px 28px rgba(4,59,40,.12);
+  --transition-fast: 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-base: 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 0.48s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--font-body);
+  background: var(--cream);
+  color: var(--ink);
+  font-size: 16px;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.022'/%3E%3C/svg%3E");
+}
+
+
+.particle-layer {
+  position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+  pointer-events: none; z-index: 1; overflow: hidden;
+}
+.particle-layer canvas { width: 100%; height: 100%; }
+
+
+.hero {
+  background:
+    linear-gradient(160deg, rgba(2, 15, 10, 0.78) 0%, rgba(4, 30, 22, 0.85) 100%),
+    url("https://drive.google.com/thumbnail?id=1tQU0UOQPcw6UNFO3fUXEkgNlt1vy5oVP&sz=w2000") center / cover;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  text-align: center;
+  position: relative;
+  overflow: visible;
+}
+#heroCanvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; }
+
+
+.hero-logo-link {
+  position: fixed; top: 18px; right: 26px; z-index: 9999; display: block; cursor: pointer;
+  transition: top var(--transition-slow), transform var(--transition-base), opacity var(--transition-slow);
+}
+.hero-logo-link img {
+  width: 196px; height: auto; display: block;
+  transition: width var(--transition-slow), filter var(--transition-base), transform var(--transition-base);
+  filter: drop-shadow(0 2px 12px rgba(0,0,0,.3));
+}
+.hero-logo-link:hover img {
+  transform: scale(1.04);
+  filter: drop-shadow(0 4px 18px rgba(245, 200, 66, 0.45));
+}
+.nav-scrolled .hero-logo-link { top: 9px; }
+.nav-scrolled .hero-logo-link img { width: 106px; }
+
+
+.hero-nav {
+  position: fixed; top: 18px; left: 26px; z-index: 9999;
+  display: flex; flex-direction: row; flex-wrap: nowrap; gap: 12px; align-items: center;
+  background: rgba(2, 18, 12, 0.48);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  padding: 9px 18px;
+  border-radius: 44px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 4px 24px rgba(0,0,0,.25), inset 0 1px 0 rgba(255,255,255,.08);
+  transition:
+    top var(--transition-slow),
+    background var(--transition-slow),
+    padding var(--transition-slow),
+    box-shadow var(--transition-slow),
+    gap var(--transition-base);
+}
+.nav-links { display: flex; gap: 10px; align-items: center; transition: opacity var(--transition-base), max-width var(--transition-slow); overflow: hidden; max-width: 400px; opacity: 1; }
+.nav-links a {
+  color: rgba(255, 255, 255, 0.78);
+  text-decoration: none;
+  font-size: 13px; font-weight: 600; white-space: nowrap; letter-spacing: 0.025em;
+  position: relative; padding: 2px 4px;
+  transition: color var(--transition-fast);
+  font-family: var(--font-body);
+}
+.nav-links a::after {
+  content: ""; position: absolute; bottom: -1px; left: 0; width: 0; height: 1.5px;
+  background: var(--gold); border-radius: 1px;
+  transition: width var(--transition-base);
+}
+.nav-links a:hover { color: #fff; }
+.nav-links a:hover::after, .nav-links a.nav-active::after { width: 100%; }
+.nav-links a.nav-active { color: var(--gold); }
+.nav-divider { width: 1px; height: 16px; background: rgba(255, 255, 255, 0.16); transition: opacity var(--transition-base), max-width var(--transition-slow); flex-shrink: 0; }
+.lang-switcher {
+  display: flex;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 24px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.lang-btn {
+  padding: 5px 12px; font-size: 11px; font-weight: 700; cursor: pointer;
+  color: rgba(255, 255, 255, 0.55); background: transparent; border: none;
+  transition: all var(--transition-fast); letter-spacing: 0.06em; font-family: var(--font-body);
+}
+.lang-btn.active { background: var(--gold); color: var(--green-dark); }
+.lang-btn:hover:not(.active) { color: #fff; background: rgba(255,255,255,0.08); }
+.nav-auth-btn {
+  background: rgba(255, 255, 255, 0.09);
+  color: rgba(255, 255, 255, 0.88);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  padding: 6px 16px; border-radius: 26px; font-size: 12px; font-weight: 700;
+  cursor: pointer; white-space: nowrap; flex-shrink: 0;
+  font-family: var(--font-body); letter-spacing: 0.02em;
+  transition: background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast), transform var(--transition-fast);
+}
+.nav-auth-btn:hover {
+  background: rgba(21, 154, 110, 0.4);
+  border-color: var(--green-vivid);
+  color: #fff;
+  transform: translateY(-1px);
+}
+.nav-auth-btn.signed-in { background: var(--green-vivid); border-color: var(--green-vivid); color: #fff; }
+
+
+.nav-menu-wrap { position: relative; display: none; opacity: 0; transition: opacity var(--transition-base); }
+.nav-menu-btn {
+  display: flex; align-items: center; gap: 6px;
+  background: rgba(255, 255, 255, 0.09); border: 1px solid rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.88); padding: 5px 13px; border-radius: 24px;
+  font-size: 12px; font-weight: 700; cursor: pointer; white-space: nowrap;
+  font-family: var(--font-body);
+  transition: background var(--transition-fast), border-color var(--transition-fast);
+}
+.nav-menu-btn:hover, .nav-menu-btn.open { background: rgba(21,154,110,.35); border-color: var(--green-vivid); }
+.nav-menu-icon { font-size: 14px; line-height: 1; }
+.nav-menu-label { font-size: 12px; }
+.nav-dropdown {
+  display: none;
+  position: absolute; top: calc(100% + 12px); left: 0;
+  background: rgba(3, 20, 14, 0.97);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(21, 154, 110, 0.28);
+  border-radius: 18px; padding: 8px; min-width: 164px;
+  box-shadow: var(--shadow-xl); z-index: 20000;
+  animation: dropdownIn 0.2s cubic-bezier(.4,0,.2,1) both;
+}
+.nav-dropdown.open { display: block; }
+.nav-drop-link {
+  display: block; padding: 10px 16px; border-radius: 11px;
+  color: rgba(255, 255, 255, 0.78); text-decoration: none;
+  font-size: 13px; font-weight: 600; font-family: var(--font-body);
+  transition: background var(--transition-fast), color var(--transition-fast);
+  white-space: nowrap;
+}
+.nav-drop-link:hover { background: rgba(255, 255, 255, 0.08); color: #fff; }
+.nav-drop-link.nav-active { background: rgba(21, 154, 110, 0.2); color: var(--gold); }
+
+
+.nav-scrolled .hero-nav {
+  top: 9px;
+  background: rgba(2, 14, 9, 0.94);
+  backdrop-filter: blur(22px) saturate(200%);
+  -webkit-backdrop-filter: blur(22px) saturate(200%);
+  box-shadow: 0 6px 32px rgba(0,0,0,.42), inset 0 1px 0 rgba(255,255,255,.06);
+  gap: 8px; padding: 6px 14px;
+}
+.nav-scrolled .nav-links { max-width: 0; opacity: 0; pointer-events: none; }
+.nav-scrolled .nav-menu-wrap { display: block; opacity: 1; }
+.nav-scrolled .nav-divider { opacity: 0; max-width: 0; overflow: hidden; }
+.nav-scrolled .lang-btn { padding: 4px 9px; font-size: 10px; }
+.nav-scrolled .nav-auth-btn { padding: 4px 12px; font-size: 11px; }
+
+
+.hero-content {
+  position: relative; z-index: 3;
+  max-width: 880px; padding: 0 32px;
+  display: flex; flex-direction: column; align-items: center;
+}
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(245, 200, 66, 0.1);
+  color: rgba(245, 200, 66, 0.88);
+  font-size: 10px; font-weight: 700;
+  padding: 7px 20px; border-radius: 22px;
+  letter-spacing: 0.14em; margin-bottom: 28px;
+  border: 1px solid rgba(245, 200, 66, 0.22);
+  animation: fadeSlideDown 0.8s cubic-bezier(.4,0,.2,1) both;
+  font-family: var(--font-body); text-transform: uppercase;
+  backdrop-filter: blur(8px);
+}
+.hero h1 {
+  font-family: var(--font-display);
+  font-size: clamp(38px, 6.2vw, 68px);
+  font-weight: 700; margin-bottom: 22px;
+  line-height: 1.1;
+  animation: fadeSlideUp 0.9s cubic-bezier(.4,0,.2,1) 0.1s both;
+  letter-spacing: -0.025em;
+  text-shadow: 0 2px 32px rgba(0,0,0,.3);
+}
+.hero h1 span { color: var(--gold); }
+.hero-sub {
+  font-size: clamp(15px, 2.2vw, 19px);
+  color: rgba(255, 255, 255, 0.62);
+  margin-bottom: 36px;
+  animation: fadeSlideUp 0.9s cubic-bezier(.4,0,.2,1) 0.2s both;
+  font-weight: 400; line-height: 1.7;
+  max-width: 540px; margin-left: auto; margin-right: auto;
+  letter-spacing: 0.01em;
+}
+
+
+.hero-values {
+  display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;
+  margin-bottom: 40px;
+  animation: fadeSlideUp 0.9s cubic-bezier(.4,0,.2,1) 0.3s both;
+}
+.value-btn {
+  position: relative; overflow: visible;
+  background: rgba(255, 255, 255, 0.07);
+  color: rgba(255, 255, 255, 0.86);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  padding: 8px 20px; border-radius: 26px;
+  font-size: 12px; font-weight: 600; cursor: pointer;
+  font-family: var(--font-body); letter-spacing: 0.04em;
+  backdrop-filter: blur(8px);
+  transition: background var(--transition-base), border-color var(--transition-base), color var(--transition-base), transform var(--transition-base), box-shadow var(--transition-base);
+}
+.value-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0,0,0,.28);
+  background: rgba(255,255,255,.11);
+}
+.value-btn:hover, .value-btn.active {
+  background: var(--green-vivid);
+  border-color: var(--green-vivid);
+  color: #fff;
+}
+.value-tooltip {
+  display: none;
+  position: absolute; bottom: calc(100% + 16px); top: auto; left: 50%;
+  transform: translateX(-50%);
+  background: rgba(3, 20, 14, 0.97);
+  color: #d8f3e8;
+  border: 1px solid rgba(21,154,110,.4);
+  border-radius: 18px; padding: 18px 22px;
+  font-size: 12.5px; line-height: 1.78;
+  width: 290px; max-width: calc(100vw - 36px);
+  z-index: 99999; text-align: left;
+  box-shadow: var(--shadow-xl);
+  pointer-events: none;
+  animation: tooltipIn 0.2s cubic-bezier(.4,0,.2,1) both;
+  font-family: var(--font-body);
+  backdrop-filter: blur(16px);
+}
+.value-tooltip::before {
+  content: ""; position: absolute; bottom: -8px; top: auto; left: 50%;
+  transform: translateX(-50%);
+  border-left: 8px solid transparent; border-right: 8px solid transparent;
+  border-top: 8px solid rgba(21,154,110,.4); border-bottom: none;
+}
+.value-btn.active .value-tooltip { display: block; }
+
+
+.hero-btns {
+  display: flex; gap: 14px; justify-content: center; flex-wrap: wrap;
+  animation: fadeSlideUp 0.9s cubic-bezier(.4,0,.2,1) 0.4s both;
+}
+.btn-primary {
+  background: linear-gradient(135deg, #1ab87f, #0a7a52);
+  color: white; padding: 15px 44px; border-radius: 44px;
+  text-decoration: none; font-weight: 700; font-size: 15px;
+  display: inline-block; border: none; cursor: pointer;
+  font-family: var(--font-body); letter-spacing: 0.03em;
+  transition: all var(--transition-base);
+  animation: goldPulse 3.5s ease-in-out 2.2s infinite;
+  box-shadow: 0 8px 28px rgba(21, 154, 110, 0.4), inset 0 1px 0 rgba(255,255,255,.15);
+  position: relative; overflow: hidden;
+}
+.btn-primary::before {
+  content: ""; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.12), transparent);
+  transition: left 0.6s ease;
+}
+.btn-primary:hover::before { left: 100%; }
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 40px rgba(21, 154, 110, 0.52), inset 0 1px 0 rgba(255,255,255,.15);
+  animation: none;
+  background: linear-gradient(135deg, #22c98d, #1ab87f);
+}
+.btn-outline {
+  background: transparent; color: rgba(255, 255, 255, 0.86);
+  padding: 15px 36px; border-radius: 44px; text-decoration: none;
+  font-weight: 600; font-size: 15px; display: inline-block;
+  border: 1.5px solid rgba(255, 255, 255, 0.3);
+  font-family: var(--font-body); letter-spacing: 0.02em;
+  transition: all var(--transition-base); backdrop-filter: blur(4px);
+}
+.btn-outline:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateY(-2px);
+  border-color: rgba(255, 255, 255, 0.6);
+  box-shadow: 0 8px 24px rgba(0,0,0,.2);
+}
+
+
+.container { max-width: 1100px; margin: 0 auto; padding: 0 32px; }
+.section { padding: 96px 0; position: relative; overflow: hidden; }
+
+
+.about-section { background: var(--cream); }
+.about-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 64px;
+  align-items: start; position: relative; z-index: 2;
+}
+.about-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--green-light); color: var(--green-mid);
+  font-size: 10px; font-weight: 700;
+  padding: 5px 14px; border-radius: 20px;
+  letter-spacing: 0.1em; margin-bottom: 18px;
+  text-transform: uppercase; font-family: var(--font-body);
+}
+.about-title {
+  font-family: var(--font-display);
+  font-size: clamp(24px, 3.5vw, 34px);
+  font-weight: 700; color: var(--ink);
+  line-height: 1.25; margin-bottom: 22px;
+  letter-spacing: -0.02em;
+}
+.about-text {
+  font-size: 15.5px; color: var(--muted);
+  line-height: 1.9; margin-bottom: 16px; font-weight: 400;
+}
+
+
+.feature-cards { display: flex; flex-direction: column; gap: 12px; position: relative; z-index: 2; }
+.feature-card {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 20px 22px;
+  display: flex; align-items: flex-start; gap: 16px;
+  box-shadow: var(--shadow-xs);
+  transition: transform var(--transition-base), box-shadow var(--transition-base), border-color var(--transition-base);
+  position: relative; overflow: hidden;
+}
+.feature-card::before {
+  content: ""; position: absolute; top: 0; left: 0; width: 3px; height: 100%;
+  background: linear-gradient(180deg, var(--green-vivid), transparent);
+  opacity: 0;
+  transition: opacity var(--transition-base);
+}
+.feature-card:hover {
+  transform: translateY(-4px) translateX(2px);
+  box-shadow: var(--shadow-md);
+  border-color: #ade6cb;
+}
+.feature-card:hover::before { opacity: 1; }
+.feature-icon {
+  width: 42px; height: 42px; min-width: 42px;
+  border-radius: 12px;
+  background: var(--green-light);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  transition: background var(--transition-base), transform var(--transition-base);
+}
+.feature-card:hover .feature-icon {
+  background: #c4edd9;
+  transform: scale(1.06);
+}
+.feature-icon svg { width: 18px; height: 18px; }
+.feature-card h4 {
+  font-size: 14px; font-weight: 700; color: var(--ink);
+  margin-bottom: 4px; font-family: var(--font-body);
+  letter-spacing: -0.01em;
+}
+.feature-card p { font-size: 13px; color: var(--muted); line-height: 1.7; margin: 0; }
+
+
+.about-stats {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;
+  margin-top: 52px; padding-top: 36px;
+  border-top: 1px solid var(--border);
+  position: relative; z-index: 2;
+}
+.stat-item { text-align: center; }
+.stat-item .val {
+  font-family: var(--font-display);
+  font-size: 28px; font-weight: 700;
+  color: var(--green-mid); margin-bottom: 5px;
+  letter-spacing: -0.02em;
+}
+.stat-item .lbl {
+  font-size: 11px; color: #8a8278;
+  font-weight: 600; letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+
+.jobs-section { background: #eaeee9; }
+.jobs-section .container { position: relative; z-index: 2; }
+.section-badge {
+  display: inline-flex; align-items: center;
+  background: var(--green-light); color: var(--green-mid);
+  font-size: 10px; font-weight: 700;
+  padding: 5px 15px; border-radius: 20px;
+  letter-spacing: 0.1em; margin-bottom: 14px;
+  text-transform: uppercase; font-family: var(--font-body);
+}
+.section-title {
+  font-family: var(--font-display);
+  font-size: clamp(26px, 4vw, 38px);
+  font-weight: 700; color: var(--green-dark);
+  margin-bottom: 10px; text-align: center;
+  letter-spacing: -0.025em;
+}
+.section-subtitle {
+  text-align: center; color: var(--muted);
+  margin-bottom: 40px; font-size: 15.5px; font-weight: 400;
+  line-height: 1.7;
+}
+.jobs-filter { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 36px; }
+.jobs-filter input {
+  flex: 1; min-width: 0;
+  padding: 13px 20px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 14px; background: white; outline: none;
+  font-family: var(--font-body); color: var(--ink);
+  box-shadow: var(--shadow-xs);
+  transition: border-color var(--transition-base), box-shadow var(--transition-base);
+}
+.jobs-filter input:focus {
+  border-color: var(--green-vivid);
+  box-shadow: 0 0 0 4px rgba(21, 154, 110, 0.12);
+}
+.jobs-filter input::placeholder { color: #b0a9a2; }
+.jobs-filter select {
+  padding: 13px 18px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 14px; background: white; min-width: 0; outline: none;
+  font-family: var(--font-body); color: var(--ink);
+  cursor: pointer; box-shadow: var(--shadow-xs);
+  transition: border-color var(--transition-base);
+  -webkit-appearance: none; appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%235a6460' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 14px center;
+  padding-right: 36px;
+}
+.jobs-filter select:focus { border-color: var(--green-vivid); }
+
+.jobs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 28px;
+}
+.job-card {
+  background: white; border-radius: var(--radius-lg); padding: 30px;
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--transition-base), box-shadow var(--transition-base), border-color var(--transition-base);
+  border: 1px solid var(--border);
+  position: relative; overflow: hidden;
+}
+.job-card::after {
+  content: ""; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: linear-gradient(90deg, var(--green-vivid), var(--gold));
+  opacity: 0; transition: opacity var(--transition-base);
+}
+.job-card:hover {
+  transform: translateY(-7px);
+  box-shadow: var(--shadow-lg);
+  border-color: #c2dfc9;
+}
+.job-card:hover::after { opacity: 1; }
+.job-card h3 {
+  font-family: var(--font-display);
+  font-size: 21px; color: var(--green-dark);
+  margin-bottom: 8px; font-weight: 700;
+  letter-spacing: -0.02em;
+}
+.job-card .closing {
+  color: var(--green-vivid); font-size: 13px;
+  margin-bottom: 14px; font-weight: 600;
+  display: flex; align-items: center; gap: 6px;
+}
+.job-card .desc {
+  color: var(--muted); margin-bottom: 18px;
+  line-height: 1.75; font-size: 14px;
+}
+.job-card .req-section {
+  background: var(--green-pale);
+  border: 1px solid #c0e6d0;
+  border-radius: var(--radius-sm);
+  padding: 14px 18px; margin-bottom: 22px;
+}
+.job-card .req-section h4 {
+  font-size: 11px; font-weight: 700;
+  color: var(--green-mid); margin-bottom: 6px;
+  text-transform: uppercase; letter-spacing: 0.08em;
+  font-family: var(--font-body);
+}
+.job-card .req-section p { font-size: 13px; color: #374151; line-height: 1.7; margin: 0; }
+
+.apply-btn {
+  width: 100%;
+  background: linear-gradient(135deg, var(--green-dark), var(--green-mid));
+  color: white; padding: 14px;
+  border: none; border-radius: var(--radius-md);
+  font-weight: 700; cursor: pointer; font-size: 14px;
+  font-family: var(--font-body); letter-spacing: 0.03em;
+  transition: all var(--transition-base);
+  box-shadow: 0 4px 12px rgba(10, 92, 66, 0.25);
+  position: relative; overflow: hidden;
+}
+.apply-btn::before {
+  content: ""; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.1), transparent);
+  transition: left 0.5s ease;
+}
+.apply-btn:hover::before { left: 100%; }
+.apply-btn:hover {
+  background: linear-gradient(135deg, #1ab87f, #22c98d);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 28px rgba(21, 154, 110, 0.35);
+}
+.apply-btn:active { transform: translateY(0); box-shadow: none; }
+
+.empty-state {
+  background: white; border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 64px 32px;
+  text-align: center; box-shadow: var(--shadow-xs);
+}
+.empty-icon {
+  width: 64px; height: 64px; border-radius: 50%;
+  background: var(--green-light);
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 20px;
+}
+.empty-icon svg { width: 28px; height: 28px; }
+.empty-state h3 {
+  font-family: var(--font-display);
+  font-size: 19px; font-weight: 700; color: var(--ink); margin-bottom: 8px;
+}
+.empty-state p { font-size: 14px; color: var(--muted); }
+
+
+.contact-section { background: var(--cream); position: relative; overflow: hidden; }
+.contact-section .container { position: relative; z-index: 2; }
+.contact-title {
+  font-family: var(--font-display);
+  font-size: clamp(26px, 4vw, 36px);
+  font-weight: 700; color: var(--green-dark);
+  text-align: center; margin-bottom: 12px;
+  letter-spacing: -0.022em;
+}
+.contact-sub {
+  text-align: center; color: var(--muted);
+  margin-bottom: 44px; font-size: 15.5px;
+  line-height: 1.7;
+}
+.contact-layout {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 40px; align-items: start;
+  max-width: 960px; margin: 0 auto;
+}
+.contact-cards {
+  display: flex; flex-direction: column;
+  gap: 30px; padding-top: 6px;
+}
+.info-row {
+  display: flex; align-items: flex-start; gap: 16px;
+}
+.info-icon {
+  width: 42px; height: 42px; min-width: 42px;
+  border: 1.5px solid var(--border); border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--green-mid);
+  transition: border-color var(--transition-base), background var(--transition-base);
+}
+.info-icon svg { width: 18px; height: 18px; }
+.info-row:hover .info-icon { border-color: var(--green-vivid); background: var(--green-pale); }
+.info-label {
+  font-size: 10px; color: #8a8278;
+  margin-bottom: 5px; text-transform: uppercase;
+  letter-spacing: 0.08em; font-weight: 700;
+}
+.info-value { font-size: 15px; font-weight: 700; color: var(--ink); line-height: 1.55; }
+.info-value a { color: var(--ink); text-decoration: none; transition: color var(--transition-fast); }
+.info-value a:hover { color: var(--green-vivid); }
+
+
+footer {
+  background: linear-gradient(160deg, var(--green-deep) 0%, #071a10 100%);
+  padding: 64px 0; text-align: center;
+  position: relative; overflow: hidden;
+}
+footer .container { position: relative; z-index: 2; }
+.footer-logo { max-width: 112px; margin: 0 auto 22px; display: block; opacity: 0.82; }
+.footer-name {
+  font-family: var(--font-display); font-size: 18px; font-weight: 700;
+  color: white; margin-bottom: 6px;
+}
+.footer-tagline {
+  font-size: 13px; color: rgba(255, 255, 255, 0.4);
+  margin-bottom: 26px; font-weight: 400; letter-spacing: 0.01em;
+}
+.footer-pills {
+  display: flex; justify-content: center; gap: 8px;
+  flex-wrap: wrap; margin-bottom: 22px;
+}
+.footer-pill {
+  background: rgba(255, 255, 255, 0.07);
+  color: rgba(255, 255, 255, 0.48); font-size: 10px;
+  padding: 4px 14px; border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  letter-spacing: 0.05em; font-weight: 600;
+}
+.footer-links { display: flex; justify-content: center; gap: 24px; margin-bottom: 20px; }
+.footer-links a {
+  color: rgba(255, 255, 255, 0.36); font-size: 12px;
+  text-decoration: none; transition: color var(--transition-fast); font-weight: 500;
+}
+.footer-links a:hover { color: rgba(255, 255, 255, 0.68); }
+.footer-copy { font-size: 11px; color: rgba(255, 255, 255, 0.18); letter-spacing: 0.04em; }
+
+
+.modal {
+  display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0, 0, 0, 0.68); z-index: 10000;
+  align-items: center; justify-content: center; padding: 20px;
+  backdrop-filter: blur(4px);
+}
+.modal.modal-open { display: flex; animation: modalFadeIn 0.25s cubic-bezier(.4,0,.2,1) both; }
+.modal-content {
+  background: white; border-radius: var(--radius-xl);
+  max-width: 580px; width: 100%; max-height: 92vh; overflow: auto;
+  padding: 38px; box-shadow: var(--shadow-xl);
+  animation: modalSlideUp 0.32s cubic-bezier(.4,0,.2,1) both;
+}
+.modal-header {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 30px;
+}
+.modal-header h3 {
+  font-family: var(--font-display); font-size: 22px;
+  color: var(--green-dark); font-weight: 700;
+  letter-spacing: -0.02em;
+}
+.close-btn {
+  font-size: 26px; cursor: pointer; color: #bbb6b0;
+  line-height: 1; background: none; border: none; padding: 0;
+  transition: color var(--transition-fast), transform var(--transition-base);
+  width: 34px; height: 34px; display: flex; align-items: center; justify-content: center;
+  border-radius: 50%;
+}
+.close-btn:hover {
+  color: var(--muted); transform: rotate(90deg);
+  background: var(--cream);
+}
+.form-group { margin-bottom: 18px; }
+.form-group label {
+  display: block; margin-bottom: 7px; font-weight: 700;
+  font-size: 11.5px; color: var(--ink);
+  text-transform: uppercase; letter-spacing: 0.06em;
+  font-family: var(--font-body);
+}
+.form-group input,
+.form-group select {
+  width: 100%; padding: 12px 16px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 14px; outline: none;
+  background: white; font-family: var(--font-body); color: var(--ink);
+  transition: border-color var(--transition-base), box-shadow var(--transition-base);
+  box-shadow: var(--shadow-xs);
+}
+.form-group input:focus,
+.form-group select:focus {
+  border-color: var(--green-vivid);
+  box-shadow: 0 0 0 4px rgba(21, 154, 110, 0.12);
+}
+.form-group textarea:focus {
+  border-color: var(--green-vivid);
+  box-shadow: 0 0 0 4px rgba(21, 154, 110, 0.12);
+}
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.consent {
+  background: #fffdf0; border: 1px solid #f5e28a;
+  padding: 16px 18px; border-radius: var(--radius-md);
+  margin: 18px 0; font-size: 13px; color: var(--muted); line-height: 1.75;
+}
+.consent label { display: flex; gap: 10px; cursor: pointer; align-items: flex-start; }
+.btn-cancel {
+  flex: 1; background: white; color: var(--muted);
+  padding: 14px; border: 1.5px solid var(--border);
+  border-radius: var(--radius-lg); font-weight: 700; cursor: pointer;
+  font-size: 14px; font-family: var(--font-body);
+  transition: all var(--transition-fast);
+}
+.btn-cancel:hover { background: var(--cream); border-color: #b0a9a2; }
+.btn-submit {
+  flex: 1;
+  background: linear-gradient(135deg, var(--green-dark), var(--green-mid));
+  color: white; padding: 14px; border: none;
+  border-radius: var(--radius-lg); font-weight: 700; cursor: pointer;
+  font-size: 14px; font-family: var(--font-body);
+  box-shadow: 0 4px 14px rgba(10, 92, 66, 0.28);
+  transition: all var(--transition-base);
+}
+.btn-submit:hover {
+  background: linear-gradient(135deg, #1ab87f, #22c98d);
+  transform: translateY(-1px);
+  box-shadow: 0 8px 24px rgba(21, 154, 110, 0.38);
+}
+.btn-submit:disabled { background: #c5c0ba; cursor: not-allowed; transform: none; box-shadow: none; }
+.modal-btns { display: flex; gap: 14px; margin-top: 26px; }
+.auth-tabs {
+  display: flex; border-bottom: 1.5px solid var(--border);
+  margin-bottom: 26px;
+}
+.auth-tab {
+  flex: 1; padding: 10px; text-align: center;
+  font-weight: 700; font-size: 14px; cursor: pointer;
+  color: #8a8278; border-bottom: 2.5px solid transparent;
+  margin-bottom: -1.5px;
+  transition: color var(--transition-fast), border-color var(--transition-fast);
+  font-family: var(--font-body);
+}
+.auth-tab.active { color: var(--green-dark); border-bottom-color: var(--green-vivid); }
+.auth-panel { display: none; }
+.auth-panel.active { display: block; }
+.auth-msg {
+  padding: 12px 16px; border-radius: var(--radius-sm);
+  font-size: 13px; margin-bottom: 14px;
+  display: none; line-height: 1.65;
+}
+.auth-msg.success {
+  background: #e6f7ef; color: #0a5c42;
+  border: 1px solid #b0e0c8; display: block;
+}
+.auth-msg.error {
+  background: #fef2f2; color: #991b1b;
+  border: 1px solid #fecaca; display: block;
+}
+.pass-strength {
+  height: 3px; border-radius: 2px; margin-top: 7px;
+  transition: width 0.4s ease, background 0.4s ease;
+  background: var(--border);
+}
+.pass-strength.weak { background: #dc2626; width: 33%; }
+.pass-strength.medium { background: #f59e0b; width: 66%; }
+.pass-strength.strong { background: var(--green-vivid); width: 100%; }
+.pass-hint { font-size: 11px; color: #8a8278; margin-top: 4px; }
+
+
+.tracker-panel {
+  background: var(--green-pale); border: 1px solid #b8e6cc;
+  border-radius: var(--radius-md); padding: 24px;
+}
+.tracker-panel h4 {
+  font-family: var(--font-display); font-size: 17px; font-weight: 700;
+  color: var(--green-dark); margin-bottom: 18px; letter-spacing: -0.01em;
+}
+.tracker-summary {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 10px; margin-bottom: 22px;
+}
+.tracker-summary-card {
+  background: white; border-radius: var(--radius-sm);
+  padding: 14px; text-align: center;
+  border: 1px solid var(--border); box-shadow: var(--shadow-xs);
+}
+.tracker-summary-card .ts-num {
+  font-family: var(--font-display); font-size: 26px;
+  font-weight: 700; color: var(--green-dark);
+}
+.tracker-summary-card .ts-lbl {
+  font-size: 10px; color: #8a8278; margin-top: 3px;
+  letter-spacing: 0.05em; font-weight: 700;
+  text-transform: uppercase;
+}
+.app-row {
+  background: white; border: 1px solid var(--border);
+  border-radius: var(--radius-md); padding: 18px 22px; margin-bottom: 14px;
+  box-shadow: var(--shadow-xs);
+}
+.app-row-header {
+  display: flex; justify-content: space-between;
+  align-items: flex-start; flex-wrap: wrap; gap: 10px;
+}
+.app-row .job-title { font-weight: 700; color: var(--ink); font-size: 14px; }
+.app-row .app-date { font-size: 12px; color: #8a8278; margin-top: 2px; }
+.status-pill {
+  display: inline-block; padding: 4px 14px; border-radius: 20px;
+  font-size: 11px; font-weight: 700; letter-spacing: 0.03em;
+}
+.status-Pending { background: #fef9c3; color: #854d0e; }
+.status-Reviewed { background: #dbeafe; color: #1e3a8a; }
+.status-Shortlisted { background: #d1fae5; color: #065f46; }
+.status-Rejected { background: #fee2e2; color: #7f1d1d; }
+.timeline { margin-top: 16px; padding-left: 4px; }
+.timeline-item { display: flex; gap: 12px; margin-bottom: 12px; }
+.timeline-dot-wrap { display: flex; flex-direction: column; align-items: center; }
+.timeline-dot {
+  width: 11px; height: 11px; border-radius: 50%;
+  background: var(--green-vivid); flex-shrink: 0; margin-top: 3px;
+}
+.timeline-dot.submitted { background: var(--green-vivid); }
+.timeline-dot.statuschanged { background: #3b82f6; }
+.timeline-dot.pending { background: #f59e0b; }
+.timeline-line { flex: 1; width: 1.5px; background: var(--border); margin-top: 4px; }
+.timeline-content { flex: 1; padding-bottom: 4px; }
+.timeline-label { font-size: 12px; font-weight: 700; color: var(--green-dark); }
+.timeline-detail { font-size: 12px; color: var(--muted); margin-top: 2px; }
+.timeline-time { font-size: 11px; color: #bab3ac; margin-top: 2px; }
+
+
+.loading { text-align: center; padding: 56px; }
+.spinner {
+  display: inline-block; width: 36px; height: 36px;
+  border: 3px solid var(--border); border-top-color: var(--green-vivid);
+  border-radius: 50%; animation: spin 0.85s linear infinite;
+}
+
+
+.loc-gate {
+  display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0, 0, 0, 0.86); z-index: 30000;
+  align-items: center; justify-content: center; padding: 20px;
+  backdrop-filter: blur(6px);
+}
+.loc-gate.open { display: flex; animation: modalFadeIn 0.3s ease both; }
+.loc-box {
+  background: white; border-radius: var(--radius-xl);
+  max-width: 460px; width: 100%;
+  padding: 48px 44px; text-align: center;
+  animation: modalSlideUp 0.36s cubic-bezier(.4,0,.2,1) both;
+  border-top: 4px solid var(--green-vivid);
+  box-shadow: var(--shadow-xl);
+}
+.loc-icon { font-size: 52px; margin-bottom: 20px; }
+.loc-box h2 {
+  font-family: var(--font-display); font-size: 26px;
+  font-weight: 700; color: var(--green-dark); margin-bottom: 12px;
+  letter-spacing: -0.022em;
+}
+.loc-box p { font-size: 14.5px; color: var(--muted); line-height: 1.8; margin-bottom: 26px; }
+.loc-allow-btn {
+  width: 100%;
+  background: linear-gradient(135deg, #1ab87f, #0a7a52);
+  color: white; padding: 15px; border: none;
+  border-radius: 44px; font-weight: 700; font-size: 15px;
+  cursor: pointer; font-family: var(--font-body);
+  transition: all var(--transition-base); margin-bottom: 8px;
+  box-shadow: 0 8px 24px rgba(21, 154, 110, 0.38);
+}
+.loc-allow-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 32px rgba(21, 154, 110, 0.48);
+}
+.loc-skip {
+  margin-top: 14px; font-size: 12px; color: #bab3ac;
+  cursor: pointer; text-decoration: underline;
+  display: inline-block; transition: color var(--transition-fast);
+}
+.loc-skip:hover { color: var(--muted); }
+
+
+.reveal {
+  opacity: 0; transform: translateY(32px);
+  transition: opacity 0.72s cubic-bezier(.4,0,.2,1), transform 0.72s cubic-bezier(.4,0,.2,1);
+}
+.reveal.visible { opacity: 1; transform: translateY(0); }
+.reveal-stagger > * {
+  opacity: 0; transform: translateY(24px);
+  transition: opacity 0.6s cubic-bezier(.4,0,.2,1), transform 0.6s cubic-bezier(.4,0,.2,1);
+}
+.reveal-stagger.visible > *:nth-child(1) { opacity: 1; transform: none; transition-delay: 0.06s; }
+.reveal-stagger.visible > *:nth-child(2) { opacity: 1; transform: none; transition-delay: 0.16s; }
+.reveal-stagger.visible > *:nth-child(3) { opacity: 1; transform: none; transition-delay: 0.26s; }
+.reveal-stagger.visible > *:nth-child(4) { opacity: 1; transform: none; transition-delay: 0.36s; }
+
+
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes goldPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(245,200,66,0), 0 8px 28px rgba(21,154,110,.4); }
+  50% { box-shadow: 0 0 0 14px rgba(245,200,66,.12), 0 8px 28px rgba(21,154,110,.4); }
+}
+@keyframes fadeSlideDown { from { opacity: 0; transform: translateY(-16px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes fadeSlideUp { from { opacity: 0; transform: translateY(28px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes modalFadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes modalSlideUp { from { opacity: 0; transform: translateY(32px) scale(.975); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@keyframes tooltipIn { from { opacity: 0; transform: translateX(-50%) translateY(7px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
+@keyframes dropdownIn { from { opacity: 0; transform: translateY(-8px) scale(.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
+
+
+@media (max-width: 768px) {
+  .hero-nav { top: 8px; left: 8px; gap: 5px; padding: 5px 10px; max-width: calc(100vw - 112px); }
+  .hero-nav a { font-size: 11px; }
+  .lang-btn { padding: 5px 10px; font-size: 11px; }
+  .nav-auth-btn { padding: 5px 11px; font-size: 11px; }
+  .hero-logo-link { top: 8px; right: 8px; }
+  .hero-logo-link img { width: 108px; }
+  .nav-scrolled .hero-logo-link img { width: 80px; }
+  .nav-scrolled .lang-btn { padding: 4px 9px; font-size: 10px; }
+  .nav-scrolled .nav-auth-btn { padding: 4px 10px; font-size: 11px; }
+
+  .hero h1 { font-size: 34px; letter-spacing: -0.01em; }
+  .hero-sub { font-size: 16px; }
+  .hero-badge { font-size: 10px; letter-spacing: 0.09em; padding: 5px 15px; }
+
+  .hero-content { display: flex; flex-direction: column; align-items: center; }
+  .hero-values { order: 1; width: 100%; justify-content: center; gap: 8px; margin-bottom: 22px; }
+  .value-btn { font-size: 13px; padding: 9px 18px; }
+  .hero-btns { order: 2; flex-direction: column; width: 100%; max-width: 300px; gap: 12px; }
+  .btn-primary, .btn-outline { font-size: 15px; padding: 15px; text-align: center; width: 100%; }
+
+  .value-tooltip { width: min(260px, calc(100vw - 32px)); font-size: 13px; }
+
+  .about-grid { grid-template-columns: 1fr; }
+  .about-stats { grid-template-columns: repeat(2, 1fr); }
+  .about-title { font-size: 24px; }
+  .about-text { font-size: 15px; }
+  .feature-card h4 { font-size: 14px; }
+  .feature-card p { font-size: 13px; }
+  .stat-item .val { font-size: 24px; }
+  .stat-item .lbl { font-size: 12px; }
+
+  .section { padding: 64px 0; }
+  .container { padding: 0 20px; }
+  .section-title { font-size: 26px; }
+  .section-subtitle { font-size: 15px; }
+  .section-badge { font-size: 11px; }
+
+  .jobs-grid { grid-template-columns: 1fr; }
+  .jobs-filter input, .jobs-filter select { min-width: 0; width: 100%; font-size: 15px; }
+  .job-card h3 { font-size: 20px; }
+  .job-card .desc { font-size: 14px; }
+  .job-card .closing { font-size: 14px; }
+  .job-card .req-section p { font-size: 14px; }
+  .apply-btn { font-size: 15px; padding: 15px; }
+
+  .form-row { grid-template-columns: 1fr; }
+  .modal-content { padding: 24px; }
+  .modal-header h3 { font-size: 20px; }
+  .form-group label { font-size: 13px; }
+  .form-group input, .form-group select { font-size: 15px; }
+  .consent { font-size: 14px; }
+  .btn-cancel, .btn-submit { font-size: 15px; }
+
+  .contact-layout { grid-template-columns: 1fr; }
+  .contact-title { font-size: 26px; }
+  .contact-sub { font-size: 15px; }
+  .info-label { font-size: 11px; }
+  .info-value { font-size: 15px; }
+
+  .tracker-summary { grid-template-columns: repeat(2, 1fr); }
+  .tracker-summary-card .ts-num { font-size: 26px; }
+  .tracker-summary-card .ts-lbl { font-size: 11px; }
+  .app-row .job-title { font-size: 15px; }
+  .app-row .app-date { font-size: 13px; }
+  .status-pill { font-size: 12px; }
+
+  .footer-name { font-size: 18px; }
+  .footer-tagline { font-size: 14px; }
+  .footer-pill { font-size: 11px; }
+  .footer-links a { font-size: 13px; }
+  .footer-copy { font-size: 12px; }
+}
+
+@media (max-width: 900px) and (orientation: landscape) {
+  .hero-nav { top: 6px; left: 6px; gap: 3px; padding: 4px 8px; }
+  .hero-logo-link { top: 6px; right: 6px; }
+  .hero-logo-link img { width: 110px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+  .reveal, .reveal-stagger > * { opacity: 1; transform: none; }
+}
+
+</style>
+</head>
+<body>
+
+<div id="bks-config"
+  data-lat="-24.454"
+  data-lng="30.033"
+  data-km="25"
+  style="display:none;"></div>
+
+<div class="loc-gate" id="locGate">
+  <div class="loc-box" id="locBox">
+    <div class="loc-icon">&#128205;</div>
+    <h2 data-i18n="locTitle">Location Verification</h2>
+    <p><span data-i18n-html="locBody">This portal is exclusively for residents of <strong>Atok, 0749 area</strong>. Please allow location access to confirm you are in the eligible area.</span></p>
+    <button class="loc-allow-btn" id="locAllowBtn" data-i18n="locAllow">Allow Location Access</button>
+    <div><span class="loc-skip" id="locSkip"><span data-i18n="locSkipText">I understand &mdash; continue anyway</span></span></div>
+  </div>
+</div>
+
+<div class="hero">
+  <canvas id="heroCanvas" aria-hidden="true"></canvas>
+
+  <a href="#" class="hero-logo-link" title="BKS Community Job Center — Home">
+    <img src="https://drive.google.com/thumbnail?id=1idJ5CgHUVJ98YP8frCLbeDexMPkmraLn&sz=w500" alt="BKS Logo">
+  </a>
+
+  <nav class="hero-nav">
+    <div class="nav-links" id="navLinks">
+      <a href="#" data-i18n="navHome">Home</a>
+      <a href="#jobs" data-i18n="navJobs">Jobs</a>
+      <a href="#about" data-i18n="navAbout">About</a>
+      <a href="#contact" data-i18n="navContact">Contact</a>
+    </div>
+    <div class="nav-menu-wrap" id="navMenuWrap">
+      <button class="nav-menu-btn" id="navMenuBtn" aria-label="Menu">
+        <span class="nav-menu-icon">&#9776;</span>
+        <span class="nav-menu-label" id="navMenuLabel">Menu</span>
+      </button>
+      <div class="nav-dropdown" id="navDropdown">
+        <a href="#" class="nav-drop-link" data-i18n="navHome">Home</a>
+        <a href="#jobs" class="nav-drop-link" data-i18n="navJobs">Jobs</a>
+        <a href="#about" class="nav-drop-link" data-i18n="navAbout">About</a>
+        <a href="#contact" class="nav-drop-link" data-i18n="navContact">Contact</a>
+      </div>
+    </div>
+    <div class="nav-divider"></div>
+    <span id="navUser" style="display:none;color:rgba(255,255,255,.85);font-size:13px;"></span>
+    <div class="lang-switcher" title="Language / Polelo">
+      <button class="lang-btn active" id="btnLangEN">ENG</button>
+      <button class="lang-btn" id="btnLangNSO">Sepedi</button>
+    </div>
+    <button class="nav-auth-btn" id="navAuthBtn" data-i18n="navSignIn">Sign In</button>
+  </nav>
+
+  <div class="hero-content">
+    <div class="hero-badge" data-i18n="heroBadge">BKS COMMUNITY JOB CENTER</div>
+    <h1 data-i18n-html="heroH1">Connecting Every Heart<br><span>to Every Opportunity</span></h1>
+    <p class="hero-sub" data-i18n="heroSub">Empowering local communities through fair and transparent job access</p>
+    <div class="hero-values">
+      <button class="value-btn" id="vbFair" data-vb="fair">
+        <span class="vb-label" data-i18n="vbFairLabel">&#9670; Fair</span>
+        <div class="value-tooltip" data-i18n="vbFairTip">Every community member has an equal opportunity to apply. No favouritism, no exclusions — your application is judged on what you bring, not who you know. Our mission is to ensure that jobs reach the people who deserve them most.</div>
+      </button>
+      <button class="value-btn" id="vbTransparent" data-vb="transparent">
+        <span class="vb-label" data-i18n="vbTransparentLabel">&#9670; Transparent</span>
+        <div class="value-tooltip" data-i18n="vbTransparentTip">Every application submitted is recorded with a date and time stamp. Nothing is lost, changed, or deleted quietly. The Local Committee and Traditional Authority can review the full record at any time — creating accountability for all.</div>
+      </button>
+      <button class="value-btn" id="vbMerit" data-vb="merit">
+        <span class="vb-label" data-i18n="vbMeritLabel">&#9670; Merit-Based</span>
+        <div class="value-tooltip" data-i18n="vbMeritTip">Selection is guided by qualifications, experience, and the requirements of the job — not by personal connections or random draws. BKS ensures the right people are seen for the right opportunities, strengthening both the community and the mine.</div>
+      </button>
+      <button class="value-btn" id="vbPopia" data-vb="popia">
+        <span class="vb-label" data-i18n="vbPopiaLabel">&#9670; POPIA Compliant</span>
+        <div class="value-tooltip" data-i18n="vbPopiaTip">Your personal information — including your ID document and CV — is stored securely and handled in full compliance with the Protection of Personal Information Act (POPIA). Your data is never shared without your consent.</div>
+      </button>
+    </div>
+    <div class="hero-btns">
+      <a href="#jobs" class="btn-primary" data-i18n="heroBtnJobs">Browse Open Jobs</a>
+      <a href="#about" class="btn-outline" data-i18n="heroBtnAbout">Learn How It Works</a>
+    </div>
+  </div>
+</div>
+
+<div class="section about-section" id="about">
+  <div id="aboutParticles" class="particle-layer" aria-hidden="true"></div>
+  <div class="container">
+    <div class="about-grid">
+      <div class="reveal">
+        <div class="about-badge" data-i18n="aboutBadge">ABOUT US</div>
+        <h2 class="about-title" data-i18n-html="aboutTitle">Built for local communities.<br>Powered by local leadership.</h2>
+        <p class="about-text">BKS Community Job Center connects local families to mine employment opportunities — fairly, transparently, and on merit.</p>
+        <p class="about-text">We work alongside traditional leadership and local committees — not around them — bringing digital efficiency to a process that directly impacts livelihoods across our communities.</p>
+      </div>
+      <div class="feature-cards reveal">
+        <div class="feature-card">
+          <div class="feature-icon"><svg fill="none" stroke="#0F6E56" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+          <div>
+            <h4>Regulatory &amp; Legislative Alignment</h4>
+            <p>The BKS Portal is fully aligned with the Mineral and Petroleum Resources Development Act (MPRDA), Act No. 28 of 2002, and supports the Department of Mineral Resources and Energy (DMRE) regulatory framework — including Social and Labour Plan (SLP) obligations.</p>
+          </div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon"><svg fill="none" stroke="#0F6E56" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="7" r="4"/><path d="M5.5 21a7 7 0 0 1 13 0"/></svg></div>
+          <div>
+            <h4>Community-Led Governance</h4>
+            <p>We are committed to meaningful stakeholder engagement — respecting traditional leadership, their structures, relevant communities, and all interested and affected parties in the candidate selection process.</p>
+          </div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon"><svg fill="none" stroke="#0F6E56" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div>
+          <div><h4>Every application recorded</h4><p>All submissions are securely stored and tracked — no application is lost or overlooked.</p></div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon"><svg fill="none" stroke="#0F6E56" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
+          <div><h4>POPIA compliant &amp; secure</h4><p>Your personal information is handled with full legal compliance and kept strictly private.</p></div>
+        </div>
+      </div>
+    </div>
+    <div class="about-stats reveal-stagger">
+      <div class="stat-item"><div class="val">100%</div><div class="lbl">Community focused</div></div>
+      <div class="stat-item"><div class="val">Secure</div><div class="lbl">Cloud-based storage</div></div>
+      <div class="stat-item"><div class="val">Fair</div><div class="lbl">Merit-based selection</div></div>
+      <div class="stat-item"><div class="val">POPIA</div><div class="lbl">Legally compliant</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="section jobs-section" id="jobs">
+  <div id="jobsParticles" class="particle-layer" aria-hidden="true"></div>
+  <div class="container">
+    <div style="text-align:center;margin-bottom:10px;"><span class="section-badge">MINE OPPORTUNITIES</span></div>
+    <h2 class="section-title reveal" data-i18n="jobsTitle">Current Job Openings</h2>
+    <p class="section-subtitle reveal" data-i18n="jobsSub">Jobs allocated for local communities — fair, transparent, and merit-based</p>
+    <div class="jobs-filter">
+      <input type="text" id="jobSearch" placeholder="Search by job title or keyword...">
+      <select id="jobCategory">
+        <option value="">All categories</option>
+        <option value="surface">Surface operations</option>
+        <option value="underground">Underground</option>
+        <option value="engineering">Engineering</option>
+        <option value="administration">Administration</option>
+      </select>
+    </div>
+    <div id="jobList" class="jobs-grid">
+      <div class="loading"><div class="spinner"></div><p style="margin-top:14px;color:#78716c;font-size:14px;">Loading opportunities...</p></div>
+    </div>
+  </div>
+</div>
+
+<div id="modal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header"><h3 id="modalTitle"></h3><button class="close-btn" id="closeAppModal">&times;</button></div>
+    <form id="appForm">
+      <input type="hidden" id="jobId">
+      <div class="form-group"><label>Full Name *</label><input type="text" id="name" required placeholder="Enter your full name"></div>
+      <div class="form-row">
+        <div class="form-group"><label>ID Number *</label><input type="text" id="idNumber" maxlength="13" placeholder="13-digit SA ID"></div>
+        <div class="form-group"><label>Phone *</label><input type="tel" id="phone" placeholder="e.g. 0821234567"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Gender *</label><select id="gender" required><option value="">-- Select --</option><option value="Male">Male</option><option value="Female">Female</option></select></div>
+        <div class="form-group"><label>Marital Status *</label><select id="maritalStatus" required><option value="">-- Select --</option><option value="Single">Single</option><option value="Married">Married</option></select></div>
+      </div>
+      <div class="form-group"><label>Email (optional — needed for status updates)</label><input type="email" id="email" placeholder="your@email.com"></div>
+      <div class="form-group"><label>CV (PDF only, max 5MB) *</label><input type="file" id="cv" accept=".pdf"></div>
+      <div class="form-group"><label>ID Document (PDF, JPG or PNG, max 5MB) *</label><input type="file" id="idDoc" accept=".pdf,.jpg,.jpeg,.png"></div>
+      <div class="consent">
+        <label><input type="checkbox" id="consent" style="width:auto;margin-right:8px;margin-top:3px;">I consent to the collection and processing of my personal information for job application purposes in accordance with POPIA. <a id="privacyLink" href="/privacy.html" target="_blank" style="color:#0F6E56;font-weight:600;">View Privacy Notice</a></label>
+      </div>
+      <div class="modal-btns">
+        <button type="button" class="btn-cancel" id="cancelAppBtn">Cancel</button>
+        <button type="submit" class="btn-submit" id="submitAppBtn">Submit Application</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div id="authModal" class="modal">
+  <div class="modal-content" style="max-width:460px;">
+    <div class="modal-header"><h3>My Account</h3><button class="close-btn" id="closeAuthModal">&times;</button></div>
+    <div class="auth-tabs">
+      <div class="auth-tab active" id="tabSignIn">Sign In</div>
+      <div class="auth-tab" id="tabSignUp">Create Account</div>
+    </div>
+    <div class="auth-panel active" id="panelSignIn">
+      <div class="auth-msg" id="signinMsg"></div>
+      <div class="form-group"><label>Email Address</label><input type="email" id="siEmail" placeholder="your@email.com" autocomplete="email"></div>
+      <div class="form-group"><label>Password</label><input type="password" id="siPass" placeholder="Your password" autocomplete="current-password"></div>
+      <div class="modal-btns">
+        <button type="button" class="btn-cancel" id="cancelSignIn">Cancel</button>
+        <button type="button" class="btn-submit" id="doSignInBtn">Sign In</button>
+      </div>
+    </div>
+    <div class="auth-panel" id="panelSignUp">
+      <div class="auth-msg" id="signupMsg"></div>
+      <div class="form-group"><label>Full Name *</label><input type="text" id="suName" placeholder="Your full name" autocomplete="name"></div>
+      <div class="form-group"><label>Email Address *</label><input type="email" id="suEmail" placeholder="your@email.com" autocomplete="email"></div>
+      <div class="form-row">
+        <div class="form-group"><label>Phone</label><input type="tel" id="suPhone" placeholder="10-digit number"></div>
+        <div class="form-group"><label>ID Number</label><input type="text" id="suId" maxlength="13" placeholder="13-digit ID"></div>
+      </div>
+      <div class="form-group">
+        <label>Password * <span class="pass-hint" id="passHint"></span></label>
+        <input type="password" id="suPass" placeholder="Min 8 chars, include a number" autocomplete="new-password">
+        <div class="pass-strength" id="passStrength"></div>
+      </div>
+      <div class="form-group"><label>Confirm Password *</label><input type="password" id="suPass2" placeholder="Repeat password" autocomplete="new-password"></div>
+      <div class="modal-btns">
+        <button type="button" class="btn-cancel" id="cancelSignUp">Cancel</button>
+        <button type="button" class="btn-submit" id="doSignUpBtn">Create Account</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="trackerModal" class="modal">
+  <div class="modal-content" style="max-width:620px;">
+    <div class="modal-header"><h3>&#128203; My Applications</h3><button class="close-btn" id="closeTrackerModal">&times;</button></div>
+    <div id="trackerContent">
+      <div class="loading"><div class="spinner"></div><p style="margin-top:14px;color:#78716c;">Loading...</p></div>
+    </div>
+  </div>
+</div>
+
+<div class="section contact-section" id="contact">
+  <div id="contactParticles" class="particle-layer" aria-hidden="true"></div>
+  <div class="container">
+    <h2 class="contact-title reveal" data-i18n="contactTitle">Get in Touch</h2>
+    <p class="contact-sub reveal" data-i18n="contactSub">Have a question about a job posting or your application? We are here to help.</p>
+    <div class="contact-layout">
+    <div class="contact-cards reveal-stagger">
+      <div class="info-row">
+        <div class="info-icon"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.6 3.38 2 2 0 0 1 3.55 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.5a16 16 0 0 0 5.59 5.59l.91-.91a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21 16.92z"/></svg></div>
+        <div><div class="info-label">Phone</div><div class="info-value"><a href="tel:0714469504">071 446 9504</a></div></div>
+      </div>
+      <div class="info-row">
+        <div class="info-icon"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
+        <div><div class="info-label">Address</div><div class="info-value">Atok, Ga-Selepe, Polokwane, 0749</div></div>
+      </div>
+      <div class="info-row">
+        <div class="info-icon"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div>
+        <div><div class="info-label">Email</div><div class="info-value"><a href="mailto:briankagisokingsley@gmail.com">briankagisokingsley@gmail.com</a></div></div>
+      </div>
+    </div>
+    <div class="contact-form-wrap reveal">
+      <form id="contactForm" style="background:white;border:1px solid var(--border);border-radius:var(--radius-lg);padding:34px 32px;box-shadow:var(--shadow-sm);">
+        <div style="margin-bottom:22px;">
+          <div style="font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--green-mid);margin-bottom:6px;">Send Us a Message</div>
+          <div style="font-size:13px;color:var(--muted);line-height:1.6;">We typically respond within one business day.</div>
+        </div>
+        <div class="form-group">
+          <label data-i18n="contactFormName">Full Name *</label>
+          <input type="text" id="cName" required placeholder="Your name">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label data-i18n="contactFormEmail">Email Address *</label>
+            <input type="email" id="cEmail" required placeholder="your@email.com">
+          </div>
+          <div class="form-group">
+            <label data-i18n="contactFormPhone">Phone (optional)</label>
+            <input type="tel" id="cPhone" placeholder="e.g. 0821234567">
+          </div>
+        </div>
+        <div class="form-group">
+          <label data-i18n="contactFormMsg">Message *</label>
+          <textarea id="cMessage" required rows="5" placeholder="How can we help?"
+            style="width:100%;padding:12px 16px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:14px;font-family:var(--font-body);color:var(--ink);resize:vertical;outline:none;"></textarea>
+        </div>
+        <div id="contactFormMsgBox" class="auth-msg"></div>
+        <button type="submit" class="btn-submit" id="contactSubmitBtn" style="width:100%;display:flex;align-items:center;justify-content:center;gap:8px;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          <span id="contactSubmitLabel" data-i18n="contactFormSubmit">Send Message</span>
+        </button>
+      </form>
+    </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div id="footerParticles" class="particle-layer" aria-hidden="true"></div>
+  <div class="container">
+    <p class="footer-name">BKS Community Job Center</p>
+    <p class="footer-tagline">Connecting Our Homes to Mine Opportunities</p>
+    <div class="footer-pills"><span class="footer-pill">Fair Access</span><span class="footer-pill">POPIA Compliant</span><span class="footer-pill">Merit-Based</span></div>
+    <div class="footer-links">
+      <a id="footerPrivacyLink" href="/privacy.html" target="_blank">Privacy Notice</a>
+      <a id="footerAdminLink" href="/admin.html" target="_blank">Admin Portal</a>
+    </div>
+    <p class="footer-copy">&copy; 2026 BKS Community Job Center. All rights reserved.</p>
+  </div>
+</footer>
+
+<script>
+
+var _cfg       = document.getElementById('bks-config');
+var LOC_LAT    = parseFloat(_cfg.getAttribute('data-lat'))  || -24.454;
+var LOC_LNG    = parseFloat(_cfg.getAttribute('data-lng'))  || 30.033;
+var LOC_KM     = parseFloat(_cfg.getAttribute('data-km'))   || 25;
+var currentJobId = '';
+var allJobs      = [];
+var currentUser  = null;
+
+
+function createGoldParticles(container, count, opacity, dark) {
+  var cv = document.createElement('canvas');
+  cv.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;';
+  container.appendChild(cv);
+  var ctx = cv.getContext('2d'), W, H, pts = [];
+  function rsz(){
+    W = cv.width  = container.offsetWidth  || window.innerWidth;
+    H = cv.height = container.offsetHeight || 400;
+  }
+  rsz();
+  window.addEventListener('resize', rsz, {passive:true});
+  var alpha = opacity || 0.18;
+  var color = dark ? '255,215,0' : '29,158,117';
+  for(var i = 0; i < (count||30); i++){
+    pts.push({
+      x:Math.random()*1920, y:Math.random()*1080,
+      r:Math.random()*1.8 + 0.4,
+      dx:(Math.random()-.5)*.25, dy:(Math.random()-.5)*.22,
+      o:Math.random()*alpha + alpha*.4
+    });
+  }
+  (function draw(){
+    ctx.clearRect(0,0,W,H);
+    pts.forEach(function(p){
+      ctx.beginPath();
+      ctx.arc(p.x%W, p.y%H, p.r, 0, Math.PI*2);
+      ctx.fillStyle = 'rgba('+color+','+p.o+')';
+      ctx.fill();
+      p.x += p.dx; p.y += p.dy;
+      if(p.x < 0) p.x = W; if(p.x > W) p.x = 0;
+      if(p.y < 0) p.y = H; if(p.y > H) p.y = 0;
+    });
+    requestAnimationFrame(draw);
+  })();
+}
+
+
+function haversineKm(la1,lo1,la2,lo2){
+  var R=6371,dLa=(la2-la1)*Math.PI/180,dLo=(lo2-lo1)*Math.PI/180;
+  var a=Math.sin(dLa/2)*Math.sin(dLa/2)+Math.cos(la1*Math.PI/180)*Math.cos(la2*Math.PI/180)*Math.sin(dLo/2)*Math.sin(dLo/2);
+  return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+}
+function showLocGate(){document.getElementById('locGate').style.display='flex';}
+function hideLocGate(){document.getElementById('locGate').style.display='none';}
+document.getElementById('locAllowBtn').addEventListener('click',function(){
+  var btn=this; btn.textContent='Checking location\u2026'; btn.disabled=true;
+  if(!navigator.geolocation){hideLocGate();return;}
+  var timer=setTimeout(function(){hideLocGate();},8000);
+  navigator.geolocation.getCurrentPosition(
+    function(pos){
+      clearTimeout(timer);
+      var dist=haversineKm(pos.coords.latitude,pos.coords.longitude,LOC_LAT,LOC_LNG);
+      if(dist<=LOC_KM){hideLocGate();}
+      else{
+        document.getElementById('locBox').innerHTML=
+          '<div class="loc-icon">&#128683;</div>'+
+          '<h2>Outside Service Area</h2>'+
+          '<p>This portal is reserved for residents of <strong>Atok, Ga-Selepe and the 0749 area</strong>.<br>'+
+          'Your location is approximately <strong>'+Math.round(dist)+' km</strong> from the service area.</p>'+
+          '<p style="font-size:12px;color:#a8a29e;margin-top:8px;">If you believe this is an error, call 071\u00a0446\u00a09504.</p>';
+      }
+    },
+    function(){clearTimeout(timer);hideLocGate();},
+    {timeout:7000,maximumAge:0}
+  );
+});
+document.getElementById('locSkip').addEventListener('click',function(){hideLocGate();});
+
+
+document.querySelectorAll('.value-btn').forEach(function(btn){
+  btn.addEventListener('click',function(e){
+    e.stopPropagation();
+    var isActive=btn.classList.contains('active');
+    document.querySelectorAll('.value-btn').forEach(function(b){b.classList.remove('active');});
+    if(!isActive) btn.classList.add('active');
+  });
+});
+document.addEventListener('click',function(e){
+  if(!e.target.closest('.value-btn'))
+    document.querySelectorAll('.value-btn').forEach(function(b){b.classList.remove('active');});
+});
+
+
+function loadJobs(){
+  var jl=document.getElementById('jobList');
+  jl.innerHTML='<div class="loading"><div class="spinner"></div><p style="margin-top:14px;color:#78716c;">'+(I18N[BKS_LANG]||I18N.en).jobsLoading+'</p></div>';
+  fetch('/api/get-jobs')
+    .then(function(r){ return r.json(); })
+    .then(function(jobs){ allJobs = Array.isArray(jobs) ? jobs : []; renderJobs(allJobs); })
+    .catch(function(){ jl.innerHTML='<p style="color:#dc2626;text-align:center;padding:40px;">'+(I18N[BKS_LANG]||I18N.en).jobsError+'</p>'; });
+}
+
+function renderJobs(jobs){
+  var jl=document.getElementById('jobList');
+  if(!jl)return;
+  if(!jobs||!jobs.length){
+    jl.innerHTML='<div class="empty-state"><div class="empty-icon"><svg width="24" height="24" fill="none" stroke="#0F6E56" stroke-width="1.5" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/></svg></div><h3>'+(I18N[BKS_LANG]||I18N.en).jobsEmpty+'</h3><p>'+(I18N[BKS_LANG]||I18N.en).jobsEmptySub+'</p></div>';
+    return;
+  }
+  var html='';
+  for(var i=0;i<jobs.length;i++){
+    var j=jobs[i];
+    var sid=String(j.id).replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+    var stl=String(j.title).replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+    html+='<div class="job-card"><h3>'+escHtml(j.title)+'</h3>';
+    html+='<div class="closing">&#128197; '+(I18N[BKS_LANG]||I18N.en).jobsClosing+' '+escHtml(j.closing)+'</div>';
+    html+='<div class="desc">'+escHtml(j.description)+'</div>';
+    if(j.requirements&&j.requirements.trim())
+      html+='<div class="req-section"><h4>&#9989; '+(I18N[BKS_LANG]||I18N.en).jobsReqs+'</h4><p>'+escHtml(j.requirements)+'</p></div>';
+    html+='<button class="apply-btn" onclick="openApply(\''+sid+'\',\''+stl+'\')">'+(I18N[BKS_LANG]||I18N.en).jobsApplyBtn+'</button></div>';
+  }
+  jl.innerHTML=html;
+  jl.querySelectorAll('.job-card').forEach(function(card,i){
+    card.style.opacity='0';card.style.transform='translateY(24px)';
+    card.style.transition='opacity .5s ease,transform .5s ease';
+    card.style.transitionDelay=(i*.07)+'s';
+    setTimeout(function(){card.style.opacity='1';card.style.transform='none';},30);
+  });
+}
+
+function escHtml(s){if(!s)return '';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+document.getElementById('jobSearch').addEventListener('input',function(){
+  var q=this.value.toLowerCase();
+  renderJobs(allJobs.filter(function(j){return j.title.toLowerCase().indexOf(q)!==-1||j.description.toLowerCase().indexOf(q)!==-1;}));
+});
+
+
+function openApply(jobId,title){
+  currentJobId=jobId;
+  document.getElementById('modalTitle').textContent=title;
+  document.getElementById('jobId').value=jobId;
+  if(currentUser){
+    document.getElementById('name').value=currentUser.fullName||'';
+    document.getElementById('email').value=currentUser.email||'';
+    document.getElementById('phone').value=currentUser.phone||'';
+    document.getElementById('idNumber').value=currentUser.idNumber||'';
+  }
+  document.getElementById('modal').style.display='flex';
+}
+function closeModal(){document.getElementById('modal').style.display='none';document.getElementById('appForm').reset();}
+document.getElementById('closeAppModal').addEventListener('click',closeModal);
+document.getElementById('cancelAppBtn').addEventListener('click',closeModal);
+
+document.getElementById('appForm').addEventListener('submit',function(e){
+  e.preventDefault();
+  if(!document.getElementById('consent').checked){alert('Please accept the POPIA consent to submit.');return;}
+  var gender=document.getElementById('gender').value,marital=document.getElementById('maritalStatus').value;
+  if(!gender){alert('Please select your gender.');return;}
+  if(!marital){alert('Please select your marital status.');return;}
+  var cvFile=document.getElementById('cv').files[0],idFile=document.getElementById('idDoc').files[0];
+  if(!cvFile||!idFile){alert('Please upload both your CV and ID document.');return;}
+  var btn=document.getElementById('submitAppBtn');
+  btn.textContent='Submitting\u2026 please wait';btn.disabled=true;
+  var fd={name:document.getElementById('name').value,idNumber:document.getElementById('idNumber').value,
+    phone:document.getElementById('phone').value,email:document.getElementById('email').value||'',
+    gender:gender,maritalStatus:marital,jobId:currentJobId,jobTitle:document.getElementById('modalTitle').textContent};
+  var done=0,cvData=null,idData=null;
+  function send(){
+    if(done===2){
+      fetch('/api/submit-application', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ formData: fd, cvFileData: cvData, idFileData: idData })
+      })
+        .then(function(r){ return r.json(); })
+        .then(function(r){
+          alert(r.message);
+          if(r.success) closeModal();
+          btn.textContent=(I18N[BKS_LANG]||I18N.en).applySubmit; btn.disabled=false;
+        })
+        .catch(function(err){
+          alert('Error: '+(err.message||err));
+          btn.textContent=(I18N[BKS_LANG]||I18N.en).applySubmit; btn.disabled=false;
+        });
+    }
+  }
+  var r1=new FileReader();r1.onload=function(){cvData={data:r1.result.split(',')[1],type:cvFile.type,name:cvFile.name};done++;send();};r1.readAsDataURL(cvFile);
+  var r2=new FileReader();r2.onload=function(){idData={data:r2.result.split(',')[1],type:idFile.type,name:idFile.name};done++;send();};r2.readAsDataURL(idFile);
+});
+document.getElementById('idNumber').addEventListener('input',function(){this.value=this.value.replace(/[^0-9]/g,'').slice(0,13);});
+document.getElementById('phone').addEventListener('input',function(){this.value=this.value.replace(/[^0-9]/g,'').slice(0,10);});
+
+
+function openAuthModal(){document.getElementById('authModal').style.display='flex';switchAuthTab('signin');}
+function closeAuthModal(){document.getElementById('authModal').style.display='none';}
+document.getElementById('closeAuthModal').addEventListener('click',closeAuthModal);
+document.getElementById('cancelSignIn').addEventListener('click',closeAuthModal);
+document.getElementById('cancelSignUp').addEventListener('click',closeAuthModal);
+document.getElementById('tabSignIn').addEventListener('click',function(){switchAuthTab('signin');});
+document.getElementById('tabSignUp').addEventListener('click',function(){switchAuthTab('signup');});
+function switchAuthTab(tab){
+  document.getElementById('tabSignIn').classList.toggle('active',tab==='signin');
+  document.getElementById('tabSignUp').classList.toggle('active',tab==='signup');
+  document.getElementById('panelSignIn').classList.toggle('active',tab==='signin');
+  document.getElementById('panelSignUp').classList.toggle('active',tab==='signup');
+  document.getElementById('signinMsg').className='auth-msg';
+  document.getElementById('signupMsg').className='auth-msg';
+}
+function showAuthMsg(id,type,text){var el=document.getElementById(id);el.className='auth-msg'+(type?' '+type:'');el.textContent=text;}
+
+document.getElementById('suPass').addEventListener('input',function(){
+  var v=this.value,bar=document.getElementById('passStrength'),hint=document.getElementById('passHint');
+  bar.className='pass-strength';if(!v){hint.textContent='';return;}
+  var sc=0;if(v.length>=8)sc++;if(/[0-9]/.test(v))sc++;if(/[^A-Za-z0-9]/.test(v))sc++;
+  if(sc===1){bar.classList.add('weak');hint.textContent='Weak';}
+  else if(sc===2){bar.classList.add('medium');hint.textContent='Medium';}
+  else{bar.classList.add('strong');hint.textContent='Strong';}
+});
+
+document.getElementById('doSignInBtn').addEventListener('click',function(){
+  var email=document.getElementById('siEmail').value.trim(),pass=document.getElementById('siPass').value;
+  if(!email||!pass){showAuthMsg('signinMsg','error','Please enter your email and password.');return;}
+  showAuthMsg('signinMsg','','Signing in\u2026');
+  fetch('/api/sign-in', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ email: email, password: pass })
+  })
+    .then(function(r){ return r.json(); })
+    .then(function(r){
+      if(r.success){
+        currentUser={fullName:r.fullName,email:r.email,phone:r.phone,idNumber:r.idNumber};
+        sessionStorage.setItem('bksUser',JSON.stringify(currentUser));
+        closeAuthModal(); updateNavAuthState();
+      } else {
+        showAuthMsg('signinMsg','error',r.message||'Sign in failed.');
+      }
+    })
+    .catch(function(err){ showAuthMsg('signinMsg','error','Error: '+(err.message||err)); });
+});
+document.getElementById('siPass').addEventListener('keypress',function(e){if(e.key==='Enter')document.getElementById('doSignInBtn').click();});
+
+document.getElementById('doSignUpBtn').addEventListener('click',function(){
+  var name=document.getElementById('suName').value.trim(),email=document.getElementById('suEmail').value.trim();
+  var phone=document.getElementById('suPhone').value.trim(),idNum=document.getElementById('suId').value.trim();
+  var pass=document.getElementById('suPass').value,pass2=document.getElementById('suPass2').value;
+  if(!name||!email||!pass){showAuthMsg('signupMsg','error','Full name, email and password are required.');return;}
+  if(pass.length<8){showAuthMsg('signupMsg','error','Password must be at least 8 characters.');return;}
+  if(pass!==pass2){showAuthMsg('signupMsg','error','Passwords do not match.');return;}
+  showAuthMsg('signupMsg','','Creating your account\u2026');
+  fetch('/api/sign-up', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ fullName: name, email: email, phone: phone, idNumber: idNum, password: pass })
+  })
+    .then(function(r){ return r.json(); })
+    .then(function(r){
+      if(r.success){ showAuthMsg('signupMsg','success',r.message); setTimeout(function(){switchAuthTab('signin');},1800); }
+      else { showAuthMsg('signupMsg','error',r.message||'Sign up failed.'); }
+    })
+    .catch(function(err){ showAuthMsg('signupMsg','error','Error: '+(err.message||err)); });
+});
+
+
+function updateNavAuthState(){
+  var btn=document.getElementById('navAuthBtn'),span=document.getElementById('navUser');
+  if(currentUser){
+    btn.textContent=(BKS_LANG==='nso')?'Tswa':'Sign Out';btn.classList.add('signed-in');
+    span.style.display='inline';
+    span.innerHTML='<a id="myAppsLink" style="color:rgba(255,255,255,.85);font-weight:600;text-decoration:none;cursor:pointer;" href="#">'+(BKS_LANG==='nso'?'&#128203; Dikgopelo Tša Ka':'&#128203; My Applications')+'</a>&nbsp;|&nbsp;'+escHtml(currentUser.fullName);
+    var lk=document.getElementById('myAppsLink');
+    if(lk)lk.addEventListener('click',function(e){e.preventDefault();sessionStorage.setItem('bksUser',JSON.stringify(currentUser));window.open('/tracker.html','_blank');});
+  }else{
+    btn.textContent=(BKS_LANG==='nso')?'Tsena':'Sign In';btn.classList.remove('signed-in');
+    span.style.display='none';span.innerHTML='';
+  }
+}
+document.getElementById('navAuthBtn').addEventListener('click',function(){
+  if(currentUser){if(confirm('Sign out of your account?')){currentUser=null;sessionStorage.removeItem('bksUser');updateNavAuthState();}}
+  else openAuthModal();
+});
+
+
+function openTrackerModal(){
+  if(!currentUser){openAuthModal();return;}
+  document.getElementById('trackerModal').style.display='flex';
+  document.getElementById('trackerContent').innerHTML='<div class="loading"><div class="spinner"></div><p style="margin-top:14px;color:#78716c;">Loading your applications\u2026</p></div>';
+  fetch('/api/get-my-applications', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ email: currentUser.email })
+  })
+    .then(function(r){ return r.json(); })
+    .then(function(result){ renderMyApplications(result.apps, result.events); })
+    .catch(function(err){ document.getElementById('trackerContent').innerHTML='<p style="color:#dc2626;padding:20px;">Error: '+(err.message||err)+'</p>'; });
+}
+document.getElementById('closeTrackerModal').addEventListener('click',function(){document.getElementById('trackerModal').style.display='none';});
+
+function renderMyApplications(apps,events){
+  var c=document.getElementById('trackerContent');
+  if(!apps||!apps.length){
+    c.innerHTML='<div style="text-align:center;padding:36px;color:#78716c;">You have not submitted any applications yet.<br><br><a href="#jobs" onclick="document.getElementById(\'trackerModal\').style.display=\'none\'" style="color:#1D9E75;font-weight:700;">Browse open jobs &#8594;</a></div>';
+    return;
+  }
+  var counts={Pending:0,Reviewed:0,Shortlisted:0,Rejected:0};
+  apps.forEach(function(a){if(counts[a.status]!==undefined)counts[a.status]++;else counts.Pending++;});
+  var html='<div class="tracker-panel"><h4>&#128203; Your Application History</h4><div class="tracker-summary">';
+  html+='<div class="tracker-summary-card"><div class="ts-num">'+apps.length+'</div><div class="ts-lbl">Total</div></div>';
+  html+='<div class="tracker-summary-card"><div class="ts-num" style="color:#854d0e;">'+counts.Pending+'</div><div class="ts-lbl">Pending</div></div>';
+  html+='<div class="tracker-summary-card"><div class="ts-num" style="color:#065f46;">'+counts.Shortlisted+'</div><div class="ts-lbl">Shortlisted</div></div>';
+  html+='<div class="tracker-summary-card"><div class="ts-num" style="color:#1e3a8a;">'+counts.Reviewed+'</div><div class="ts-lbl">Reviewed</div></div>';
+  html+='</div>';
+  apps.forEach(function(app){
+    var cls='status-'+(app.status||'Pending');
+    html+='<div class="app-row"><div class="app-row-header"><div><div class="job-title">&#128188; '+escHtml(app.jobId)+'</div><div class="app-date">Submitted: '+escHtml(app.timestamp)+'</div></div><span class="status-pill '+cls+'">'+escHtml(app.status)+'</span></div>';
+    var jobEvs=(events||[]).filter(function(ev){return ev.jobId===app.jobId;});
+    if(jobEvs.length){
+      html+='<div class="timeline">';
+      jobEvs.forEach(function(ev,idx){
+        var dotCls=ev.eventType.toLowerCase().replace(/\s/g,''),last=idx===jobEvs.length-1;
+        html+='<div class="timeline-item"><div class="timeline-dot-wrap"><div class="timeline-dot '+dotCls+'"></div>'+(last?'':'<div class="timeline-line"></div>')+'</div><div class="timeline-content"><div class="timeline-label">'+escHtml(ev.eventType)+'</div><div class="timeline-detail">'+escHtml(ev.detail)+'</div><div class="timeline-time">'+escHtml(ev.timestamp)+'</div></div></div>';
+      });
+      html+='</div>';
+    }
+    html+='</div>';
+  });
+  html+='</div>';
+  c.innerHTML=html;
+}
+
+
+var BKS_LANG='en';
+var I18N={
+  en:{
+    navHome:'Home',navJobs:'Jobs',navAbout:'About',navContact:'Contact',navSignIn:'Sign In',
+    heroBadge:'BKS COMMUNITY JOB CENTER',
+    heroH1:'Connecting Every Heart<br><span>to Every Opportunity</span>',
+    heroSub:'Empowering local communities through fair and transparent job access',
+    heroBtnJobs:'Browse Open Jobs',heroBtnAbout:'Learn How It Works',
+    aboutBadge:'ABOUT US',
+    aboutTitle:'Built for local communities.<br>Powered by local leadership.',
+    jobsTitle:'Current Job Openings',
+    jobsSub:'Jobs allocated for local communities — fair, transparent, and merit-based',
+    contactTitle:'Get in Touch',
+    contactSub:'Have a question about a job posting or your application? We are here to help.',
+    contactFormName:'Full Name *',
+    contactFormEmail:'Email Address *',
+    contactFormPhone:'Phone (optional)',
+    contactFormMsg:'Message *',
+    contactFormSubmit:'Send Message',
+    locTitle:'Location Verification',
+    locBody:'This portal is exclusively for residents of <strong>Atok, Ga-Selepe and the 0749 area</strong>. Please allow location access to confirm you are in the eligible area.',
+    locAllow:'Allow Location Access',
+    locSkipText:'I understand — continue anyway',
+    jobsLoading:'Loading opportunities\u2026',
+    jobsError:'Error loading jobs. Please refresh the page.',
+    jobsEmpty:'No openings at the moment',
+    jobsEmptySub:'New opportunities are posted as they become available. Please check back soon.',
+    jobsApplyBtn:'Apply Now',jobsClosing:'Closing:',jobsReqs:'Requirements',
+    applySubmit:'Submit Application',applySubmitting:'Submitting\u2026 please wait',
+    passWeak:'Weak',passMedium:'Medium',passStrong:'Strong',
+    vbFairLabel:'\u25C6 Fair',
+    vbFairTip:'Every community member has an equal opportunity to apply. No favouritism, no exclusions \u2014 your application is judged on what you bring, not who you know. Our mission is to ensure that jobs reach the people who deserve them most.',
+    vbTransparentLabel:'\u25C6 Transparent',
+    vbTransparentTip:'Every application submitted is recorded with a date and time stamp. Nothing is lost, changed, or deleted quietly. The Local Committee and Traditional Authority can review the full record at any time \u2014 creating accountability for all.',
+    vbMeritLabel:'\u25C6 Merit-Based',
+    vbMeritTip:'Selection is guided by qualifications, experience, and the requirements of the job \u2014 not by personal connections or random draws. BKS ensures the right people are seen for the right opportunities, strengthening both the community and the mine.',
+    vbPopiaLabel:'\u25C6 POPIA Compliant',
+    vbPopiaTip:'Your personal information \u2014 including your ID document and CV \u2014 is stored securely and handled in full compliance with the Protection of Personal Information Act (POPIA). Your data is never shared without your consent.'
+  },
+  nso:{
+    navHome:'Gae',navJobs:'Me\u0161omo',navAbout:'Ka Rena',navContact:'Ikopanye',navSignIn:'Tsena',
+    heroBadge:'BKS SENTHARA SA ME\u0160OMO',
+    heroH1:'Re Kgokaganya Batho Ba Maswanedi<br><span>le Menyetla Kamoka Ya Maswanedi</span>',
+    heroSub:'Re matlafat\u0161a set\u0161haba ka phihlelelo ya me\u0161omo yeo e kgonthi\u0161it\u0161wego le ya go fihlelelwa ka maleba',
+    heroBtnJobs:'Nyaka Me\u0161omo ye e Bulet\u0161wego',heroBtnAbout:'Ithute Tsela ye e \u0160omago',
+    aboutBadge:'KA RENA',
+    aboutTitle:'Re berekela Set\u0161haba.<br>Re bu\u0161hwa ke Boetapele bja Selegae.',
+    jobsTitle:'Me\u0161omo ye e Bulet\u0161wego Ga Bjale',
+    jobsSub:'Me\u0161omo ye e swanet\u0161ego set\u0161haba sa maleba \u2014 ka toka, ponagatso, le maemo',
+    contactTitle:'Ikopanye le Rena',
+    contactSub:'Na o na le potsi\u0161o ka kgopelo ya mo\u0161omo goba ka kakaretso? Re gona go go thusha.',
+    contactFormName:'Leina la Maleba *',
+    contactFormEmail:'Aterese ya Imeile *',
+    contactFormPhone:'Founu (ga se kgapeletso)',
+    contactFormMsg:'Molaet\u0161a *',
+    contactFormSubmit:'Romela Molaet\u0161a',
+    locTitle:'Netefatso ya Lefelo',
+    locBody:'Lefelo le le amana le baagi ba <strong>Atok, Ga-Selepe la 0749</strong>. Dumelela phihlelelo ya lefelo go netefatsa gore o mo lefelong le le maleba.',
+    locAllow:'Dumelela Phihlelelo ya Lefelo',
+    locSkipText:'Ke a kwesisa \u2014 tswela pele',
+    jobsLoading:'Re a laetsa menyetla\u2026',
+    jobsError:'Phosho. Hlaola letlakala gape.',
+    jobsEmpty:'Ga go na mebereko ka nako ye',
+    jobsEmptySub:'Menyetla ye meswa e bonala ge e le gona. Bowa ka morago nyana.',
+    jobsApplyBtn:'Kgopela',jobsClosing:'Fetsa:',jobsReqs:'Dinyakwa',
+    applySubmit:'Kgopela',applySubmitting:'Re a romela\u2026 emela',
+    passWeak:'Bonolo',passMedium:'Bogare',passStrong:'Maatla',
+    vbFairLabel:'\u25C6 Toka',
+    vbFairTip:'Maloko kamoka a set\u0161haba ba na le monyetla wa go lekana wa go kgopela mebereko. Ga go kgethwe ka gore o tseba mang ebile ga re hlaole \u2014 kgopelo ya gago e ya le ka se o se tsebago, eseng taba ya gore o tseba mang. Maikemi\u0161et\u0161o a rena ke go netefatsa gore me\u0161omo e fihlelela batho bao ba e hlokago ka nnete.',
+    vbTransparentLabel:'\u25C6 Ponagat\u0161o',
+    vbTransparentTip:'Dikgopelo kamoka di rometšwego di rekotilwe ka let\u0161atši le nako. Ga go na le seo se lahlwago, se fetošwago, goba se phimolwago ka sephiring. Komiti ya Selegae le Bolaodi ba Set\u0161o ba ka sekaseka rekoto kamoka nako efe le efe \u2014 go bopa boikarabelo go batho kamoka.',
+    vbMeritLabel:'\u25C6 Maemo a tsebo',
+    vbMeritTip:'Kgetho e hlahlojwa ka dithuto, boitemogelo, le dinyakwa t\u0161a mo\u0161omo \u2014 e seng ka dikgokagano t\u0161a batho goba gono "topa yes". BKS e netefat\u0161a gore batho ba maleba ba boniwa menyetleng ya maleba, go matlafat\u0161a set\u0161haba le moepo.',
+    vbPopiaLabel:'\u25C6 Molao wa POPIA',
+    vbPopiaTip:'Tshedimo\u0161o ya gago ya motho \u2014 go akaret\u0161wa tokomane ya boitsebi\u0161o le CV \u2014 di bolokwa ka polokego mme e laolwa ka go latela melao ya Popia ya T\u0161hiret\u0161o ya Tshedimo\u0161o ya Motho (POPIA) ka botlalo. Data ya gago ga e fetiswe ntle le tumelo ya gago.'
+  }
+};
+
+function applyLang(lang){
+  BKS_LANG=lang;
+  var d=I18N[lang]||I18N.en;
+  document.querySelectorAll('[data-i18n]').forEach(function(el){var k=el.getAttribute('data-i18n');if(d[k]!==undefined)el.textContent=d[k];});
+  document.querySelectorAll('[data-i18n-html]').forEach(function(el){var k=el.getAttribute('data-i18n-html');if(d[k]!==undefined)el.innerHTML=d[k];});
+  document.getElementById('btnLangEN').classList.toggle('active',lang==='en');
+  document.getElementById('btnLangNSO').classList.toggle('active',lang==='nso');
+  updateNavAuthState();
+  renderJobs(allJobs);
+  var dropLinks=document.querySelectorAll('.nav-drop-link[data-i18n]');
+  dropLinks.forEach(function(el){var k=el.getAttribute('data-i18n');if(d[k]!==undefined)el.textContent=d[k];});
+  try{localStorage.setItem('bksLang',lang);}catch(e){}
+}
+function initLang(){var s='en';try{s=localStorage.getItem('bksLang')||'en';}catch(e){}applyLang(s);}
+document.getElementById('btnLangEN').addEventListener('click',function(){applyLang('en');});
+document.getElementById('btnLangNSO').addEventListener('click',function(){applyLang('nso');});
+
+
+document.getElementById('contactForm').addEventListener('submit', function(e){
+  e.preventDefault();
+  var name    = document.getElementById('cName').value.trim();
+  var email   = document.getElementById('cEmail').value.trim();
+  var phone   = document.getElementById('cPhone').value.trim();
+  var message = document.getElementById('cMessage').value.trim();
+
+  if(!name || !email || !message){
+    showContactMsg('error','Please fill in your name, email and message.');
+    return;
+  }
+
+  var btn = document.getElementById('contactSubmitBtn');
+  var btnLabel = document.getElementById('contactSubmitLabel');
+  btnLabel.textContent = 'Sending\u2026'; btn.disabled = true;
+
+  fetch('/api/submit-contact', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ name: name, email: email, phone: phone, message: message })
+  })
+    .then(function(r){ return r.json(); })
+    .then(function(r){
+      showContactMsg(r.success ? 'success' : 'error', r.message);
+      if(r.success) document.getElementById('contactForm').reset();
+      btnLabel.textContent = (I18N[BKS_LANG]||I18N.en).contactFormSubmit || 'Send Message';
+      btn.disabled = false;
+    })
+    .catch(function(err){
+      showContactMsg('error','Error: ' + (err.message || err));
+      btnLabel.textContent = (I18N[BKS_LANG]||I18N.en).contactFormSubmit || 'Send Message';
+      btn.disabled = false;
+    });
+});
+
+function showContactMsg(type, text){
+  var el = document.getElementById('contactFormMsgBox');
+  el.className = 'auth-msg ' + type;
+  el.textContent = text;
+}
+
+
+function startApp(){
+  initLang();
+  var sv=sessionStorage.getItem('bksUser');if(sv){try{currentUser=JSON.parse(sv);}catch(e){currentUser=null;}}
+  updateNavAuthState();
+  showLocGate();
+  loadJobs();
+  startAnimations();
+}
+window.addEventListener('load', startApp);
+
+
+function startAnimations(){
+
+  (function(){
+    var cv=document.getElementById('heroCanvas');if(!cv)return;
+    var ctx=cv.getContext('2d'),W,H,pts=[];
+    function rsz(){W=cv.width=cv.offsetWidth;H=cv.height=cv.offsetHeight;}
+    rsz();window.addEventListener('resize',rsz,{passive:true});
+    for(var i=0;i<60;i++)pts.push({x:Math.random()*1920,y:Math.random()*1080,r:Math.random()*2+.4,dx:(Math.random()-.5)*.3,dy:(Math.random()-.5)*.3,o:Math.random()*.4+.1});
+    (function draw(){
+      ctx.clearRect(0,0,W,H);
+      pts.forEach(function(p){ctx.beginPath();ctx.arc(p.x%W,p.y%H,p.r,0,Math.PI*2);ctx.fillStyle='rgba(255,215,0,'+p.o+')';ctx.fill();p.x+=p.dx;p.y+=p.dy;if(p.x<0)p.x=W;if(p.x>W)p.x=0;if(p.y<0)p.y=H;if(p.y>H)p.y=0;});
+      requestAnimationFrame(draw);
+    })();
+  })();
+
+
+  createGoldParticles(document.getElementById('aboutParticles'),   25, 0.12, false);
+  createGoldParticles(document.getElementById('jobsParticles'),    35, 0.16, true);
+  createGoldParticles(document.getElementById('contactParticles'), 20, 0.10, false);
+  createGoldParticles(document.getElementById('footerParticles'),  40, 0.22, true);
+
+
+  if(!('IntersectionObserver' in window))return;
+  var obs=new IntersectionObserver(function(entries){entries.forEach(function(en){if(en.isIntersecting){en.target.classList.add('visible');obs.unobserve(en.target);}});},{threshold:0.12,rootMargin:'0px 0px -40px 0px'});
+  document.querySelectorAll('.reveal,.reveal-stagger').forEach(function(el){obs.observe(el);});
+
+
+  var sObs=new IntersectionObserver(function(entries){
+    entries.forEach(function(en){
+      if(!en.isIntersecting)return;
+      var el=en.target,val=el.querySelector('.val');
+      if(!val||el.dataset.counted)return;el.dataset.counted='1';
+      var txt=val.textContent.trim(),num=parseFloat(txt.replace(/[^0-9.]/g,'')),suf=txt.replace(/[0-9.]/g,'');
+      if(isNaN(num)||!num){val.style.opacity='0';setTimeout(function(){val.style.transition='opacity .5s';val.style.opacity='1';},100);sObs.unobserve(el);return;}
+      var t0=null,dur=1200;
+      (function step(ts){if(!t0)t0=ts;var p=Math.min((ts-t0)/dur,1),e=1-Math.pow(1-p,3);val.textContent=(Number.isInteger(num)?Math.round(e*num):Math.round(e*num*10)/10)+suf;if(p<1)requestAnimationFrame(step);else val.textContent=txt;})(performance.now());
+      sObs.unobserve(el);
+    });
+  },{threshold:.4});
+  document.querySelectorAll('.stat-item').forEach(function(el){sObs.observe(el);});
+
+
+  var bar=document.createElement('div');
+  bar.style.cssText='position:fixed;top:0;left:0;height:3px;width:0;background:linear-gradient(to right,#1D9E75,#ffd700);z-index:99999;pointer-events:none;transition:width .1s linear;';
+  document.body.appendChild(bar);
+
+
+  var navMenuBtn=document.getElementById('navMenuBtn');
+  var navDropdown=document.getElementById('navDropdown');
+  var navMenuLabel=document.getElementById('navMenuLabel');
+  navMenuBtn.addEventListener('click',function(e){
+    e.stopPropagation();
+    var isOpen=navDropdown.classList.contains('open');
+    navDropdown.classList.toggle('open',!isOpen);
+    navMenuBtn.classList.toggle('open',!isOpen);
+  });
+  document.addEventListener('click',function(e){
+    if(!e.target.closest('.nav-menu-wrap')){navDropdown.classList.remove('open');navMenuBtn.classList.remove('open');}
+  });
+  document.querySelectorAll('.nav-drop-link').forEach(function(a){
+    a.addEventListener('click',function(){navDropdown.classList.remove('open');navMenuBtn.classList.remove('open');});
+  });
+
+
+  var allSecs=[{id:'',href:'#'},{id:'jobs',href:'#jobs'},{id:'about',href:'#about'},{id:'contact',href:'#contact'}];
+  function getNavLink(href){return document.querySelector('.nav-links a[href="'+href+'"]');}
+  function getDropLink(href){return document.querySelector('.nav-drop-link[href="'+href+'"]');}
+  function onScroll(){
+    var sy=window.scrollY;
+    var pct=(sy/(document.body.scrollHeight-window.innerHeight))*100;
+    bar.style.width=Math.min(pct,100)+'%';
+    document.body.classList.toggle('nav-scrolled',sy>60);
+    var active='#';
+    allSecs.slice(1).forEach(function(s){
+      var sec=document.getElementById(s.id);
+      if(sec&&sy+140>=sec.offsetTop)active=s.href;
+    });
+    allSecs.forEach(function(s){
+      var a=getNavLink(s.href);var d=getDropLink(s.href);
+      if(a)a.classList.toggle('nav-active',s.href===active);
+      if(d)d.classList.toggle('nav-active',s.href===active);
+    });
+    var activeDropLink=document.querySelector('.nav-drop-link.nav-active');
+    if(navMenuLabel) navMenuLabel.textContent=activeDropLink?activeDropLink.textContent:'Menu';
+  }
+  window.addEventListener('scroll',onScroll,{passive:true});
+  onScroll();
+}
+</script>
+</body>
+</html>

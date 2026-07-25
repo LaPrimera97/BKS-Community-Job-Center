@@ -193,6 +193,17 @@ body {
 }
 .nav-drop-link:hover { background: rgba(255, 255, 255, 0.08); color: #fff; }
 .nav-drop-link.nav-active { background: rgba(21, 154, 110, 0.2); color: var(--gold); }
+.nav-drop-divider { height: 1px; background: rgba(255,255,255,0.1); margin: 8px 4px; }
+.nav-drop-lang { display: flex; gap: 8px; padding: 6px 4px 10px; }
+.nav-drop-lang .lang-btn { flex: 1; padding: 8px 0; border-radius: 8px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.14); }
+.nav-drop-lang .lang-btn.active { background: var(--gold); color: var(--green-dark); border-color: var(--gold); }
+.nav-drop-authbtn {
+  display: block; width: 100%; margin-top: 2px;
+  background: var(--green-vivid); color: #fff; border: none;
+  padding: 11px 16px; border-radius: 11px; font-size: 13px; font-weight: 700;
+  cursor: pointer; font-family: var(--font-body); letter-spacing: 0.02em;
+}
+.nav-drop-authbtn.signed-in { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); }
 
 
 .nav-scrolled .hero-nav {
@@ -936,15 +947,17 @@ footer .container { position: relative; z-index: 2; }
 
 
 @media (max-width: 768px) {
-  .hero-nav { top: 8px; left: 8px; gap: 5px; padding: 5px 10px; max-width: calc(100vw - 112px); }
-  .hero-nav a { font-size: 11px; }
-  .lang-btn { padding: 5px 10px; font-size: 11px; }
-  .nav-auth-btn { padding: 5px 11px; font-size: 11px; }
-  .hero-logo-link { top: 8px; right: 8px; }
-  .hero-logo-link img { width: 108px; }
-  .nav-scrolled .hero-logo-link img { width: 80px; }
-  .nav-scrolled .lang-btn { padding: 4px 9px; font-size: 10px; }
-  .nav-scrolled .nav-auth-btn { padding: 4px 10px; font-size: 11px; }
+  /* Always collapse to hamburger on mobile — don't wait for scroll */
+  .hero-nav { top: 10px; left: 10px; gap: 0; padding: 7px 12px; max-width: none; }
+  .hero-nav .nav-links { display: none !important; }
+  .hero-nav .nav-divider { display: none !important; }
+  .hero-nav .lang-switcher { display: none !important; }
+  .hero-nav .nav-auth-btn { display: none !important; }
+  .nav-menu-wrap { display: block !important; opacity: 1 !important; }
+  .nav-menu-btn { padding: 7px 14px; font-size: 13px; }
+  .nav-dropdown { min-width: 200px; }
+
+  .hero-logo-link { display: none !important; }
 
   .hero h1 { font-size: 34px; letter-spacing: -0.01em; }
   .hero-sub { font-size: 16px; }
@@ -1064,6 +1077,12 @@ footer .container { position: relative; z-index: 2; }
         <a href="#jobs" class="nav-drop-link" data-i18n="navJobs">Jobs</a>
         <a href="#about" class="nav-drop-link" data-i18n="navAbout">About</a>
         <a href="#contact" class="nav-drop-link" data-i18n="navContact">Contact</a>
+        <div class="nav-drop-divider"></div>
+        <div class="nav-drop-lang">
+          <button class="lang-btn active" id="btnLangENMobile">ENG</button>
+          <button class="lang-btn" id="btnLangNSOMobile">Sepedi</button>
+        </div>
+        <button class="nav-drop-authbtn" id="navAuthBtnMobile" data-i18n="navSignIn">Sign In</button>
       </div>
     </div>
     <div class="nav-divider"></div>
@@ -1583,6 +1602,11 @@ document.getElementById('doSignUpBtn').addEventListener('click',function(){
 
 function updateNavAuthState(){
   var btn=document.getElementById('navAuthBtn'),span=document.getElementById('navUser');
+  var mbtn=document.getElementById('navAuthBtnMobile');
+  if(mbtn){
+    mbtn.textContent = currentUser ? ((BKS_LANG==='nso')?'Tswa':'Sign Out') : ((BKS_LANG==='nso')?'Tsena':'Sign In');
+    mbtn.classList.toggle('signed-in', !!currentUser);
+  }
   if(currentUser){
     btn.textContent=(BKS_LANG==='nso')?'Tswa':'Sign Out';btn.classList.add('signed-in');
     span.style.display='inline';
@@ -1598,6 +1622,15 @@ document.getElementById('navAuthBtn').addEventListener('click',function(){
   if(currentUser){if(confirm('Sign out of your account?')){currentUser=null;sessionStorage.removeItem('bksUser');updateNavAuthState();}}
   else openAuthModal();
 });
+var navAuthBtnMobileEl = document.getElementById('navAuthBtnMobile');
+if(navAuthBtnMobileEl){
+  navAuthBtnMobileEl.addEventListener('click',function(){
+    document.getElementById('navDropdown').classList.remove('open');
+    document.getElementById('navMenuBtn').classList.remove('open');
+    if(currentUser){if(confirm('Sign out of your account?')){currentUser=null;sessionStorage.removeItem('bksUser');updateNavAuthState();}}
+    else openAuthModal();
+  });
+}
 
 
 function openTrackerModal(){
@@ -1733,6 +1766,8 @@ function applyLang(lang){
   document.querySelectorAll('[data-i18n-html]').forEach(function(el){var k=el.getAttribute('data-i18n-html');if(d[k]!==undefined)el.innerHTML=d[k];});
   document.getElementById('btnLangEN').classList.toggle('active',lang==='en');
   document.getElementById('btnLangNSO').classList.toggle('active',lang==='nso');
+  if(btnLangENMobileEl) btnLangENMobileEl.classList.toggle('active',lang==='en');
+  if(btnLangNSOMobileEl) btnLangNSOMobileEl.classList.toggle('active',lang==='nso');
   updateNavAuthState();
   renderJobs(allJobs);
   var dropLinks=document.querySelectorAll('.nav-drop-link[data-i18n]');
@@ -1742,6 +1777,10 @@ function applyLang(lang){
 function initLang(){var s='en';try{s=localStorage.getItem('bksLang')||'en';}catch(e){}applyLang(s);}
 document.getElementById('btnLangEN').addEventListener('click',function(){applyLang('en');});
 document.getElementById('btnLangNSO').addEventListener('click',function(){applyLang('nso');});
+var btnLangENMobileEl = document.getElementById('btnLangENMobile');
+var btnLangNSOMobileEl = document.getElementById('btnLangNSOMobile');
+if(btnLangENMobileEl) btnLangENMobileEl.addEventListener('click',function(){applyLang('en');});
+if(btnLangNSOMobileEl) btnLangNSOMobileEl.addEventListener('click',function(){applyLang('nso');});
 
 
 document.getElementById('contactForm').addEventListener('submit', function(e){

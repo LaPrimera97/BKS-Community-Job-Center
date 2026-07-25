@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<link rel="icon" href="https://drive.google.com/thumbnail?id=1idJ5CgHUVJ98YP8frCLbeDexMPkmraLn&sz=w64">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<title>Privacy Notice — BKS Community Job Center</title>
+<style>
+:root{
+  --green-deep:#042e24;
+  --green-dark:#064e3b;
+  --green-mid:#0F6E56;
+  --green-vivid:#1D9E75;
+  --green-light:#E1F5EE;
+  --green-pale:#f0faf5;
+  --gold:#ffd700;
+  --cream:#faf6f0;
+  --ink:#1a2e20;
+  --muted:#57534e;
+  --border:#e5e0dc;
+  --font-display:'Playfair Display',Georgia,serif;
+  --font-body:'DM Sans',Arial,sans-serif;
+  --radius-sm:10px;
+  --radius-md:16px;
+  --radius-lg:24px;
+  --shadow-sm:0 1px 6px rgba(6,78,59,.07);
+  --shadow-md:0 4px 20px rgba(6,78,59,.12);
+}
+
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  font-family:var(--font-body);
+  background:var(--cream);
+  color:var(--ink);
+  font-size:16px;
+  line-height:1.75;
+  -webkit-font-smoothing:antialiased;
+}
+
+
+.page-header{
+  background:linear-gradient(135deg,var(--green-deep) 0%,var(--green-dark) 55%,#0a6b50 100%);
+  color:white;padding:52px 0 44px;
+  position:relative;overflow:hidden;
+}
+.page-header::before{
+  content:"";position:absolute;top:0;left:0;right:0;bottom:0;
+  background:radial-gradient(ellipse at 80% 50%, rgba(255,215,0,.06) 0%, transparent 60%);
+  pointer-events:none;
+}
+#headerCanvas{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:1;}
+.page-header .container{display:flex;align-items:center;gap:28px;flex-wrap:wrap;position:relative;z-index:2;}
+.header-logo{max-width:150px;display:block;cursor:pointer;transition:opacity .2s,transform .2s;}
+.header-logo:hover{opacity:.9;transform:scale(1.03);}
+.header-text h1{font-family:var(--font-display);font-size:clamp(22px,4vw,32px);font-weight:700;margin-bottom:7px;letter-spacing:-.01em;}
+.header-text p{font-size:13px;color:rgba(255,255,255,.6);margin-bottom:0;font-weight:400;}
+.effective-badge{
+  display:inline-block;
+  background:rgba(255,215,0,.12);border:1px solid rgba(255,215,0,.3);
+  color:rgba(255,215,0,.9);font-size:10px;font-weight:700;
+  padding:5px 16px;border-radius:20px;letter-spacing:.07em;margin-top:12px;
+  font-family:var(--font-body);text-transform:uppercase;
+}
+
+
+.back-bar{background:white;border-bottom:1px solid var(--border);padding:14px 0;box-shadow:var(--shadow-sm);}
+.back-bar a{
+  color:var(--green-mid);text-decoration:none;font-size:14px;font-weight:600;
+  display:inline-flex;align-items:center;gap:7px;
+  transition:color .2s,gap .2s;font-family:var(--font-body);
+}
+.back-bar a:hover{color:var(--green-dark);gap:10px;}
+
+
+.container{max-width:880px;margin:0 auto;padding:0 28px;}
+
+
+.toc-card{
+  background:white;border:1px solid var(--border);border-radius:var(--radius-lg);
+  padding:28px 32px;margin:40px 0 36px;
+  box-shadow:var(--shadow-sm);
+  border-left:5px solid var(--green-vivid);
+}
+.toc-card h2{
+  font-family:var(--font-body);font-size:11px;font-weight:700;
+  color:var(--green-mid);text-transform:uppercase;letter-spacing:.1em;margin-bottom:18px;
+}
+.toc-list{list-style:none;display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:6px 24px;}
+.toc-list li a{
+  color:var(--green-mid);text-decoration:none;font-size:14px;font-weight:500;
+  display:flex;align-items:center;gap:10px;padding:4px 0;
+  transition:color .2s,gap .15s;font-family:var(--font-body);
+}
+.toc-list li a::before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--green-vivid);flex-shrink:0;}
+.toc-list li a:hover{color:var(--green-dark);}
+
+
+.content{padding-bottom:80px;}
+.section-block{
+  background:white;border:1px solid var(--border);border-radius:var(--radius-lg);
+  padding:32px 36px;margin-bottom:20px;
+  box-shadow:var(--shadow-sm);
+  transition:box-shadow .3s ease;
+}
+.section-block:hover{box-shadow:var(--shadow-md);}
+.section-block h2{
+  font-family:var(--font-display);font-size:20px;font-weight:700;color:var(--green-dark);
+  margin-bottom:16px;padding-bottom:14px;
+  border-bottom:2px solid var(--green-light);
+  display:flex;align-items:center;gap:12px;
+}
+.section-block h2 .icon{
+  width:36px;height:36px;border-radius:50%;background:var(--green-light);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:16px;
+}
+.section-block h3{font-size:15px;font-weight:700;color:var(--ink);margin:20px 0 8px;font-family:var(--font-body);}
+.section-block p{font-size:14px;color:var(--muted);margin-bottom:12px;line-height:1.8;}
+.section-block p:last-child{margin-bottom:0;}
+.section-block ul,.section-block ol{padding-left:20px;font-size:14px;color:var(--muted);margin-bottom:12px;line-height:1.8;}
+.section-block ul li,.section-block ol li{margin-bottom:8px;}
+.section-block ul li:last-child,.section-block ol li:last-child{margin-bottom:0;}
+
+
+.highlight{
+  background:var(--green-pale);border:1.5px solid #c6e8d4;
+  border-radius:var(--radius-sm);padding:16px 18px;margin:16px 0;
+  font-size:13px;color:var(--ink);line-height:1.75;
+}
+.highlight strong{color:var(--green-dark);}
+.warning{
+  background:#fffbeb;border:1.5px solid #fde68a;
+  border-radius:var(--radius-sm);padding:16px 18px;margin:16px 0;
+  font-size:13px;color:var(--muted);line-height:1.75;
+}
+.warning strong{color:#854d0e;}
+
+
+.data-table{width:100%;border-collapse:collapse;font-size:13px;margin:16px 0;border-radius:var(--radius-sm);overflow:hidden;}
+.data-table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:var(--radius-sm);}
+.data-table thead{background:linear-gradient(135deg,var(--green-dark),var(--green-mid));}
+.data-table th{color:white;text-align:left;padding:12px 15px;font-weight:700;font-family:var(--font-body);font-size:12px;letter-spacing:.04em;}
+.data-table td{padding:12px 15px;border-bottom:1px solid var(--border);color:var(--muted);vertical-align:top;}
+.data-table tbody tr:hover td{background:#fafaf8;}
+.data-table tbody tr:last-child td{border-bottom:none;}
+
+
+.rights-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:14px;margin:18px 0;}
+.right-card{
+  background:var(--green-pale);border:1.5px solid #c6e8d4;
+  border-radius:var(--radius-md);padding:18px;
+  transition:transform .25s ease,box-shadow .25s ease;
+}
+.right-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-md);}
+.right-card .right-icon{font-size:22px;margin-bottom:8px;}
+.right-card h4{font-size:13px;font-weight:700;color:var(--green-dark);margin-bottom:5px;font-family:var(--font-body);}
+.right-card p{font-size:12px;color:var(--muted);margin:0;line-height:1.6;}
+
+
+.contact-box{
+  background:linear-gradient(135deg,var(--green-deep) 0%,var(--green-dark) 100%);
+  border-radius:var(--radius-lg);padding:28px 32px;color:white;margin-top:22px;
+  position:relative;overflow:hidden;
+}
+.contact-box::before{
+  content:"";position:absolute;top:-30px;right:-30px;
+  width:140px;height:140px;border-radius:50%;
+  background:rgba(255,215,0,.06);pointer-events:none;
+}
+.contact-box h3{font-family:var(--font-display);font-size:17px;font-weight:700;margin-bottom:18px;color:#a7f3d0;}
+.contact-row{display:flex;gap:12px;align-items:flex-start;margin-bottom:12px;font-size:14px;}
+.contact-row:last-child{margin-bottom:0;}
+.contact-label{color:rgba(255,255,255,.5);min-width:72px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;padding-top:2px;font-family:var(--font-body);}
+.contact-val{color:rgba(255,255,255,.9);line-height:1.6;}
+.contact-val a{color:#6ee7b7;text-decoration:none;transition:color .2s;}
+.contact-val a:hover{color:#a7f3d0;text-decoration:underline;}
+
+
+.page-footer{
+  background:linear-gradient(135deg,var(--green-deep),#0a1f17);
+  padding:36px 0;text-align:center;position:relative;overflow:hidden;
+}
+#footerCanvas{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;}
+.page-footer p{font-size:12px;color:rgba(255,255,255,.3);position:relative;z-index:2;}
+.page-footer a{color:rgba(255,255,255,.45);text-decoration:none;margin:0 10px;transition:color .2s;font-weight:500;}
+.page-footer a:hover{color:rgba(255,255,255,.75);}
+
+
+@media(max-width:640px){
+  .page-header .container{flex-direction:column;align-items:flex-start;}
+  .section-block{padding:22px 20px;}
+  .toc-card{padding:20px;}
+  .data-table{font-size:12px;}
+  .data-table th,.data-table td{padding:9px 10px;}
+  .toc-list{grid-template-columns:1fr;}
+  .container{padding:0 18px;}
+}
+
+@media(prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important;}
+}
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <canvas id="headerCanvas" aria-hidden="true"></canvas>
+  <div class="container">
+    <a id="pvLogoLink" href="/portal.html">
+      <img class="header-logo" src="https://drive.google.com/thumbnail?id=1idJ5CgHUVJ98YP8frCLbeDexMPkmraLn&sz=w300" alt="BKS Logo">
+    </a>
+    <div class="header-text">
+      <h1>Privacy Notice</h1>
+      <p>BKS Community Job Center &mdash; Atok, Ga-Selepe, 0749</p>
+      <div class="effective-badge">Effective Date: 1 January 2026 &nbsp;&bull;&nbsp; POPIA Compliant</div>
+    </div>
+  </div>
+</div>
+
+<div class="back-bar">
+  <div class="container">
+    <a id="pvBackLink" href="/portal.html">&#8592; Return to Job Portal</a>
+  </div>
+</div>
+
+<div class="container">
+
+  <div class="toc-card">
+    <h2>Contents</h2>
+    <ul class="toc-list">
+      <li><a href="#s1">1. Who We Are</a></li>
+      <li><a href="#s2">2. What Information We Collect</a></li>
+      <li><a href="#s3">3. Why We Collect Your Information</a></li>
+      <li><a href="#s4">4. Legal Basis for Processing</a></li>
+      <li><a href="#s5">5. How We Store and Protect Your Information</a></li>
+      <li><a href="#s6">6. How Long We Keep Your Information</a></li>
+      <li><a href="#s7">7. Who We Share Your Information With</a></li>
+      <li><a href="#s8">8. Your Rights Under POPIA</a></li>
+      <li><a href="#s9">9. Cookies and Location Data</a></li>
+      <li><a href="#s10">10. Children's Privacy</a></li>
+      <li><a href="#s11">11. Changes to This Notice</a></li>
+      <li><a href="#s12">12. How to Contact Us</a></li>
+    </ul>
+  </div>
+
+  <div class="content">
+
+    <div class="section-block" id="s1">
+      <h2><span class="icon">&#127968;</span>1. Who We Are</h2>
+      <p>BKS Community Job Center ("BKS", "we", "us", "our") is a community-operated job facilitation service based in Atok, Ga-Selepe, Limpopo (postal code 0749), South Africa. We operate this online portal to connect local community members with employment opportunities at mines.</p>
+      <p>BKS acts as the <strong>Responsible Party</strong> as defined under the Protection of Personal Information Act, 4 of 2013 (POPIA), and is responsible for the lawful, fair, and transparent processing of your personal information.</p>
+      <div class="highlight"><strong>Our commitment:</strong> We collect only what we need, store it securely, share it only with those who need it to process your application, and delete it when it is no longer required.</div>
+    </div>
+
+    <div class="section-block" id="s2">
+      <h2><span class="icon">&#128196;</span>2. What Information We Collect</h2>
+      <p>When you register an account or submit a job application through this portal, we collect the following categories of personal information:</p>
+      <div class="data-table-wrap"><table class="data-table">
+        <thead>
+          <tr><th>Category</th><th>Information Collected</th><th>When</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>Identity</strong></td><td>Full name, South African ID number, gender, marital status</td><td>On application submission</td></tr>
+          <tr><td><strong>Contact</strong></td><td>Phone number, email address</td><td>On registration &amp; application</td></tr>
+          <tr><td><strong>Account</strong></td><td>Email address, password (stored as SHA-256 hash — never readable)</td><td>On account creation</td></tr>
+          <tr><td><strong>Application Documents</strong></td><td>Curriculum Vitae (CV/résumé), ID document scan or photograph</td><td>On application submission</td></tr>
+          <tr><td><strong>Location</strong></td><td>GPS coordinates (eligibility verification only — never stored)</td><td>On portal entry (optional)</td></tr>
+          <tr><td><strong>Usage &amp; Events</strong></td><td>Application submission timestamps, status change history</td><td>Automatically on each event</td></tr>
+        </tbody>
+      </table></div>
+      <div class="highlight"><strong>Password security:</strong> Your password is converted to a SHA-256 cryptographic hash before it is saved. Not even BKS administrators can see your original password. The hash cannot be reversed.</div>
+      <h3>Information We Do Not Collect</h3>
+      <ul>
+        <li>Banking or financial account details</li>
+        <li>Medical or health information</li>
+        <li>Race or ethnic origin (beyond what may appear in identity documents)</li>
+        <li>Religious or political beliefs</li>
+        <li>Criminal records</li>
+        <li>Biometric data</li>
+      </ul>
+    </div>
+
+    <div class="section-block" id="s3">
+      <h2><span class="icon">&#127919;</span>3. Why We Collect Your Information</h2>
+      <p>We process your personal information for the following specific purposes only:</p>
+      <ol>
+        <li><strong>To process your job application</strong> — matching your details and qualifications to available positions and sharing your application with recruitment personnel.</li>
+        <li><strong>To verify your eligibility</strong> — confirming that you reside within the eligible community area.</li>
+        <li><strong>To communicate with you</strong> — sending confirmation emails on application receipt, and status update emails when your application status changes.</li>
+        <li><strong>To maintain a transparent record</strong> — creating a time-stamped, auditable record of all applications accessible to the Local Committee and the mine.</li>
+        <li><strong>To manage your account</strong> — allowing you to sign in securely, pre-fill application forms, and track your application history.</li>
+        <li><strong>To comply with legal obligations</strong> — retaining records as required under applicable South African labour and community development regulations.</li>
+      </ol>
+      <div class="warning"><strong>We will never:</strong> sell your information, use it for marketing purposes, share it with any party not involved in the recruitment process, or use it for any purpose other than those listed above.</div>
+    </div>
+
+    <div class="section-block" id="s4">
+      <h2><span class="icon">&#9878;&#65039;</span>4. Legal Basis for Processing</h2>
+      <p>Under POPIA, we are required to have a lawful basis for processing your personal information. Our legal bases are:</p>
+      <ul>
+        <li><strong>Consent</strong> — You provide explicit consent by ticking the consent checkbox when submitting your application. You may withdraw consent at any time by contacting us.</li>
+        <li><strong>Contractual necessity</strong> — Processing is necessary to take steps at your request prior to entering into employment.</li>
+        <li><strong>Legitimate interest</strong> — Maintaining an accurate, accountable record of all applications, in line with the mine's Social and Labour Plan (SLP) obligations.</li>
+        <li><strong>Legal compliance</strong> — Retaining records as required by South African law.</li>
+      </ul>
+    </div>
+
+    <div class="section-block" id="s5">
+      <h2><span class="icon">&#128274;</span>5. How We Store and Protect Your Information</h2>
+      <p>All data is stored within Supabase's cloud infrastructure (a managed PostgreSQL database and secure file storage), which operates data centres with industry-standard security certifications.</p>
+      <h3>Technical safeguards in place:</h3>
+      <ul>
+        <li><strong>Password hashing:</strong> All passwords are hashed using SHA-256 before storage. The original password is never stored anywhere.</li>
+        <li><strong>Access control:</strong> The admin portal is password-protected, verified server-side. Only authorised BKS administrators and authorised committee personnel can access it.</li>
+        <li><strong>Encrypted transmission:</strong> All data is transmitted over HTTPS (TLS encryption).</li>
+        <li><strong>Private document storage:</strong> Uploaded CVs and ID documents are stored in a private storage bucket, accessible only via time-limited secure links generated for authorised staff.</li>
+        <li><strong>No public exposure:</strong> No personal data is publicly accessible.</li>
+      </ul>
+      <div class="highlight"><strong>Location data:</strong> GPS coordinates are used only in your browser to calculate distance. They are <strong>never transmitted to or stored on</strong> our servers.</div>
+    </div>
+
+    <div class="section-block" id="s6">
+      <h2><span class="icon">&#128197;</span>6. How Long We Keep Your Information</h2>
+      <div class="data-table-wrap"><table class="data-table">
+        <thead>
+          <tr><th>Data Type</th><th>Retention Period</th><th>Reason</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Job application records</td><td>3 years from submission date</td><td>Accountability, auditing, and regulatory compliance</td></tr>
+          <tr><td>Uploaded documents (CV, ID)</td><td>3 years from submission date</td><td>Recruitment record keeping</td></tr>
+          <tr><td>Account information</td><td>Until account deletion is requested</td><td>Ongoing access to application history</td></tr>
+          <tr><td>Application event logs</td><td>3 years from last event</td><td>Transparency and audit trail</td></tr>
+          <tr><td>Location data (GPS)</td><td>Not retained — deleted immediately after eligibility check</td><td>Used only client-side for verification</td></tr>
+        </tbody>
+      </table></div>
+      <p>After the retention period, personal information will be securely deleted or anonymised so that it can no longer be linked to you.</p>
+    </div>
+
+    <div class="section-block" id="s7">
+      <h2><span class="icon">&#128101;</span>7. Who We Share Your Information With</h2>
+      <p>We share your information only where necessary for the purposes described in this notice:</p>
+      <ul>
+        <li><strong>Mine &amp; HR Team:</strong> Your application details are shared with the mine's authorised recruitment personnel for candidate evaluation and shortlisting.</li>
+        <li><strong>Local Community Committee:</strong> The committee may review the application register for governance and accountability purposes.</li>
+        <li><strong>Traditional Leadership:</strong> Traditional authority structures may review anonymised or summarised application data as part of their oversight role.</li>
+        <li><strong>Infrastructure providers (data processors):</strong> Supabase and Netlify provide the underlying cloud infrastructure. These providers process data strictly as processors under our instruction and do not use your data for their own purposes.</li>
+      </ul>
+      <div class="warning"><strong>We do not share your information</strong> with any third-party advertisers, data brokers, marketing companies, or any entity not listed above.</div>
+    </div>
+
+    <div class="section-block" id="s8">
+      <h2><span class="icon">&#9878;&#65039;</span>8. Your Rights Under POPIA</h2>
+      <p>As a data subject under POPIA, 4 of 2013, you have the following rights:</p>
+      <div class="rights-grid">
+        <div class="right-card"><div class="right-icon">&#128269;</div><h4>Right of Access</h4><p>Request a copy of the personal information we hold about you.</p></div>
+        <div class="right-card"><div class="right-icon">&#9999;&#65039;</div><h4>Right to Correction</h4><p>Request correction of inaccurate, misleading, or incomplete information.</p></div>
+        <div class="right-card"><div class="right-icon">&#128683;</div><h4>Right to Object</h4><p>Object to the processing of your information in certain circumstances.</p></div>
+        <div class="right-card"><div class="right-icon">&#128465;&#65039;</div><h4>Right to Deletion</h4><p>Request deletion of your information where we have no lawful reason to retain it.</p></div>
+        <div class="right-card"><div class="right-icon">&#128274;</div><h4>Withdraw Consent</h4><p>Withdraw your consent to processing at any time by contacting us.</p></div>
+        <div class="right-card"><div class="right-icon">&#128222;</div><h4>Right to Complain</h4><p>Lodge a complaint with the Information Regulator of South Africa.</p></div>
+      </div>
+      <p>To exercise any of these rights, contact us using the details in Section 12. We will respond within 30 days.</p>
+      <div class="highlight">
+        <strong>Information Regulator of South Africa</strong><br>
+        Website: <a href="https://www.justice.gov.za/inforeg/" target="_blank" style="color:var(--green-mid);">www.justice.gov.za/inforeg</a><br>
+        Email: inforeg@justice.gov.za &nbsp;&bull;&nbsp; Phone: 010 023 5207
+      </div>
+    </div>
+
+    <div class="section-block" id="s9">
+      <h2><span class="icon">&#127759;</span>9. Cookies and Location Data</h2>
+      <h3>Session Storage</h3>
+      <p>This portal uses your browser's <strong>sessionStorage</strong> (not cookies) to keep you signed in during your visit. This data is temporary — it is automatically cleared when you close your browser tab. No persistent tracking cookies are set by BKS.</p>
+      <h3>Location Data</h3>
+      <p>When you visit the portal, you are asked to share your device's GPS location solely to verify that you reside within the eligible Atok, Ga-Selepe, 0749 service area. The verification happens entirely within your browser — your coordinates are <strong>never sent to our servers and never stored</strong>. You may decline location access at any time.</p>
+      <h3>Third-Party Services</h3>
+      <p>This portal is hosted on Netlify with data stored via Supabase. Their respective privacy policies apply: <a href="https://www.netlify.com/privacy/" target="_blank" style="color:var(--green-mid);">netlify.com/privacy</a> and <a href="https://supabase.com/privacy" target="_blank" style="color:var(--green-mid);">supabase.com/privacy</a></p>
+    </div>
+
+    <div class="section-block" id="s10">
+      <h2><span class="icon">&#128100;</span>10. Children's Privacy</h2>
+      <p>This portal is intended for adults seeking employment. We do not knowingly collect personal information from persons under the age of 18. If you are under 18, please do not submit an application without the consent of a parent or legal guardian. If we become aware that we have inadvertently collected information from a minor, we will delete it promptly.</p>
+    </div>
+
+    <div class="section-block" id="s11">
+      <h2><span class="icon">&#128260;</span>11. Changes to This Notice</h2>
+      <p>We may update this Privacy Notice from time to time to reflect changes in our practices or legal requirements. When we make material changes, we will update the effective date shown at the top of this page. We encourage you to review this notice periodically. Continued use of the portal after changes are posted constitutes your acceptance of the updated notice.</p>
+    </div>
+
+    <div class="section-block" id="s12">
+      <h2><span class="icon">&#128222;</span>12. How to Contact Us</h2>
+      <p>If you have any questions about this Privacy Notice, wish to exercise your rights, or want to raise a concern, please contact us:</p>
+      <div class="contact-box">
+        <h3>BKS Community Job Center — Privacy Contact</h3>
+        <div class="contact-row"><span class="contact-label">Name</span><span class="contact-val">BKS Community Job Center</span></div>
+        <div class="contact-row"><span class="contact-label">Address</span><span class="contact-val">Atok, Ga-Selepe, Limpopo, 0749, South Africa</span></div>
+        <div class="contact-row"><span class="contact-label">Email</span><span class="contact-val"><a href="mailto:briankagisokingsley@gmail.com">briankagisokingsley@gmail.com</a></span></div>
+        <div class="contact-row"><span class="contact-label">Phone</span><span class="contact-val"><a href="tel:0714469504">071 446 9504</a></span></div>
+        <div class="contact-row"><span class="contact-label">Hours</span><span class="contact-val">Monday – Friday, 08:00 – 17:00 SAST</span></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="page-footer">
+  <canvas id="footerCanvas" aria-hidden="true"></canvas>
+  <p>
+    <a id="pvFooterLink" href="/portal.html">&#8592; Job Portal</a>
+    &bull;
+    BKS Community Job Center &copy; 2026
+    &bull;
+    Fair. Transparent. Merit-Based. POPIA Compliant.
+  </p>
+</div>
+
+<script>
+(function(){
+  function makeParticles(canvasEl, gold){
+    if(!canvasEl) return;
+    var ctx = canvasEl.getContext('2d'), W, H, pts = [];
+    function rsz(){
+      W = canvasEl.width  = canvasEl.parentElement.offsetWidth  || window.innerWidth;
+      H = canvasEl.height = canvasEl.parentElement.offsetHeight || 200;
+    }
+    rsz(); window.addEventListener('resize', rsz, {passive:true});
+    var col = gold ? '255,215,0' : '29,158,117';
+    for(var i = 0; i < 40; i++){
+      pts.push({x:Math.random()*1920,y:Math.random()*400,r:Math.random()*1.6+.4,
+        dx:(Math.random()-.5)*.28,dy:(Math.random()-.5)*.22,o:Math.random()*.22+.06});
+    }
+    (function draw(){
+      ctx.clearRect(0,0,W,H);
+      pts.forEach(function(p){
+        ctx.beginPath();ctx.arc(p.x%W,p.y%H,p.r,0,Math.PI*2);
+        ctx.fillStyle='rgba('+col+','+p.o+')';ctx.fill();
+        p.x+=p.dx;p.y+=p.dy;
+        if(p.x<0)p.x=W;if(p.x>W)p.x=0;if(p.y<0)p.y=H;if(p.y>H)p.y=0;
+      });
+      requestAnimationFrame(draw);
+    })();
+  }
+
+  makeParticles(document.getElementById('headerCanvas'), true);
+  makeParticles(document.getElementById('footerCanvas'), true);
+})();
+</script>
+</body>
+</html>

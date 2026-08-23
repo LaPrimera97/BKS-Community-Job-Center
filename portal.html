@@ -60,9 +60,7 @@ body {
 
 
 .hero {
-  background:
-    linear-gradient(160deg, rgba(2, 15, 10, 0.78) 0%, rgba(4, 30, 22, 0.85) 100%),
-    url("https://drive.google.com/thumbnail?id=1tQU0UOQPcw6UNFO3fUXEkgNlt1vy5oVP&sz=w2000") center / cover;
+  background: linear-gradient(160deg, var(--green-deep) 0%, var(--green-dark) 55%, var(--green-mid) 100%);
   min-height: 100vh;
   display: flex;
   align-items: center;
@@ -75,21 +73,6 @@ body {
 #heroCanvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; }
 
 
-.hero-logo-link {
-  position: fixed; top: 18px; right: 26px; z-index: 9999; display: block; cursor: pointer;
-  transition: top var(--transition-slow), transform var(--transition-base), opacity var(--transition-slow);
-}
-.hero-logo-link img {
-  width: 196px; height: auto; display: block;
-  transition: width var(--transition-slow), filter var(--transition-base), transform var(--transition-base);
-  filter: drop-shadow(0 2px 12px rgba(0,0,0,.3));
-}
-.hero-logo-link:hover img {
-  transform: scale(1.04);
-  filter: drop-shadow(0 4px 18px rgba(245, 200, 66, 0.45));
-}
-.nav-scrolled .hero-logo-link { top: 9px; }
-.nav-scrolled .hero-logo-link img { width: 106px; }
 
 
 .hero-nav {
@@ -596,49 +579,6 @@ body {
 .empty-state p { font-size: 14px; color: var(--muted); }
 
 
-.contact-section { background: var(--cream); position: relative; overflow: hidden; }
-.contact-section .container { position: relative; z-index: 2; }
-.contact-title {
-  font-family: var(--font-display);
-  font-size: clamp(26px, 4vw, 36px);
-  font-weight: 700; color: var(--green-dark);
-  text-align: center; margin-bottom: 12px;
-  letter-spacing: -0.022em;
-}
-.contact-sub {
-  text-align: center; color: var(--muted);
-  margin-bottom: 44px; font-size: 15.5px;
-  line-height: 1.7;
-}
-.contact-layout {
-  display: grid; grid-template-columns: 1fr 1fr;
-  gap: 40px; align-items: start;
-  max-width: 960px; margin: 0 auto;
-}
-.contact-cards {
-  display: flex; flex-direction: column;
-  gap: 30px; padding-top: 6px;
-}
-.info-row {
-  display: flex; align-items: flex-start; gap: 16px;
-}
-.info-icon {
-  width: 42px; height: 42px; min-width: 42px;
-  border: 1.5px solid var(--border); border-radius: 12px;
-  display: flex; align-items: center; justify-content: center;
-  color: var(--green-mid);
-  transition: border-color var(--transition-base), background var(--transition-base);
-}
-.info-icon svg { width: 18px; height: 18px; }
-.info-row:hover .info-icon { border-color: var(--green-vivid); background: var(--green-pale); }
-.info-label {
-  font-size: 10px; color: #8a8278;
-  margin-bottom: 5px; text-transform: uppercase;
-  letter-spacing: 0.08em; font-weight: 700;
-}
-.info-value { font-size: 15px; font-weight: 700; color: var(--ink); line-height: 1.55; }
-.info-value a { color: var(--ink); text-decoration: none; transition: color var(--transition-fast); }
-.info-value a:hover { color: var(--green-vivid); }
 
 
 footer {
@@ -957,8 +897,6 @@ footer .container { position: relative; z-index: 2; }
   .nav-menu-btn { padding: 7px 14px; font-size: 13px; }
   .nav-dropdown { min-width: 200px; }
 
-  .hero-logo-link { display: none !important; }
-
   .hero h1 { font-size: 34px; letter-spacing: -0.01em; }
   .hero-sub { font-size: 16px; }
   .hero-badge { font-size: 10px; letter-spacing: 0.09em; padding: 5px 15px; }
@@ -1002,12 +940,6 @@ footer .container { position: relative; z-index: 2; }
   .consent { font-size: 14px; }
   .btn-cancel, .btn-submit { font-size: 15px; }
 
-  .contact-layout { grid-template-columns: 1fr; }
-  .contact-title { font-size: 26px; }
-  .contact-sub { font-size: 15px; }
-  .info-label { font-size: 11px; }
-  .info-value { font-size: 15px; }
-
   .tracker-summary { grid-template-columns: repeat(2, 1fr); }
   .tracker-summary-card .ts-num { font-size: 26px; }
   .tracker-summary-card .ts-lbl { font-size: 11px; }
@@ -1024,8 +956,6 @@ footer .container { position: relative; z-index: 2; }
 
 @media (max-width: 900px) and (orientation: landscape) {
   .hero-nav { top: 6px; left: 6px; gap: 3px; padding: 4px 8px; }
-  .hero-logo-link { top: 6px; right: 6px; }
-  .hero-logo-link img { width: 110px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1056,16 +986,11 @@ footer .container { position: relative; z-index: 2; }
 <div class="hero">
   <canvas id="heroCanvas" aria-hidden="true"></canvas>
 
-  <a href="#" class="hero-logo-link" title="BKS Community Job Center — Home">
-    <img src="https://drive.google.com/thumbnail?id=1idJ5CgHUVJ98YP8frCLbeDexMPkmraLn&sz=w500" alt="BKS Logo">
-  </a>
-
   <nav class="hero-nav">
     <div class="nav-links" id="navLinks">
       <a href="#" data-i18n="navHome">Home</a>
       <a href="#jobs" data-i18n="navJobs">Jobs</a>
       <a href="#about" data-i18n="navAbout">About</a>
-      <a href="#contact" data-i18n="navContact">Contact</a>
     </div>
     <div class="nav-menu-wrap" id="navMenuWrap">
       <button class="nav-menu-btn" id="navMenuBtn" aria-label="Menu">
@@ -1076,7 +1001,6 @@ footer .container { position: relative; z-index: 2; }
         <a href="#" class="nav-drop-link" data-i18n="navHome">Home</a>
         <a href="#jobs" class="nav-drop-link" data-i18n="navJobs">Jobs</a>
         <a href="#about" class="nav-drop-link" data-i18n="navAbout">About</a>
-        <a href="#contact" class="nav-drop-link" data-i18n="navContact">Contact</a>
         <div class="nav-drop-divider"></div>
         <div class="nav-drop-lang">
           <button class="lang-btn active" id="btnLangENMobile">ENG</button>
@@ -1260,62 +1184,6 @@ footer .container { position: relative; z-index: 2; }
     <div class="modal-header"><h3>&#128203; My Applications</h3><button class="close-btn" id="closeTrackerModal">&times;</button></div>
     <div id="trackerContent">
       <div class="loading"><div class="spinner"></div><p style="margin-top:14px;color:#78716c;">Loading...</p></div>
-    </div>
-  </div>
-</div>
-
-<div class="section contact-section" id="contact">
-  <div id="contactParticles" class="particle-layer" aria-hidden="true"></div>
-  <div class="container">
-    <h2 class="contact-title reveal" data-i18n="contactTitle">Get in Touch</h2>
-    <p class="contact-sub reveal" data-i18n="contactSub">Have a question about a job posting or your application? We are here to help.</p>
-    <div class="contact-layout">
-    <div class="contact-cards reveal-stagger">
-      <div class="info-row">
-        <div class="info-icon"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.6 3.38 2 2 0 0 1 3.55 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.5a16 16 0 0 0 5.59 5.59l.91-.91a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21 16.92z"/></svg></div>
-        <div><div class="info-label">Phone</div><div class="info-value"><a href="tel:0714469504">071 446 9504</a></div></div>
-      </div>
-      <div class="info-row">
-        <div class="info-icon"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
-        <div><div class="info-label">Address</div><div class="info-value">Atok, Ga-Selepe, Polokwane, 0749</div></div>
-      </div>
-      <div class="info-row">
-        <div class="info-icon"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div>
-        <div><div class="info-label">Email</div><div class="info-value"><a href="mailto:briankagisokingsley@gmail.com">briankagisokingsley@gmail.com</a></div></div>
-      </div>
-    </div>
-    <div class="contact-form-wrap reveal">
-      <form id="contactForm" style="background:white;border:1px solid var(--border);border-radius:var(--radius-lg);padding:34px 32px;box-shadow:var(--shadow-sm);">
-        <div style="margin-bottom:22px;">
-          <div style="font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--green-mid);margin-bottom:6px;">Send Us a Message</div>
-          <div style="font-size:13px;color:var(--muted);line-height:1.6;">We typically respond within one business day.</div>
-        </div>
-        <div class="form-group">
-          <label data-i18n="contactFormName">Full Name *</label>
-          <input type="text" id="cName" required placeholder="Your name">
-        </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label data-i18n="contactFormEmail">Email Address *</label>
-            <input type="email" id="cEmail" required placeholder="your@email.com">
-          </div>
-          <div class="form-group">
-            <label data-i18n="contactFormPhone">Phone (optional)</label>
-            <input type="tel" id="cPhone" placeholder="e.g. 0821234567">
-          </div>
-        </div>
-        <div class="form-group">
-          <label data-i18n="contactFormMsg">Message *</label>
-          <textarea id="cMessage" required rows="5" placeholder="How can we help?"
-            style="width:100%;padding:12px 16px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:14px;font-family:var(--font-body);color:var(--ink);resize:vertical;outline:none;"></textarea>
-        </div>
-        <div id="contactFormMsgBox" class="auth-msg"></div>
-        <button type="submit" class="btn-submit" id="contactSubmitBtn" style="width:100%;display:flex;align-items:center;justify-content:center;gap:8px;">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-          <span id="contactSubmitLabel" data-i18n="contactFormSubmit">Send Message</span>
-        </button>
-      </form>
-    </div>
     </div>
   </div>
 </div>
@@ -1695,11 +1563,6 @@ var I18N={
     jobsSub:'Jobs allocated for local communities — fair, transparent, and merit-based',
     contactTitle:'Get in Touch',
     contactSub:'Have a question about a job posting or your application? We are here to help.',
-    contactFormName:'Full Name *',
-    contactFormEmail:'Email Address *',
-    contactFormPhone:'Phone (optional)',
-    contactFormMsg:'Message *',
-    contactFormSubmit:'Send Message',
     locTitle:'Location Verification',
     locBody:'This portal is exclusively for residents of <strong>Atok, Ga-Selepe and the 0749 area</strong>. Please allow location access to confirm you are in the eligible area.',
     locAllow:'Allow Location Access',
@@ -1732,11 +1595,6 @@ var I18N={
     jobsSub:'Me\u0161omo ye e swanet\u0161ego set\u0161haba sa maleba \u2014 ka toka, ponagatso, le maemo',
     contactTitle:'Ikopanye le Rena',
     contactSub:'Na o na le potsi\u0161o ka kgopelo ya mo\u0161omo goba ka kakaretso? Re gona go go thusha.',
-    contactFormName:'Leina la Maleba *',
-    contactFormEmail:'Aterese ya Imeile *',
-    contactFormPhone:'Founu (ga se kgapeletso)',
-    contactFormMsg:'Molaet\u0161a *',
-    contactFormSubmit:'Romela Molaet\u0161a',
     locTitle:'Netefatso ya Lefelo',
     locBody:'Lefelo le le amana le baagi ba <strong>Atok, Ga-Selepe la 0749</strong>. Dumelela phihlelelo ya lefelo go netefatsa gore o mo lefelong le le maleba.',
     locAllow:'Dumelela Phihlelelo ya Lefelo',
@@ -1783,48 +1641,6 @@ if(btnLangENMobileEl) btnLangENMobileEl.addEventListener('click',function(){appl
 if(btnLangNSOMobileEl) btnLangNSOMobileEl.addEventListener('click',function(){applyLang('nso');});
 
 
-document.getElementById('contactForm').addEventListener('submit', function(e){
-  e.preventDefault();
-  var name    = document.getElementById('cName').value.trim();
-  var email   = document.getElementById('cEmail').value.trim();
-  var phone   = document.getElementById('cPhone').value.trim();
-  var message = document.getElementById('cMessage').value.trim();
-
-  if(!name || !email || !message){
-    showContactMsg('error','Please fill in your name, email and message.');
-    return;
-  }
-
-  var btn = document.getElementById('contactSubmitBtn');
-  var btnLabel = document.getElementById('contactSubmitLabel');
-  btnLabel.textContent = 'Sending\u2026'; btn.disabled = true;
-
-  fetch('/api/submit-contact', {
-    method: 'POST',
-    headers: {'Content-Type':'application/json'},
-    body: JSON.stringify({ name: name, email: email, phone: phone, message: message })
-  })
-    .then(function(r){ return r.json(); })
-    .then(function(r){
-      showContactMsg(r.success ? 'success' : 'error', r.message);
-      if(r.success) document.getElementById('contactForm').reset();
-      btnLabel.textContent = (I18N[BKS_LANG]||I18N.en).contactFormSubmit || 'Send Message';
-      btn.disabled = false;
-    })
-    .catch(function(err){
-      showContactMsg('error','Error: ' + (err.message || err));
-      btnLabel.textContent = (I18N[BKS_LANG]||I18N.en).contactFormSubmit || 'Send Message';
-      btn.disabled = false;
-    });
-});
-
-function showContactMsg(type, text){
-  var el = document.getElementById('contactFormMsgBox');
-  el.className = 'auth-msg ' + type;
-  el.textContent = text;
-}
-
-
 function startApp(){
   initLang();
   var sv=sessionStorage.getItem('bksUser');if(sv){try{currentUser=JSON.parse(sv);}catch(e){currentUser=null;}}
@@ -1854,7 +1670,6 @@ function startAnimations(){
 
   createGoldParticles(document.getElementById('aboutParticles'),   25, 0.12, false);
   createGoldParticles(document.getElementById('jobsParticles'),    35, 0.16, true);
-  createGoldParticles(document.getElementById('contactParticles'), 20, 0.10, false);
   createGoldParticles(document.getElementById('footerParticles'),  40, 0.22, true);
 
 
@@ -1900,7 +1715,7 @@ function startAnimations(){
   });
 
 
-  var allSecs=[{id:'',href:'#'},{id:'jobs',href:'#jobs'},{id:'about',href:'#about'},{id:'contact',href:'#contact'}];
+  var allSecs=[{id:'',href:'#'},{id:'jobs',href:'#jobs'},{id:'about',href:'#about'}];
   function getNavLink(href){return document.querySelector('.nav-links a[href="'+href+'"]');}
   function getDropLink(href){return document.querySelector('.nav-drop-link[href="'+href+'"]');}
   function onScroll(){

@@ -1,15 +1,20 @@
 const { supabase } = require('./lib/supabaseClient');
+const { requireAdmin } = require('./lib/adminAuth');
 
 exports.handler = async function (event) {
   if (event.httpMethod !== 'POST') {
     return { statusCode: 405, body: JSON.stringify({ error: 'Method not allowed' }) };
   }
 
+  if (!requireAdmin(event)) {
+    return respond(401, { success: false, message: 'Admin authentication required.' });
+  }
+
   try {
     const { jobId } = JSON.parse(event.body || '{}');
 
     if (!jobId) {
-      return respond(200, { success: false, message: 'Job ID is required.' });
+      return respond(400, { success: false, message: 'Job ID is required.' });
     }
 
     const { error } = await supabase.from('jobs').delete().eq('id', jobId);
@@ -19,7 +24,7 @@ exports.handler = async function (event) {
 
   } catch (err) {
     console.error('admin-delete-job error:', err);
-    return respond(200, { success: false, message: err.message || 'Failed to delete job.' });
+    return respond(500, { success: false, message: err.message || 'Failed to delete job.' });
   }
 };
 

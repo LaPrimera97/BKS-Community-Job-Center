@@ -1,8 +1,13 @@
 const { supabase } = require('./lib/supabaseClient');
+const { requireAdmin } = require('./lib/adminAuth');
 
 exports.handler = async function (event) {
   if (event.httpMethod !== 'GET') {
     return { statusCode: 405, body: JSON.stringify({ error: 'Method not allowed' }) };
+  }
+
+  if (!requireAdmin(event)) {
+    return respond(401, { error: 'Admin authentication required.' });
   }
 
   try {
@@ -64,7 +69,7 @@ exports.handler = async function (event) {
 
   } catch (err) {
     console.error('admin-dashboard-data error:', err);
-    return respond(200, { jobs: [], apps: [] });
+    return respond(500, { jobs: [], apps: [] });
   }
 };
 

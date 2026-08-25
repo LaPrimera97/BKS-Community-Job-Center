@@ -179,6 +179,12 @@ var jobsData = [], appsData = [];
 document.getElementById('loginBtn').addEventListener('click', login);
 document.getElementById('password').addEventListener('keypress', function(e){if(e.key==='Enter')login();});
 
+function adminHeaders(extra){
+  var h = extra ? Object.assign({}, extra) : {};
+  h['Authorization'] = 'Bearer ' + (sessionStorage.getItem('adminToken') || '');
+  return h;
+}
+
 function login(){
   var pw = document.getElementById('password').value;
   var btn = document.getElementById('loginBtn');
@@ -196,6 +202,7 @@ function login(){
       btn.textContent = 'Sign In'; btn.disabled = false;
       if(r.success){
         sessionStorage.setItem('adminLoggedIn','true');
+        sessionStorage.setItem('adminToken', r.token || '');
         document.getElementById('loginScreen').style.display = 'none';
         document.getElementById('dashboardScreen').style.display = 'block';
         document.getElementById('currentDate').innerHTML = new Date().toLocaleDateString('en-ZA',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
@@ -215,6 +222,7 @@ function login(){
 
 document.getElementById('logoutBtn').addEventListener('click', function(){
   sessionStorage.removeItem('adminLoggedIn');
+  sessionStorage.removeItem('adminToken');
   document.getElementById('loginScreen').style.display = 'flex';
   document.getElementById('dashboardScreen').style.display = 'none';
   document.getElementById('password').value = '';
@@ -247,7 +255,7 @@ function switchTab(tab){
 
 
 function loadDashboard(){
-  fetch('/api/admin-dashboard-data')
+  fetch('/api/admin-dashboard-data', {headers: adminHeaders()})
     .then(function(r){ return r.json(); })
     .then(function(data){
       jobsData = data.jobs||[]; appsData = data.apps||[];
@@ -281,7 +289,7 @@ function getBadge(s){
 
 
 function loadJobsAdmin(){
-  fetch('/api/admin-dashboard-data')
+  fetch('/api/admin-dashboard-data', {headers: adminHeaders()})
     .then(function(r){ return r.json(); })
     .then(function(data){
       var jobs = data.jobs||[];
@@ -305,20 +313,20 @@ function loadJobsAdmin(){
 
 function closeJobRow(jobId){
   if(!confirm('Close this job?'))return;
-  fetch('/api/admin-update-job-status', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({jobId:jobId,status:'Closed'})})
+  fetch('/api/admin-update-job-status', {method:'POST',headers:adminHeaders({'Content-Type':'application/json'}),body:JSON.stringify({jobId:jobId,status:'Closed'})})
     .then(function(r){return r.json();})
     .then(function(res){if(res.success)loadJobsAdmin();else alert('Error: '+res.message);})
     .catch(function(e){alert(e.message||e);});
 }
 function openJobRow(jobId){
-  fetch('/api/admin-update-job-status', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({jobId:jobId,status:'Open'})})
+  fetch('/api/admin-update-job-status', {method:'POST',headers:adminHeaders({'Content-Type':'application/json'}),body:JSON.stringify({jobId:jobId,status:'Open'})})
     .then(function(r){return r.json();})
     .then(function(res){if(res.success)loadJobsAdmin();else alert('Error: '+res.message);})
     .catch(function(e){alert(e.message||e);});
 }
 function deleteJobRow(jobId){
   if(!confirm('Permanently delete this job?'))return;
-  fetch('/api/admin-delete-job', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({jobId:jobId})})
+  fetch('/api/admin-delete-job', {method:'POST',headers:adminHeaders({'Content-Type':'application/json'}),body:JSON.stringify({jobId:jobId})})
     .then(function(r){return r.json();})
     .then(function(res){if(res.success)loadJobsAdmin();else alert('Error: '+res.message);})
     .catch(function(e){alert(e.message||e);});
@@ -326,7 +334,7 @@ function deleteJobRow(jobId){
 
 
 function loadApplications(){
-  fetch('/api/admin-dashboard-data')
+  fetch('/api/admin-dashboard-data', {headers: adminHeaders()})
     .then(function(r){ return r.json(); })
     .then(function(data){
       var apps = data.apps||[];
@@ -361,7 +369,7 @@ function loadApplications(){
 }
 
 function updateAppStatus(applicationId,status){
-  fetch('/api/admin-update-application-status', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({applicationId:applicationId,status:status})})
+  fetch('/api/admin-update-application-status', {method:'POST',headers:adminHeaders({'Content-Type':'application/json'}),body:JSON.stringify({applicationId:applicationId,status:status})})
     .then(function(r){return r.json();})
     .then(function(res){if(res.success)loadApplications();else alert('Error: '+res.message);})
     .catch(function(e){alert(e.message||e);});
@@ -391,7 +399,7 @@ function saveNewJob(){
     closing:      closing,
     status:       document.getElementById('newJobStatus').value
   };
-  fetch('/api/admin-add-job', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(job)})
+  fetch('/api/admin-add-job', {method:'POST',headers:adminHeaders({'Content-Type':'application/json'}),body:JSON.stringify(job)})
     .then(function(r){return r.json();})
     .then(function(res){if(res.success){closeAddJobModal();loadJobsAdmin();}else alert('Error: '+res.message);})
     .catch(function(e){alert(e.message||e);});
@@ -399,7 +407,7 @@ function saveNewJob(){
 
 
 function startAdmin(){
-  if(sessionStorage.getItem('adminLoggedIn')==='true'){
+  if(sessionStorage.getItem('adminLoggedIn')==='true' && sessionStorage.getItem('adminToken')){
     document.getElementById('loginScreen').style.display = 'none';
     document.getElementById('dashboardScreen').style.display = 'block';
     document.getElementById('currentDate').innerHTML = new Date().toLocaleDateString('en-ZA',{weekday:'long',year:'numeric',month:'long',day:'numeric'});

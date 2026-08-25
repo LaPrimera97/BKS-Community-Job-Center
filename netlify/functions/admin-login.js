@@ -1,4 +1,5 @@
 const { checkAdminPassword } = require('./lib/auth');
+const { issueAdminToken } = require('./lib/adminAuth');
 
 exports.handler = async function (event) {
   if (event.httpMethod !== 'POST') {
@@ -9,15 +10,14 @@ exports.handler = async function (event) {
     const { password } = JSON.parse(event.body || '{}');
 
     if (!password) {
-      return respond(200, { success: false, message: 'Please enter the admin password.' });
+      return respond(400, { success: false, message: 'Please enter the admin password.' });
     }
 
     const ok = checkAdminPassword(password);
 
-    return respond(200, ok
-      ? { success: true }
-      : { success: false, message: 'Invalid password. Please try again.' }
-    );
+    return ok
+      ? respond(200, { success: true, token: issueAdminToken() })
+      : respond(401, { success: false, message: 'Invalid password. Please try again.' });
 
   } catch (err) {
     console.error('admin-login error:', err);

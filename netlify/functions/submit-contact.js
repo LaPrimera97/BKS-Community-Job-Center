@@ -9,7 +9,7 @@ exports.handler = async function (event) {
     const formData = JSON.parse(event.body || '{}');
 
     if (!formData.name || !formData.email || !formData.message) {
-      return respond(200, { success: false, message: 'Please fill in your name, email and message.' });
+      return respond(400, { success: false, message: 'Please fill in your name, email and message.' });
     }
 
     const { error } = await supabase.from('contact_messages').insert({
@@ -26,7 +26,7 @@ exports.handler = async function (event) {
 
   } catch (err) {
     console.error('submit-contact error:', err);
-    return respond(200, { success: false, message: 'Failed to send your message due to a server error. Please try again.' });
+    return respond(500, { success: false, message: 'Failed to send your message due to a server error. Please try again.' });
   }
 };
 

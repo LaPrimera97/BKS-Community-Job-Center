@@ -22,7 +22,7 @@ exports.handler = async function (event) {
   } catch (err) {
     console.error('get-jobs error:', err);
     return {
-      statusCode: 200,
+      statusCode: 500,
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify([])
     };

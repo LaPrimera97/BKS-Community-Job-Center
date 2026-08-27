@@ -19,7 +19,7 @@ exports.handler = async function (event) {
 
     const { data: app, error: updateErr } = await supabase
       .from('applications')
-      .update({ status, updated_at: new Date().toISOString() })
+      .update({ status })
       .eq('id', applicationId)
       .select()
       .single();

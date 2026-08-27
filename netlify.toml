@@ -1,6 +1,13 @@
 [build]
   functions = "netlify/functions"
   publish = "."
+
+[[redirects]]
+  from = "https://bkscommunityjobcenter.netlify.app/*"
+  to = "https://bkscommunityjobcenter.com/:splat"
+  status = 301
+  force = true
+
 [[redirects]]
   from = "/api/*"
   to = "/.netlify/functions/:splat"

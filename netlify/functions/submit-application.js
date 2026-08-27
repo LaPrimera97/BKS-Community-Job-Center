@@ -11,32 +11,32 @@ exports.handler = async function (event) {
     const { formData, cvFileData, idFileData } = JSON.parse(event.body || '{}');
 
     if (!formData || !formData.name || !formData.idNumber || !formData.phone || !formData.jobId) {
-      return respond(200, { success: false, message: 'Please fill in all required fields.' });
+      return respond(400, { success: false, message: 'Please fill in all required fields.' });
     }
     if (!cvFileData || !idFileData) {
-      return respond(200, { success: false, message: 'Please upload both your CV and ID document.' });
+      return respond(400, { success: false, message: 'Please upload both your CV and ID document.' });
     }
     if (!formData.gender || !formData.maritalStatus) {
-      return respond(200, { success: false, message: 'Please select your gender and marital status.' });
+      return respond(400, { success: false, message: 'Please select your gender and marital status.' });
     }
 
     const idStr = formData.idNumber.toString().replace(/\D/g, '');
     if (idStr.length !== 13) {
-      return respond(200, { success: false, message: 'Please enter a valid 13-digit South African ID number.' });
+      return respond(400, { success: false, message: 'Please enter a valid 13-digit South African ID number.' });
     }
 
     const phoneStr = formData.phone.toString().replace(/\D/g, '');
     if (phoneStr.length < 10) {
-      return respond(200, { success: false, message: 'Please enter a valid 10-digit phone number.' });
+      return respond(400, { success: false, message: 'Please enter a valid 10-digit phone number.' });
     }
     
     const cvBuffer = Buffer.from(cvFileData.data, 'base64');
     const idBuffer = Buffer.from(idFileData.data, 'base64');
     if (cvBuffer.length > MAX_BYTES) {
-      return respond(200, { success: false, message: 'Your CV file is too large. Maximum size is 5MB.' });
+      return respond(400, { success: false, message: 'Your CV file is too large. Maximum size is 5MB.' });
     }
     if (idBuffer.length > MAX_BYTES) {
-      return respond(200, { success: false, message: 'Your ID document is too large. Maximum size is 5MB.' });
+      return respond(400, { success: false, message: 'Your ID document is too large. Maximum size is 5MB.' });
     }
 
     const { data: existingApp } = await supabase
@@ -47,7 +47,7 @@ exports.handler = async function (event) {
       .maybeSingle();
 
     if (existingApp) {
-      return respond(200, {
+      return respond(409, {
         success: false,
         message: 'You have already submitted an application for this position. Please check your application status.'
       });
@@ -107,7 +107,7 @@ exports.handler = async function (event) {
 
   } catch (err) {
     console.error('submit-application error:', err);
-    return respond(200, { success: false, message: 'Submission failed due to a server error. Please try again.' });
+    return respond(500, { success: false, message: 'Submission failed due to a server error. Please try again.' });
   }
 };
 

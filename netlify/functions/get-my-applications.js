@@ -49,7 +49,7 @@ exports.handler = async function (event) {
 
   } catch (err) {
     console.error('get-my-applications error:', err);
-    return respond(200, { apps: [], events: [] });
+    return respond(500, { apps: [], events: [] });
   }
 };
 

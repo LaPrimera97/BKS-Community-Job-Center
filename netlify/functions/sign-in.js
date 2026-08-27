@@ -10,7 +10,7 @@ exports.handler = async function (event) {
     const { email, password } = JSON.parse(event.body || '{}');
 
     if (!email || !password) {
-      return respond(200, { success: false, message: 'Please enter your email and password.' });
+      return respond(400, { success: false, message: 'Please enter your email and password.' });
     }
 
     const eLow = email.toLowerCase().trim();
@@ -24,11 +24,11 @@ exports.handler = async function (event) {
     if (error) throw error;
 
     if (!user) {
-      return respond(200, { success: false, message: 'No account found with that email address.' });
+      return respond(401, { success: false, message: 'No account found with that email address.' });
     }
 
     if (user.password_hash !== hashPassword(password)) {
-      return respond(200, { success: false, message: 'Incorrect password. Please try again.' });
+      return respond(401, { success: false, message: 'Incorrect password. Please try again.' });
     }
 
     await supabase.from('users').update({ last_login: new Date().toISOString() }).eq('id', user.id);
@@ -43,7 +43,7 @@ exports.handler = async function (event) {
 
   } catch (err) {
     console.error('sign-in error:', err);
-    return respond(200, { success: false, message: 'Sign in failed. Please try again.' });
+    return respond(500, { success: false, message: 'Sign in failed. Please try again.' });
   }
 };
 

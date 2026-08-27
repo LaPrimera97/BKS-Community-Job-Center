@@ -11,10 +11,10 @@ exports.handler = async function (event) {
     const email = (userData.email || '').toLowerCase().trim();
 
     if (!email || !userData.password || !userData.fullName) {
-      return respond(200, { success: false, message: 'Email, password and full name are required.' });
+      return respond(400, { success: false, message: 'Email, password and full name are required.' });
     }
     if (userData.password.length < 8) {
-      return respond(200, { success: false, message: 'Password must be at least 8 characters.' });
+      return respond(400, { success: false, message: 'Password must be at least 8 characters.' });
     }
 
     const { data: existing } = await supabase
@@ -24,7 +24,7 @@ exports.handler = async function (event) {
       .maybeSingle();
 
     if (existing) {
-      return respond(200, { success: false, message: 'An account with this email already exists. Please sign in.' });
+      return respond(409, { success: false, message: 'An account with this email already exists. Please sign in.' });
     }
 
     const { error } = await supabase.from('users').insert({
@@ -41,7 +41,7 @@ exports.handler = async function (event) {
 
   } catch (err) {
     console.error('sign-up error:', err);
-    return respond(200, { success: false, message: 'Registration failed. Please try again.' });
+    return respond(500, { success: false, message: 'Registration failed. Please try again.' });
   }
 };
 

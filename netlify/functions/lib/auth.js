@@ -1,8 +1,7 @@
 const crypto = require('crypto');
 
-function hashPassword(password) {
-  if (!password) return '';
-  return crypto.createHash('sha256').update(password, 'utf8').digest('hex');
+function digest(value) {
+  return crypto.createHash('sha256').update(String(value), 'utf8').digest();
 }
 
 function checkAdminPassword(password) {
@@ -10,7 +9,7 @@ function checkAdminPassword(password) {
   if (!correct) {
     throw new Error('ADMIN_PASSWORD environment variable is not set.');
   }
-  return password === correct;
+  return crypto.timingSafeEqual(digest(password), digest(correct));
 }
 
-module.exports = { hashPassword, checkAdminPassword };
+module.exports = { checkAdminPassword };

@@ -1,5 +1,9 @@
 const { supabase } = require('./lib/supabaseClient');
-const { hashPassword } = require('./lib/auth');
+const { verifyPassword, burnPassword, hashPassword } = require('./lib/password');
+const { issueUserToken } = require('./lib/tokens');
+const { clientIp, isLimited, recordHit, clearHits, FIFTEEN_MINUTES } = require('./lib/rateLimit');
+
+const GENERIC_FAILURE = 'Incorrect email or password. Please try again.';
 
 exports.handler = async function (event) {
   if (event.httpMethod !== 'POST') {
@@ -9,32 +13,50 @@ exports.handler = async function (event) {
   try {
     const { email, password } = JSON.parse(event.body || '{}');
 
-    if (!email || !password) {
+    if (!email || !password || typeof email !== 'string' || typeof password !== 'string') {
       return respond(400, { success: false, message: 'Please enter your email and password.' });
     }
 
     const eLow = email.toLowerCase().trim();
+    const emailKey = 'signin:' + eLow;
+    const ipKey = 'signin-ip:' + clientIp(event);
+
+    if ((await isLimited(emailKey, 5, FIFTEEN_MINUTES)) || (await isLimited(ipKey, 30, FIFTEEN_MINUTES))) {
+      return respond(429, { success: false, message: 'Too many sign-in attempts. Please wait 15 minutes and try again.' });
+    }
 
     const { data: user, error } = await supabase
       .from('users')
-      .select('*')
+      .select('id, email, password_hash, full_name, phone, id_number')
       .eq('email', eLow)
       .maybeSingle();
 
     if (error) throw error;
 
     if (!user) {
-      return respond(401, { success: false, message: 'No account found with that email address.' });
+      await burnPassword(password);
+      await recordHit(emailKey);
+      await recordHit(ipKey);
+      return respond(401, { success: false, message: GENERIC_FAILURE });
     }
 
-    if (user.password_hash !== hashPassword(password)) {
-      return respond(401, { success: false, message: 'Incorrect password. Please try again.' });
+    const { valid, needsUpgrade } = await verifyPassword(password, user.password_hash);
+
+    if (!valid) {
+      await recordHit(emailKey);
+      await recordHit(ipKey);
+      return respond(401, { success: false, message: GENERIC_FAILURE });
     }
 
-    await supabase.from('users').update({ last_login: new Date().toISOString() }).eq('id', user.id);
+    await clearHits(emailKey);
+
+    const update = { last_login: new Date().toISOString() };
+    if (needsUpgrade) update.password_hash = await hashPassword(password);
+    await supabase.from('users').update(update).eq('id', user.id);
 
     return respond(200, {
       success: true,
+      token: issueUserToken(user.email),
       fullName: user.full_name || eLow,
       email: user.email,
       phone: user.phone || '',

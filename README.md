@@ -28,7 +28,7 @@ Requires Docker.
 ```bash
    cp .env.example .env
 ```
-   Set `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, and `ADMIN_PASSWORD` in `.env`.
+   Set `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `ADMIN_PASSWORD`, and `TOKEN_SECRET` (a random string of at least 32 characters) in `.env`. Run `supabase-migration.sql` once in the Supabase SQL editor.
 
 2. Start the app:
 ```bash

@@ -27,7 +27,8 @@ exports.handler = async function (event) {
     if (updateErr) throw updateErr;
 
     await supabase.from('application_events').insert({
-      applicant_email: app.email || '',
+      applicant_email: (app.email || '').toLowerCase(),
+      user_email: app.user_email || null,
       applicant_name: app.name || '',
       job_id: app.job_id || '',
       event_type: 'StatusChanged',

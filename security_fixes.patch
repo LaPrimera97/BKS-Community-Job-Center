@@ -1,0 +1,1273 @@
+diff --git a/.env.example b/.env.example
+index f14aed4..c3bdae8 100644
+--- a/.env.example
++++ b/.env.example
+@@ -1,4 +1,5 @@
+ SUPABASE_URL=
+ SUPABASE_SERVICE_ROLE_KEY=
+ ADMIN_PASSWORD=
++TOKEN_SECRET=
+ ADMIN_EMAIL=briankagisokingsley@gmail.com
+diff --git a/README.md b/README.md
+index 0d8b1c3..81ce127 100644
+--- a/README.md
++++ b/README.md
+@@ -28,7 +28,7 @@ Requires Docker.
+ ```bash
+    cp .env.example .env
+ ```
+-   Set `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, and `ADMIN_PASSWORD` in `.env`.
++   Set `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `ADMIN_PASSWORD`, and `TOKEN_SECRET` (a random string of at least 32 characters) in `.env`. Run `supabase-migration.sql` once in the Supabase SQL editor.
+ 
+ 2. Start the app:
+ ```bash
+diff --git a/netlify.toml b/netlify.toml
+index 09c24ba..bd44b9d 100644
+--- a/netlify.toml
++++ b/netlify.toml
+@@ -8,6 +8,54 @@
+   status = 301
+   force = true
+ 
++[[redirects]]
++  from = "/netlify/*"
++  to = "/404.html"
++  status = 404
++  force = true
++
++[[redirects]]
++  from = "/server.js"
++  to = "/404.html"
++  status = 404
++  force = true
++
++[[redirects]]
++  from = "/package.json"
++  to = "/404.html"
++  status = 404
++  force = true
++
++[[redirects]]
++  from = "/package-lock.json"
++  to = "/404.html"
++  status = 404
++  force = true
++
++[[redirects]]
++  from = "/Dockerfile"
++  to = "/404.html"
++  status = 404
++  force = true
++
++[[redirects]]
++  from = "/docker-compose.yml"
++  to = "/404.html"
++  status = 404
++  force = true
++
++[[redirects]]
++  from = "/supabase-migration.sql"
++  to = "/404.html"
++  status = 404
++  force = true
++
++[[redirects]]
++  from = "/*.py"
++  to = "/404.html"
++  status = 404
++  force = true
++
+ [[redirects]]
+   from = "/api/*"
+   to = "/.netlify/functions/:splat"
+diff --git a/netlify/functions/admin-login.js b/netlify/functions/admin-login.js
+index 8a375a6..769de86 100644
+--- a/netlify/functions/admin-login.js
++++ b/netlify/functions/admin-login.js
+@@ -1,5 +1,6 @@
+ const { checkAdminPassword } = require('./lib/auth');
+-const { issueAdminToken } = require('./lib/adminAuth');
++const { issueAdminToken } = require('./lib/tokens');
++const { clientIp, isLimited, recordHit, clearHits, FIFTEEN_MINUTES } = require('./lib/rateLimit');
+ 
+ exports.handler = async function (event) {
+   if (event.httpMethod !== 'POST') {
+@@ -9,19 +10,29 @@ exports.handler = async function (event) {
+   try {
+     const { password } = JSON.parse(event.body || '{}');
+ 
+-    if (!password) {
++    if (!password || typeof password !== 'string') {
+       return respond(400, { success: false, message: 'Please enter the admin password.' });
+     }
+ 
+-    const ok = checkAdminPassword(password);
++    const ipKey = 'admin-ip:' + clientIp(event);
++    const globalKey = 'admin-global';
+ 
+-    return ok
+-      ? respond(200, { success: true, token: issueAdminToken() })
+-      : respond(401, { success: false, message: 'Invalid password. Please try again.' });
++    if ((await isLimited(ipKey, 5, FIFTEEN_MINUTES)) || (await isLimited(globalKey, 20, FIFTEEN_MINUTES))) {
++      return respond(429, { success: false, message: 'Too many attempts. Please wait 15 minutes and try again.' });
++    }
++
++    if (!checkAdminPassword(password)) {
++      await recordHit(ipKey);
++      await recordHit(globalKey);
++      return respond(401, { success: false, message: 'Invalid password. Please try again.' });
++    }
++
++    await clearHits(ipKey);
++    return respond(200, { success: true, token: issueAdminToken() });
+ 
+   } catch (err) {
+     console.error('admin-login error:', err);
+-    return respond(200, { success: false, message: 'Login failed. Please try again.' });
++    return respond(500, { success: false, message: 'Login failed. Please try again.' });
+   }
+ };
+ 
+diff --git a/netlify/functions/admin-update-application-status.js b/netlify/functions/admin-update-application-status.js
+index 4a6d654..e6488cb 100644
+--- a/netlify/functions/admin-update-application-status.js
++++ b/netlify/functions/admin-update-application-status.js
+@@ -27,7 +27,8 @@ exports.handler = async function (event) {
+     if (updateErr) throw updateErr;
+ 
+     await supabase.from('application_events').insert({
+-      applicant_email: app.email || '',
++      applicant_email: (app.email || '').toLowerCase(),
++      user_email: app.user_email || null,
+       applicant_name: app.name || '',
+       job_id: app.job_id || '',
+       event_type: 'StatusChanged',
+diff --git a/netlify/functions/create-upload-urls.js b/netlify/functions/create-upload-urls.js
+new file mode 100644
+index 0000000..42dba28
+--- /dev/null
++++ b/netlify/functions/create-upload-urls.js
+@@ -0,0 +1,95 @@
++const crypto = require('crypto');
++const { supabase } = require('./lib/supabaseClient');
++const { requireUser, issueUploadTicket } = require('./lib/tokens');
++const { isValidSouthAfricanId } = require('./lib/saId');
++const { checkDeclaredFile } = require('./lib/uploads');
++const { clientIp, isLimited, recordHit, ONE_HOUR } = require('./lib/rateLimit');
++
++exports.handler = async function (event) {
++  if (event.httpMethod !== 'POST') {
++    return { statusCode: 405, body: JSON.stringify({ error: 'Method not allowed' }) };
++  }
++
++  try {
++    const body = JSON.parse(event.body || '{}');
++    const name = (body.name || '').toString().trim();
++    const jobId = (body.jobId || '').toString().trim();
++    const idStr = (body.idNumber || '').toString().replace(/\D/g, '');
++
++    if (!name || !jobId) {
++      return respond(400, { success: false, message: 'Please fill in all required fields.' });
++    }
++    if (!isValidSouthAfricanId(idStr)) {
++      return respond(400, { success: false, message: 'Please enter a valid 13-digit South African ID number.' });
++    }
++
++    const cv = checkDeclaredFile('cv', body.cv);
++    if (!cv.ok) return respond(400, { success: false, message: cv.message });
++    const idDoc = checkDeclaredFile('id', body.id);
++    if (!idDoc.ok) return respond(400, { success: false, message: idDoc.message });
++
++    const ipKey = 'upload-ip:' + clientIp(event);
++    const idKey = 'upload-id:' + idStr;
++    if ((await isLimited(ipKey, 40, ONE_HOUR)) || (await isLimited(idKey, 6, ONE_HOUR))) {
++      return respond(429, { success: false, message: 'Too many attempts. Please try again later.' });
++    }
++    await recordHit(ipKey);
++    await recordHit(idKey);
++
++    const { data: existingApp } = await supabase
++      .from('applications')
++      .select('id')
++      .eq('id_number', idStr)
++      .eq('job_id', jobId)
++      .maybeSingle();
++
++    if (existingApp) {
++      return respond(409, {
++        success: false,
++        message: 'You have already submitted an application for this position. Please check your application status.'
++      });
++    }
++
++    const now = new Date();
++    const year = now.getFullYear();
++    const month = now.toLocaleString('en-US', { month: 'long' });
++    const safeName = name.replace(/[^a-zA-Z0-9 _-]/g, '').trim().slice(0, 60) || 'applicant';
++    const safeJob = jobId.replace(/[^a-zA-Z0-9_-]/g, '').slice(0, 60) || 'job';
++    const suffix = crypto.randomBytes(3).toString('hex');
++    const folder = `${year}/${month}/${safeJob}/${safeName}_${now.getTime()}_${suffix}`;
++    const cvPath = `${folder}/CV_${cv.base}.${cv.ext}`;
++    const idPath = `${folder}/ID_${idDoc.base}.${idDoc.ext}`;
++
++    const bucket = supabase.storage.from('applications');
++    const cvSigned = await bucket.createSignedUploadUrl(cvPath);
++    if (cvSigned.error) throw cvSigned.error;
++    const idSigned = await bucket.createSignedUploadUrl(idPath);
++    if (idSigned.error) throw idSigned.error;
++
++    const ticket = issueUploadTicket({
++      folder,
++      cvPath,
++      idPath,
++      idNumber: idStr,
++      jobId,
++      userEmail: requireUser(event)
++    });
++
++    return respond(200, {
++      success: true,
++      ticket,
++      uploads: {
++        cv: { signedUrl: cvSigned.data.signedUrl, contentType: cv.contentType },
++        id: { signedUrl: idSigned.data.signedUrl, contentType: idDoc.contentType }
++      }
++    });
++
++  } catch (err) {
++    console.error('create-upload-urls error:', err);
++    return respond(500, { success: false, message: 'Could not start your upload. Please try again.' });
++  }
++};
++
++function respond(statusCode, body) {
++  return { statusCode, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) };
++}
+diff --git a/netlify/functions/get-my-applications.js b/netlify/functions/get-my-applications.js
+index a6e964a..114c854 100644
+--- a/netlify/functions/get-my-applications.js
++++ b/netlify/functions/get-my-applications.js
+@@ -1,23 +1,21 @@
+ const { supabase } = require('./lib/supabaseClient');
++const { requireUser } = require('./lib/tokens');
+ 
+ exports.handler = async function (event) {
+   if (event.httpMethod !== 'POST') {
+     return { statusCode: 405, body: JSON.stringify({ error: 'Method not allowed' }) };
+   }
+ 
+-  try {
+-    const { email } = JSON.parse(event.body || '{}');
+-
+-    if (!email) {
+-      return respond(200, { apps: [], events: [] });
+-    }
+-
+-    const eLow = email.toLowerCase().trim();
++  const email = requireUser(event);
++  if (!email) {
++    return respond(401, { apps: [], events: [], message: 'Please sign in again.' });
++  }
+ 
++  try {
+     const { data: apps, error: appsErr } = await supabase
+       .from('applications')
+       .select('submitted_at, name, job_id, status')
+-      .eq('email', eLow)
++      .eq('user_email', email)
+       .order('submitted_at', { ascending: false });
+ 
+     if (appsErr) throw appsErr;
+@@ -25,7 +23,7 @@ exports.handler = async function (event) {
+     const { data: events, error: eventsErr } = await supabase
+       .from('application_events')
+       .select('created_at, job_id, event_type, detail, triggered_by')
+-      .eq('applicant_email', eLow)
++      .eq('user_email', email)
+       .order('created_at', { ascending: true });
+ 
+     if (eventsErr) throw eventsErr;
+diff --git a/netlify/functions/lib/adminAuth.js b/netlify/functions/lib/adminAuth.js
+index bd292fe..9c36eda 100644
+--- a/netlify/functions/lib/adminAuth.js
++++ b/netlify/functions/lib/adminAuth.js
+@@ -1,45 +1,3 @@
+-const crypto = require('crypto');
+-
+-const SECRET = process.env.ADMIN_PASSWORD || 'fallback-dev-secret';
+-const TOKEN_TTL_MS = 8 * 60 * 60 * 1000; // 8 hours
+-
+-function base64url(buf) {
+-  return buf.toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+-}
+-
+-function fromBase64url(str) {
+-  return Buffer.from(str.replace(/-/g, '+').replace(/_/g, '/'), 'base64');
+-}
+-
+-function issueAdminToken() {
+-  const expires = Date.now() + TOKEN_TTL_MS;
+-  const payload = base64url(Buffer.from(JSON.stringify({ role: 'admin', expires })));
+-  const sig = base64url(crypto.createHmac('sha256', SECRET).update(payload).digest());
+-  return payload + '.' + sig;
+-}
+-
+-function verifyAdminToken(token) {
+-  if (!token || typeof token !== 'string' || token.indexOf('.') === -1) return false;
+-  const parts = token.split('.');
+-  if (parts.length !== 2) return false;
+-  const [payload, sig] = parts;
+-  const expectedSig = base64url(crypto.createHmac('sha256', SECRET).update(payload).digest());
+-  if (sig.length !== expectedSig.length) return false;
+-  const sigMatches = crypto.timingSafeEqual(Buffer.from(sig), Buffer.from(expectedSig));
+-  if (!sigMatches) return false;
+-  try {
+-    const data = JSON.parse(fromBase64url(payload).toString('utf8'));
+-    return data.role === 'admin' && typeof data.expires === 'number' && data.expires > Date.now();
+-  } catch (e) {
+-    return false;
+-  }
+-}
+-
+-function requireAdmin(event) {
+-  const headers = event.headers || {};
+-  const header = headers.authorization || headers.Authorization || '';
+-  const token = header.indexOf('Bearer ') === 0 ? header.slice(7) : '';
+-  return verifyAdminToken(token);
+-}
++const { issueAdminToken, verifyAdminToken, requireAdmin } = require('./tokens');
+ 
+ module.exports = { issueAdminToken, verifyAdminToken, requireAdmin };
+diff --git a/netlify/functions/lib/auth.js b/netlify/functions/lib/auth.js
+index 3249f35..a881ace 100644
+--- a/netlify/functions/lib/auth.js
++++ b/netlify/functions/lib/auth.js
+@@ -1,8 +1,7 @@
+ const crypto = require('crypto');
+ 
+-function hashPassword(password) {
+-  if (!password) return '';
+-  return crypto.createHash('sha256').update(password, 'utf8').digest('hex');
++function digest(value) {
++  return crypto.createHash('sha256').update(String(value), 'utf8').digest();
+ }
+ 
+ function checkAdminPassword(password) {
+@@ -10,7 +9,7 @@ function checkAdminPassword(password) {
+   if (!correct) {
+     throw new Error('ADMIN_PASSWORD environment variable is not set.');
+   }
+-  return password === correct;
++  return crypto.timingSafeEqual(digest(password), digest(correct));
+ }
+ 
+-module.exports = { hashPassword, checkAdminPassword };
++module.exports = { checkAdminPassword };
+diff --git a/netlify/functions/lib/password.js b/netlify/functions/lib/password.js
+new file mode 100644
+index 0000000..4e8d98f
+--- /dev/null
++++ b/netlify/functions/lib/password.js
+@@ -0,0 +1,39 @@
++const crypto = require('crypto');
++const bcrypt = require('bcryptjs');
++
++const ROUNDS = 10;
++const MAX_PASSWORD_LENGTH = 72;
++
++let dummyHash = null;
++
++function isBcryptHash(stored) {
++  return typeof stored === 'string' && /^\$2[aby]\$/.test(stored);
++}
++
++function legacyHash(password) {
++  return crypto.createHash('sha256').update(String(password), 'utf8').digest('hex');
++}
++
++function hashPassword(password) {
++  return bcrypt.hash(String(password), ROUNDS);
++}
++
++async function verifyPassword(password, stored) {
++  if (!stored || typeof stored !== 'string') {
++    return { valid: false, needsUpgrade: false };
++  }
++  if (isBcryptHash(stored)) {
++    return { valid: await bcrypt.compare(String(password), stored), needsUpgrade: false };
++  }
++  const expected = Buffer.from(stored);
++  const given = Buffer.from(legacyHash(password));
++  const valid = expected.length === given.length && crypto.timingSafeEqual(expected, given);
++  return { valid, needsUpgrade: valid };
++}
++
++async function burnPassword(password) {
++  if (!dummyHash) dummyHash = bcrypt.hashSync('not-a-real-password', ROUNDS);
++  await bcrypt.compare(String(password), dummyHash);
++}
++
++module.exports = { hashPassword, verifyPassword, burnPassword, MAX_PASSWORD_LENGTH };
+diff --git a/netlify/functions/lib/rateLimit.js b/netlify/functions/lib/rateLimit.js
+new file mode 100644
+index 0000000..a0a3985
+--- /dev/null
++++ b/netlify/functions/lib/rateLimit.js
+@@ -0,0 +1,49 @@
++const { supabase } = require('./supabaseClient');
++
++const FIFTEEN_MINUTES = 15 * 60 * 1000;
++const ONE_HOUR = 60 * 60 * 1000;
++
++function clientIp(event) {
++  const headers = (event && event.headers) || {};
++  const forwarded = (headers['x-forwarded-for'] || '').split(',')[0].trim();
++  return headers['x-nf-client-connection-ip'] || forwarded || headers['client-ip'] || 'unknown';
++}
++
++async function isLimited(key, max, windowMs) {
++  try {
++    const since = new Date(Date.now() - windowMs).toISOString();
++    const { count, error } = await supabase
++      .from('rate_limits')
++      .select('id', { count: 'exact', head: true })
++      .eq('key', key)
++      .gte('created_at', since);
++    if (error) throw error;
++    return (count || 0) >= max;
++  } catch (err) {
++    console.error('rate limit check failed:', err.message || err);
++    return false;
++  }
++}
++
++async function recordHit(key) {
++  try {
++    const { error } = await supabase.from('rate_limits').insert({ key });
++    if (error) throw error;
++    if (Math.random() < 0.02) {
++      const cutoff = new Date(Date.now() - 24 * ONE_HOUR).toISOString();
++      await supabase.from('rate_limits').delete().lt('created_at', cutoff);
++    }
++  } catch (err) {
++    console.error('rate limit record failed:', err.message || err);
++  }
++}
++
++async function clearHits(key) {
++  try {
++    await supabase.from('rate_limits').delete().eq('key', key);
++  } catch (err) {
++    console.error('rate limit clear failed:', err.message || err);
++  }
++}
++
++module.exports = { clientIp, isLimited, recordHit, clearHits, FIFTEEN_MINUTES, ONE_HOUR };
+diff --git a/netlify/functions/lib/saId.js b/netlify/functions/lib/saId.js
+new file mode 100644
+index 0000000..bcbbad9
+--- /dev/null
++++ b/netlify/functions/lib/saId.js
+@@ -0,0 +1,30 @@
++function validDate(year, month, day) {
++  const d = new Date(Date.UTC(year, month - 1, day));
++  return d.getUTCFullYear() === year && d.getUTCMonth() === month - 1 && d.getUTCDate() === day;
++}
++
++function luhnValid(digits) {
++  let sum = 0;
++  for (let i = 0; i < digits.length; i++) {
++    let d = Number(digits[digits.length - 1 - i]);
++    if (i % 2 === 1) {
++      d *= 2;
++      if (d > 9) d -= 9;
++    }
++    sum += d;
++  }
++  return sum % 10 === 0;
++}
++
++function isValidSouthAfricanId(value) {
++  const id = String(value || '').replace(/\D/g, '');
++  if (!/^\d{13}$/.test(id)) return false;
++  const yy = Number(id.slice(0, 2));
++  const mm = Number(id.slice(2, 4));
++  const dd = Number(id.slice(4, 6));
++  if (!validDate(1900 + yy, mm, dd) && !validDate(2000 + yy, mm, dd)) return false;
++  if (id[10] !== '0' && id[10] !== '1') return false;
++  return luhnValid(id);
++}
++
++module.exports = { isValidSouthAfricanId };
+diff --git a/netlify/functions/lib/tokens.js b/netlify/functions/lib/tokens.js
+new file mode 100644
+index 0000000..480fdb5
+--- /dev/null
++++ b/netlify/functions/lib/tokens.js
+@@ -0,0 +1,95 @@
++const crypto = require('crypto');
++
++const TTL = {
++  admin: 8 * 60 * 60 * 1000,
++  user: 12 * 60 * 60 * 1000,
++  upload: 30 * 60 * 1000
++};
++
++function getSecret() {
++  const secret = process.env.TOKEN_SECRET;
++  if (!secret || secret.length < 32) {
++    throw new Error('TOKEN_SECRET must be set to a random string of at least 32 characters.');
++  }
++  return secret;
++}
++
++function base64url(buf) {
++  return buf.toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
++}
++
++function fromBase64url(str) {
++  return Buffer.from(str.replace(/-/g, '+').replace(/_/g, '/'), 'base64');
++}
++
++function signature(payload) {
++  return base64url(crypto.createHmac('sha256', getSecret()).update(payload).digest());
++}
++
++function issueToken(type, claims) {
++  const body = Object.assign({}, claims, { typ: type, exp: Date.now() + TTL[type] });
++  const payload = base64url(Buffer.from(JSON.stringify(body)));
++  return payload + '.' + signature(payload);
++}
++
++function verifyToken(token, type) {
++  try {
++    if (!token || typeof token !== 'string') return null;
++    const parts = token.split('.');
++    if (parts.length !== 2) return null;
++    const expected = Buffer.from(signature(parts[0]));
++    const given = Buffer.from(parts[1]);
++    if (expected.length !== given.length || !crypto.timingSafeEqual(expected, given)) return null;
++    const data = JSON.parse(fromBase64url(parts[0]).toString('utf8'));
++    if (data.typ !== type || typeof data.exp !== 'number' || data.exp <= Date.now()) return null;
++    return data;
++  } catch (e) {
++    return null;
++  }
++}
++
++function bearerToken(event) {
++  const headers = (event && event.headers) || {};
++  const header = headers.authorization || headers.Authorization || '';
++  return header.indexOf('Bearer ') === 0 ? header.slice(7) : '';
++}
++
++function issueUserToken(email) {
++  return issueToken('user', { email: String(email).toLowerCase() });
++}
++
++function requireUser(event) {
++  const data = verifyToken(bearerToken(event), 'user');
++  return data && typeof data.email === 'string' && data.email ? data.email : null;
++}
++
++function issueUploadTicket(claims) {
++  return issueToken('upload', claims);
++}
++
++function verifyUploadTicket(ticket) {
++  return verifyToken(ticket, 'upload');
++}
++
++function issueAdminToken() {
++  return issueToken('admin', { role: 'admin' });
++}
++
++function verifyAdminToken(token) {
++  const data = verifyToken(token, 'admin');
++  return !!data && data.role === 'admin';
++}
++
++function requireAdmin(event) {
++  return verifyAdminToken(bearerToken(event));
++}
++
++module.exports = {
++  issueUserToken,
++  requireUser,
++  issueUploadTicket,
++  verifyUploadTicket,
++  issueAdminToken,
++  verifyAdminToken,
++  requireAdmin
++};
+diff --git a/netlify/functions/lib/uploads.js b/netlify/functions/lib/uploads.js
+new file mode 100644
+index 0000000..6764c54
+--- /dev/null
++++ b/netlify/functions/lib/uploads.js
+@@ -0,0 +1,75 @@
++const MAX_BYTES = 5242880;
++
++const KINDS = {
++  cv: {
++    label: 'CV',
++    types: {
++      pdf: 'application/pdf',
++      doc: 'application/msword',
++      docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
++    }
++  },
++  id: {
++    label: 'ID document',
++    types: {
++      pdf: 'application/pdf',
++      jpg: 'image/jpeg',
++      jpeg: 'image/jpeg',
++      png: 'image/png'
++    }
++  }
++};
++
++const SIGNATURES = {
++  pdf: [0x25, 0x50, 0x44, 0x46],
++  doc: [0xd0, 0xcf, 0x11, 0xe0],
++  docx: [0x50, 0x4b, 0x03, 0x04],
++  jpg: [0xff, 0xd8, 0xff],
++  jpeg: [0xff, 0xd8, 0xff],
++  png: [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]
++};
++
++function extensionOf(name) {
++  const match = /\.([A-Za-z0-9]+)$/.exec(String(name || ''));
++  return match ? match[1].toLowerCase() : '';
++}
++
++function safeBase(name) {
++  const base = String(name || '')
++    .replace(/\.[^.]*$/, '')
++    .replace(/[^A-Za-z0-9_-]/g, '_')
++    .replace(/_+/g, '_')
++    .slice(0, 60);
++  return base || 'file';
++}
++
++function checkDeclaredFile(kind, file) {
++  const rule = KINDS[kind];
++  if (!file || typeof file !== 'object') {
++    return { ok: false, message: 'Please upload your ' + rule.label + '.' };
++  }
++  const ext = extensionOf(file.name);
++  const contentType = rule.types[ext];
++  if (!contentType) {
++    return {
++      ok: false,
++      message: 'Your ' + rule.label + ' must be one of: ' + Object.keys(rule.types).join(', ').toUpperCase() + '.'
++    };
++  }
++  const size = Number(file.size);
++  if (!Number.isFinite(size) || size <= 0) {
++    return { ok: false, message: 'Your ' + rule.label + ' appears to be empty.' };
++  }
++  if (size > MAX_BYTES) {
++    return { ok: false, message: 'Your ' + rule.label + ' is too large. Maximum size is 5MB.' };
++  }
++  return { ok: true, ext, contentType, base: safeBase(file.name) };
++}
++
++function matchesSignature(ext, buffer) {
++  const signature = SIGNATURES[ext];
++  if (!signature || !buffer || buffer.length < signature.length) return false;
++  return signature.every((byte, i) => buffer[i] === byte);
++}
++
++module.exports = { MAX_BYTES, KINDS, extensionOf, checkDeclaredFile, matchesSignature };
+diff --git a/netlify/functions/sign-in.js b/netlify/functions/sign-in.js
+index 26a5191..03206a3 100644
+--- a/netlify/functions/sign-in.js
++++ b/netlify/functions/sign-in.js
+@@ -1,5 +1,9 @@
+ const { supabase } = require('./lib/supabaseClient');
+-const { hashPassword } = require('./lib/auth');
++const { verifyPassword, burnPassword, hashPassword } = require('./lib/password');
++const { issueUserToken } = require('./lib/tokens');
++const { clientIp, isLimited, recordHit, clearHits, FIFTEEN_MINUTES } = require('./lib/rateLimit');
++
++const GENERIC_FAILURE = 'Incorrect email or password. Please try again.';
+ 
+ exports.handler = async function (event) {
+   if (event.httpMethod !== 'POST') {
+@@ -9,32 +13,50 @@ exports.handler = async function (event) {
+   try {
+     const { email, password } = JSON.parse(event.body || '{}');
+ 
+-    if (!email || !password) {
++    if (!email || !password || typeof email !== 'string' || typeof password !== 'string') {
+       return respond(400, { success: false, message: 'Please enter your email and password.' });
+     }
+ 
+     const eLow = email.toLowerCase().trim();
++    const emailKey = 'signin:' + eLow;
++    const ipKey = 'signin-ip:' + clientIp(event);
++
++    if ((await isLimited(emailKey, 5, FIFTEEN_MINUTES)) || (await isLimited(ipKey, 30, FIFTEEN_MINUTES))) {
++      return respond(429, { success: false, message: 'Too many sign-in attempts. Please wait 15 minutes and try again.' });
++    }
+ 
+     const { data: user, error } = await supabase
+       .from('users')
+-      .select('*')
++      .select('id, email, password_hash, full_name, phone, id_number')
+       .eq('email', eLow)
+       .maybeSingle();
+ 
+     if (error) throw error;
+ 
+     if (!user) {
+-      return respond(401, { success: false, message: 'No account found with that email address.' });
++      await burnPassword(password);
++      await recordHit(emailKey);
++      await recordHit(ipKey);
++      return respond(401, { success: false, message: GENERIC_FAILURE });
+     }
+ 
+-    if (user.password_hash !== hashPassword(password)) {
+-      return respond(401, { success: false, message: 'Incorrect password. Please try again.' });
++    const { valid, needsUpgrade } = await verifyPassword(password, user.password_hash);
++
++    if (!valid) {
++      await recordHit(emailKey);
++      await recordHit(ipKey);
++      return respond(401, { success: false, message: GENERIC_FAILURE });
+     }
+ 
+-    await supabase.from('users').update({ last_login: new Date().toISOString() }).eq('id', user.id);
++    await clearHits(emailKey);
++
++    const update = { last_login: new Date().toISOString() };
++    if (needsUpgrade) update.password_hash = await hashPassword(password);
++    await supabase.from('users').update(update).eq('id', user.id);
+ 
+     return respond(200, {
+       success: true,
++      token: issueUserToken(user.email),
+       fullName: user.full_name || eLow,
+       email: user.email,
+       phone: user.phone || '',
+diff --git a/netlify/functions/sign-up.js b/netlify/functions/sign-up.js
+index 8e55fd3..3a3c091 100644
+--- a/netlify/functions/sign-up.js
++++ b/netlify/functions/sign-up.js
+@@ -1,5 +1,9 @@
+ const { supabase } = require('./lib/supabaseClient');
+-const { hashPassword } = require('./lib/auth');
++const { hashPassword, MAX_PASSWORD_LENGTH } = require('./lib/password');
++const { isValidSouthAfricanId } = require('./lib/saId');
++const { clientIp, isLimited, recordHit, ONE_HOUR } = require('./lib/rateLimit');
++
++const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+ 
+ exports.handler = async function (event) {
+   if (event.httpMethod !== 'POST') {
+@@ -8,14 +12,32 @@ exports.handler = async function (event) {
+ 
+   try {
+     const userData = JSON.parse(event.body || '{}');
+-    const email = (userData.email || '').toLowerCase().trim();
++    const email = (userData.email || '').toString().toLowerCase().trim();
++    const password = typeof userData.password === 'string' ? userData.password : '';
+ 
+-    if (!email || !userData.password || !userData.fullName) {
++    if (!email || !password || !userData.fullName) {
+       return respond(400, { success: false, message: 'Email, password and full name are required.' });
+     }
+-    if (userData.password.length < 8) {
++    if (!EMAIL_PATTERN.test(email) || email.length > 254) {
++      return respond(400, { success: false, message: 'Please enter a valid email address.' });
++    }
++    if (password.length < 8) {
+       return respond(400, { success: false, message: 'Password must be at least 8 characters.' });
+     }
++    if (Buffer.byteLength(password, 'utf8') > MAX_PASSWORD_LENGTH) {
++      return respond(400, { success: false, message: 'Password is too long. Please use at most ' + MAX_PASSWORD_LENGTH + ' characters.' });
++    }
++
++    const idNumber = (userData.idNumber || '').toString().replace(/\D/g, '');
++    if (idNumber && !isValidSouthAfricanId(idNumber)) {
++      return respond(400, { success: false, message: 'Please enter a valid 13-digit South African ID number, or leave it blank.' });
++    }
++
++    const ipKey = 'signup-ip:' + clientIp(event);
++    if (await isLimited(ipKey, 10, ONE_HOUR)) {
++      return respond(429, { success: false, message: 'Too many sign-up attempts. Please try again later.' });
++    }
++    await recordHit(ipKey);
+ 
+     const { data: existing } = await supabase
+       .from('users')
+@@ -29,13 +51,18 @@ exports.handler = async function (event) {
+ 
+     const { error } = await supabase.from('users').insert({
+       email,
+-      password_hash: hashPassword(userData.password),
++      password_hash: await hashPassword(password),
+       full_name: (userData.fullName || '').toString().trim(),
+       phone: (userData.phone || '').toString().trim(),
+-      id_number: (userData.idNumber || '').toString().trim()
++      id_number: idNumber
+     });
+ 
+-    if (error) throw error;
++    if (error) {
++      if (error.code === '23505') {
++        return respond(409, { success: false, message: 'An account with this email already exists. Please sign in.' });
++      }
++      throw error;
++    }
+ 
+     return respond(200, { success: true, message: 'Account created successfully. You can now sign in.' });
+ 
+diff --git a/netlify/functions/submit-application.js b/netlify/functions/submit-application.js
+index fca33fa..d84ffb7 100644
+--- a/netlify/functions/submit-application.js
++++ b/netlify/functions/submit-application.js
+@@ -1,112 +1,130 @@
+ const { supabase } = require('./lib/supabaseClient');
+-
+-const MAX_BYTES = 5242880; 
++const { verifyUploadTicket } = require('./lib/tokens');
++const { isValidSouthAfricanId } = require('./lib/saId');
++const { MAX_BYTES, extensionOf, matchesSignature } = require('./lib/uploads');
+ 
+ exports.handler = async function (event) {
+   if (event.httpMethod !== 'POST') {
+     return { statusCode: 405, body: JSON.stringify({ error: 'Method not allowed' }) };
+   }
+ 
++  let uploadedPaths = [];
++
++  async function discardUploads() {
++    if (!uploadedPaths.length) return;
++    try {
++      await supabase.storage.from('applications').remove(uploadedPaths);
++    } catch (err) {
++      console.error('cleanup of uploaded files failed:', err);
++    }
++  }
++
++  async function fail(statusCode, message) {
++    await discardUploads();
++    return respond(statusCode, { success: false, message });
++  }
++
+   try {
+-    const { formData, cvFileData, idFileData } = JSON.parse(event.body || '{}');
++    const { formData, ticket: ticketToken } = JSON.parse(event.body || '{}');
+ 
+-    if (!formData || !formData.name || !formData.idNumber || !formData.phone || !formData.jobId) {
+-      return respond(400, { success: false, message: 'Please fill in all required fields.' });
++    const ticket = verifyUploadTicket(ticketToken);
++    if (!ticket) {
++      return respond(400, { success: false, message: 'Your upload session has expired. Please try submitting again.' });
+     }
+-    if (!cvFileData || !idFileData) {
+-      return respond(400, { success: false, message: 'Please upload both your CV and ID document.' });
++    uploadedPaths = [ticket.cvPath, ticket.idPath];
++
++    if (!formData || !formData.name || !formData.idNumber || !formData.phone || !formData.jobId) {
++      return fail(400, 'Please fill in all required fields.');
+     }
+     if (!formData.gender || !formData.maritalStatus) {
+-      return respond(400, { success: false, message: 'Please select your gender and marital status.' });
++      return fail(400, 'Please select your gender and marital status.');
+     }
+ 
+     const idStr = formData.idNumber.toString().replace(/\D/g, '');
+-    if (idStr.length !== 13) {
+-      return respond(400, { success: false, message: 'Please enter a valid 13-digit South African ID number.' });
++    if (!isValidSouthAfricanId(idStr)) {
++      return fail(400, 'Please enter a valid 13-digit South African ID number.');
+     }
+ 
+     const phoneStr = formData.phone.toString().replace(/\D/g, '');
+     if (phoneStr.length < 10) {
+-      return respond(400, { success: false, message: 'Please enter a valid 10-digit phone number.' });
++      return fail(400, 'Please enter a valid 10-digit phone number.');
+     }
+-    
+-    const cvBuffer = Buffer.from(cvFileData.data, 'base64');
+-    const idBuffer = Buffer.from(idFileData.data, 'base64');
+-    if (cvBuffer.length > MAX_BYTES) {
+-      return respond(400, { success: false, message: 'Your CV file is too large. Maximum size is 5MB.' });
++
++    const jobIdStr = formData.jobId.toString().trim();
++    if (idStr !== ticket.idNumber || jobIdStr !== ticket.jobId) {
++      return fail(400, 'Your details do not match the uploaded documents. Please try submitting again.');
+     }
+-    if (idBuffer.length > MAX_BYTES) {
+-      return respond(400, { success: false, message: 'Your ID document is too large. Maximum size is 5MB.' });
++
++    for (const path of uploadedPaths) {
++      const { data: blob, error: downloadErr } = await supabase.storage.from('applications').download(path);
++      if (downloadErr || !blob) {
++        return fail(400, 'One of your documents did not upload correctly. Please try again.');
++      }
++      const buffer = Buffer.from(await blob.arrayBuffer());
++      if (buffer.length === 0 || buffer.length > MAX_BYTES) {
++        return fail(400, 'One of your documents is empty or larger than 5MB.');
++      }
++      if (!matchesSignature(extensionOf(path), buffer)) {
++        return fail(400, 'One of your documents is not a valid file of the type it claims to be. Please upload a PDF, Word document or image.');
++      }
+     }
+ 
+     const { data: existingApp } = await supabase
+       .from('applications')
+       .select('id')
+       .eq('id_number', idStr)
+-      .eq('job_id', formData.jobId.toString().trim())
++      .eq('job_id', jobIdStr)
+       .maybeSingle();
+ 
+     if (existingApp) {
+-      return respond(409, {
+-        success: false,
+-        message: 'You have already submitted an application for this position. Please check your application status.'
+-      });
++      return fail(409, 'You have already submitted an application for this position. Please check your application status.');
+     }
+ 
+-    const now = new Date();
+-    const year = now.getFullYear();
+-    const month = now.toLocaleString('en-US', { month: 'long' });
+-    const safeName = formData.name.toString().trim().replace(/[^a-zA-Z0-9 _-]/g, '');
+-    const folderPath = `${year}/${month}/${formData.jobId}/${safeName}_${now.getTime()}`;
+-
+-    const cvPath = `${folderPath}/CV_${cvFileData.name}`;
+-    const idPath = `${folderPath}/ID_${idFileData.name}`;
+-
+-    const { error: cvUploadErr } = await supabase.storage
+-      .from('applications')
+-      .upload(cvPath, cvBuffer, { contentType: cvFileData.type || 'application/pdf' });
+-    if (cvUploadErr) throw cvUploadErr;
+-
+-    const { error: idUploadErr } = await supabase.storage
+-      .from('applications')
+-      .upload(idPath, idBuffer, { contentType: idFileData.type || 'application/pdf' });
+-    if (idUploadErr) throw idUploadErr;
++    const email = (formData.email || '').toString().toLowerCase().trim();
+ 
+     const { error: insertErr } = await supabase.from('applications').insert({
+       name: formData.name.toString().trim(),
+       id_number: idStr,
+       phone: phoneStr,
+-      email: (formData.email || '').toString().trim(),
++      email,
++      user_email: ticket.userEmail || null,
+       gender: formData.gender,
+       marital_status: formData.maritalStatus,
+-      job_id: formData.jobId.toString().trim(),
+-      cv_url: cvPath,
+-      id_url: idPath,
+-      folder_url: folderPath,
++      job_id: jobIdStr,
++      cv_url: ticket.cvPath,
++      id_url: ticket.idPath,
++      folder_url: ticket.folder,
+       status: 'Pending'
+     });
+ 
+-    if (insertErr) throw insertErr;
++    if (insertErr) {
++      if (insertErr.code === '23505') {
++        return fail(409, 'You have already submitted an application for this position. Please check your application status.');
++      }
++      throw insertErr;
++    }
++    uploadedPaths = [];
+ 
+     await supabase.from('application_events').insert({
+-      applicant_email: formData.email || '',
+-      applicant_name: formData.name,
+-      job_id: formData.jobId,
++      applicant_email: email,
++      user_email: ticket.userEmail || null,
++      applicant_name: formData.name.toString().trim(),
++      job_id: jobIdStr,
+       event_type: 'Submitted',
+-      detail: 'Application submitted for: ' + (formData.jobTitle || formData.jobId),
++      detail: 'Application submitted for: ' + (formData.jobTitle || jobIdStr),
+       triggered_by: 'Applicant'
+     });
+ 
+     return respond(200, {
+       success: true,
+-      message: 'Application submitted successfully!' +
+-        (formData.email && formData.email.trim() !== ''
+-          ? ' A confirmation email has been sent to ' + formData.email + '.'
+-          : ' Please sign in to track your application status.')
++      message: ticket.userEmail
++        ? 'Application submitted successfully! You can follow its status under My Applications.'
++        : 'Application submitted successfully! To follow your applications in future, sign in before you apply.'
+     });
+ 
+   } catch (err) {
+     console.error('submit-application error:', err);
++    await discardUploads();
+     return respond(500, { success: false, message: 'Submission failed due to a server error. Please try again.' });
+   }
+ };
+diff --git a/package-lock.json b/package-lock.json
+index 62e1c51..235fec5 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -9,6 +9,7 @@
+       "version": "1.0.0",
+       "dependencies": {
+         "@supabase/supabase-js": "^2.45.0",
++        "bcryptjs": "^2.4.3",
+         "dotenv": "^17.4.2",
+         "express": "^5.2.1"
+       }
+@@ -111,6 +112,12 @@
+         "node": ">= 0.6"
+       }
+     },
++    "node_modules/bcryptjs": {
++      "version": "2.4.3",
++      "resolved": "https://registry.npmjs.org/bcryptjs/-/bcryptjs-2.4.3.tgz",
++      "integrity": "sha512-V/Hy/X9Vt7f3BbPJEi8BdVFMByHi+jNXrYkW3huaybV/kQ0KJg0Y6PkEMbn+zeT+i+SiKZ/HMqJGIIt4LZDqNQ==",
++      "license": "MIT"
++    },
+     "node_modules/body-parser": {
+       "version": "2.3.0",
+       "resolved": "https://registry.npmjs.org/body-parser/-/body-parser-2.3.0.tgz",
+@@ -1063,6 +1070,11 @@
+         "negotiator": "^1.0.0"
+       }
+     },
++    "bcryptjs": {
++      "version": "2.4.3",
++      "resolved": "https://registry.npmjs.org/bcryptjs/-/bcryptjs-2.4.3.tgz",
++      "integrity": "sha512-V/Hy/X9Vt7f3BbPJEi8BdVFMByHi+jNXrYkW3huaybV/kQ0KJg0Y6PkEMbn+zeT+i+SiKZ/HMqJGIIt4LZDqNQ=="
++    },
+     "body-parser": {
+       "version": "2.3.0",
+       "resolved": "https://registry.npmjs.org/body-parser/-/body-parser-2.3.0.tgz",
+diff --git a/package.json b/package.json
+index 5b1a33e..b20faf9 100644
+--- a/package.json
++++ b/package.json
+@@ -5,6 +5,7 @@
+   "description": "BKS Community Job Center — Netlify Functions backend",
+   "dependencies": {
+     "@supabase/supabase-js": "^2.45.0",
++    "bcryptjs": "^2.4.3",
+     "dotenv": "^17.4.2",
+     "express": "^5.2.1"
+   }
+diff --git a/portal.html b/portal.html
+index b57cf17..d4a63a7 100644
+--- a/portal.html
++++ b/portal.html
+@@ -1419,28 +1419,46 @@ document.getElementById('appForm').addEventListener('submit',function(e){
+   var fd={name:document.getElementById('name').value,idNumber:document.getElementById('idNumber').value,
+     phone:document.getElementById('phone').value,email:document.getElementById('email').value||'',
+     gender:gender,maritalStatus:marital,jobId:currentJobId,jobTitle:document.getElementById('modalTitle').textContent};
+-  var done=0,cvData=null,idData=null;
+-  function send(){
+-    if(done===2){
+-      fetch('/api/submit-application', {
++  function resetBtn(){btn.textContent=(I18N[BKS_LANG]||I18N.en).applySubmit;btn.disabled=false;}
++  function putFile(url,file){
++    var form=new FormData();
++    form.append('cacheControl','3600');
++    form.append('',file);
++    return fetch(url,{method:'PUT',body:form}).then(function(res){
++      if(!res.ok)throw new Error('File upload failed. Please check your connection and try again.');
++    });
++  }
++  var startHeaders={'Content-Type':'application/json'};
++  if(currentUser&&currentUser.token)startHeaders['Authorization']='Bearer '+currentUser.token;
++  fetch('/api/create-upload-urls', {
++    method: 'POST',
++    headers: startHeaders,
++    body: JSON.stringify({ name: fd.name, idNumber: fd.idNumber, jobId: fd.jobId,
++      cv: { name: cvFile.name, size: cvFile.size }, id: { name: idFile.name, size: idFile.size } })
++  })
++    .then(function(r){ return r.json(); })
++    .then(function(t){
++      if(!t.success)throw new Error(t.message||'Could not start your upload.');
++      return Promise.all([putFile(t.uploads.cv.signedUrl,cvFile),putFile(t.uploads.id.signedUrl,idFile)])
++        .then(function(){ return t.ticket; });
++    })
++    .then(function(ticket){
++      return fetch('/api/submit-application', {
+         method: 'POST',
+         headers: {'Content-Type':'application/json'},
+-        body: JSON.stringify({ formData: fd, cvFileData: cvData, idFileData: idData })
+-      })
+-        .then(function(r){ return r.json(); })
+-        .then(function(r){
+-          alert(r.message);
+-          if(r.success) closeModal();
+-          btn.textContent=(I18N[BKS_LANG]||I18N.en).applySubmit; btn.disabled=false;
+-        })
+-        .catch(function(err){
+-          alert('Error: '+(err.message||err));
+-          btn.textContent=(I18N[BKS_LANG]||I18N.en).applySubmit; btn.disabled=false;
+-        });
+-    }
+-  }
+-  var r1=new FileReader();r1.onload=function(){cvData={data:r1.result.split(',')[1],type:cvFile.type,name:cvFile.name};done++;send();};r1.readAsDataURL(cvFile);
+-  var r2=new FileReader();r2.onload=function(){idData={data:r2.result.split(',')[1],type:idFile.type,name:idFile.name};done++;send();};r2.readAsDataURL(idFile);
++        body: JSON.stringify({ formData: fd, ticket: ticket })
++      });
++    })
++    .then(function(r){ return r.json(); })
++    .then(function(r){
++      alert(r.message);
++      if(r.success) closeModal();
++      resetBtn();
++    })
++    .catch(function(err){
++      alert(err.message||String(err));
++      resetBtn();
++    });
+ });
+ document.getElementById('idNumber').addEventListener('input',function(){this.value=this.value.replace(/[^0-9]/g,'').slice(0,13);});
+ document.getElementById('phone').addEventListener('input',function(){this.value=this.value.replace(/[^0-9]/g,'').slice(0,10);});
+@@ -1484,7 +1502,7 @@ document.getElementById('doSignInBtn').addEventListener('click',function(){
+     .then(function(r){ return r.json(); })
+     .then(function(r){
+       if(r.success){
+-        currentUser={fullName:r.fullName,email:r.email,phone:r.phone,idNumber:r.idNumber};
++        currentUser={token:r.token,fullName:r.fullName,email:r.email,phone:r.phone,idNumber:r.idNumber};
+         sessionStorage.setItem('bksUser',JSON.stringify(currentUser));
+         closeAuthModal(); updateNavAuthState();
+       } else {
+@@ -1556,10 +1574,18 @@ function openTrackerModal(){
+   document.getElementById('trackerContent').innerHTML='<div class="loading"><div class="spinner"></div><p style="margin-top:14px;color:#78716c;">Loading your applications\u2026</p></div>';
+   fetch('/api/get-my-applications', {
+     method: 'POST',
+-    headers: {'Content-Type':'application/json'},
+-    body: JSON.stringify({ email: currentUser.email })
++    headers: {'Content-Type':'application/json','Authorization':'Bearer '+(currentUser.token||'')},
++    body: '{}'
+   })
+-    .then(function(r){ return r.json(); })
++    .then(function(r){
++      if(r.status===401){
++        currentUser=null;sessionStorage.removeItem('bksUser');updateNavAuthState();
++        document.getElementById('trackerModal').style.display='none';
++        openAuthModal();
++        throw new Error('Your session has expired. Please sign in again.');
++      }
++      return r.json();
++    })
+     .then(function(result){ renderMyApplications(result.apps, result.events); })
+     .catch(function(err){ document.getElementById('trackerContent').innerHTML='<p style="color:#dc2626;padding:20px;">Error: '+(err.message||err)+'</p>'; });
+ }
+diff --git a/server.js b/server.js
+index 34f145e..c08ce36 100644
+--- a/server.js
++++ b/server.js
+@@ -4,8 +4,23 @@ const path = require('path');
+ const fs = require('fs');
+ 
+ const app = express();
+-app.use(express.json({ limit: '10mb' }));
+-app.use(express.static(__dirname));
++app.use(express.json({ limit: '1mb' }));
++
++const PRIVATE_PATHS = /^\/(server\.js|package(-lock)?\.json|dockerfile|docker-compose\.yml|supabase-migration\.sql|netlify(\/.*)?|node_modules(\/.*)?|.*\.py)$/i;
++
++app.use((req, res, next) => {
++  let decoded;
++  try {
++    decoded = path.posix.normalize(decodeURIComponent(req.path));
++  } catch (err) {
++    return res.status(400).end();
++  }
++  const hidden = decoded.split('/').some((part) => part.startsWith('.'));
++  if (hidden || PRIVATE_PATHS.test(decoded)) return res.status(404).end();
++  next();
++});
++
++app.use(express.static(__dirname, { dotfiles: 'ignore' }));
+ 
+ const FUNCTIONS_DIR = path.join(__dirname, 'netlify', 'functions');
+ 
+diff --git a/supabase-migration.sql b/supabase-migration.sql
+new file mode 100644
+index 0000000..5c0a451
+--- /dev/null
++++ b/supabase-migration.sql
+@@ -0,0 +1,33 @@
++alter table applications add column if not exists user_email text;
++alter table application_events add column if not exists user_email text;
++
++update applications set email = lower(email) where email <> lower(email);
++update application_events set applicant_email = lower(applicant_email) where applicant_email <> lower(applicant_email);
++
++update applications a
++set user_email = lower(a.email)
++from users u
++where a.user_email is null
++  and a.email <> ''
++  and lower(u.email) = lower(a.email);
++
++update application_events e
++set user_email = a.user_email
++from applications a
++where e.user_email is null
++  and a.user_email is not null
++  and lower(e.applicant_email) = lower(a.email)
++  and e.job_id = a.job_id;
++
++create index if not exists applications_user_email_idx on applications (user_email);
++create index if not exists application_events_user_email_idx on application_events (user_email);
++
++create table if not exists rate_limits (
++  id bigint generated always as identity primary key,
++  key text not null,
++  created_at timestamptz not null default now()
++);
++create index if not exists rate_limits_key_created_idx on rate_limits (key, created_at);
++alter table rate_limits enable row level security;
++
++create unique index if not exists applications_id_number_job_id_key on applications (id_number, job_id);
+diff --git a/tracker.html b/tracker.html
+index 023c0c0..71926da 100644
+--- a/tracker.html
++++ b/tracker.html
+@@ -637,7 +637,7 @@ function renderSignIn(){
+     })
+       .then(function(r){ return r.json(); })
+       .then(function(r){
+-        if(r.success){currentUser={fullName:r.fullName,email:r.email,phone:r.phone,idNumber:r.idNumber};sessionStorage.setItem('bksUser',JSON.stringify(currentUser));loadData();}
++        if(r.success){currentUser={token:r.token,fullName:r.fullName,email:r.email,phone:r.phone,idNumber:r.idNumber};sessionStorage.setItem('bksUser',JSON.stringify(currentUser));loadData();}
+         else{am('siMsg','error',r.message||tl('errEmailPass'));}
+       })
+       .catch(function(e){am('siMsg','error','Error: '+(e.message||e));});
+@@ -783,10 +783,18 @@ function loadData(){
+     '<div class="loading-state"><div class="spinner"></div><p>'+escHtml(tl('loadingText'))+'</p></div>';
+   fetch('/api/get-my-applications', {
+     method: 'POST',
+-    headers: {'Content-Type':'application/json'},
+-    body: JSON.stringify({ email: currentUser.email })
++    headers: {'Content-Type':'application/json','Authorization':'Bearer '+(currentUser.token||'')},
++    body: '{}'
+   })
+-    .then(function(r){ return r.json(); })
++    .then(function(r){
++      if(r.status===401){
++        sessionStorage.removeItem('bksUser');
++        currentUser=null;
++        renderSignIn();
++        throw new Error('Your session has expired. Please sign in again.');
++      }
++      return r.json();
++    })
+     .then(function(r){ renderTracker(r.apps||[],r.events||[]); })
+     .catch(function(e){
+       document.getElementById('mainPage').innerHTML=

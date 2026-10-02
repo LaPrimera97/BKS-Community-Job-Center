@@ -637,7 +637,7 @@ function renderSignIn(){
     })
       .then(function(r){ return r.json(); })
       .then(function(r){
-        if(r.success){currentUser={fullName:r.fullName,email:r.email,phone:r.phone,idNumber:r.idNumber};sessionStorage.setItem('bksUser',JSON.stringify(currentUser));loadData();}
+        if(r.success){currentUser={token:r.token,fullName:r.fullName,email:r.email,phone:r.phone,idNumber:r.idNumber};sessionStorage.setItem('bksUser',JSON.stringify(currentUser));loadData();}
         else{am('siMsg','error',r.message||tl('errEmailPass'));}
       })
       .catch(function(e){am('siMsg','error','Error: '+(e.message||e));});
@@ -783,10 +783,18 @@ function loadData(){
     '<div class="loading-state"><div class="spinner"></div><p>'+escHtml(tl('loadingText'))+'</p></div>';
   fetch('/api/get-my-applications', {
     method: 'POST',
-    headers: {'Content-Type':'application/json'},
-    body: JSON.stringify({ email: currentUser.email })
+    headers: {'Content-Type':'application/json','Authorization':'Bearer '+(currentUser.token||'')},
+    body: '{}'
   })
-    .then(function(r){ return r.json(); })
+    .then(function(r){
+      if(r.status===401){
+        sessionStorage.removeItem('bksUser');
+        currentUser=null;
+        renderSignIn();
+        throw new Error('Your session has expired. Please sign in again.');
+      }
+      return r.json();
+    })
     .then(function(r){ renderTracker(r.apps||[],r.events||[]); })
     .catch(function(e){
       document.getElementById('mainPage').innerHTML=

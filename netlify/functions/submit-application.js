@@ -1,112 +1,130 @@
 const { supabase } = require('./lib/supabaseClient');
-
-const MAX_BYTES = 5242880; 
+const { verifyUploadTicket } = require('./lib/tokens');
+const { isValidSouthAfricanId } = require('./lib/saId');
+const { MAX_BYTES, extensionOf, matchesSignature } = require('./lib/uploads');
 
 exports.handler = async function (event) {
   if (event.httpMethod !== 'POST') {
     return { statusCode: 405, body: JSON.stringify({ error: 'Method not allowed' }) };
   }
 
+  let uploadedPaths = [];
+
+  async function discardUploads() {
+    if (!uploadedPaths.length) return;
+    try {
+      await supabase.storage.from('applications').remove(uploadedPaths);
+    } catch (err) {
+      console.error('cleanup of uploaded files failed:', err);
+    }
+  }
+
+  async function fail(statusCode, message) {
+    await discardUploads();
+    return respond(statusCode, { success: false, message });
+  }
+
   try {
-    const { formData, cvFileData, idFileData } = JSON.parse(event.body || '{}');
+    const { formData, ticket: ticketToken } = JSON.parse(event.body || '{}');
+
+    const ticket = verifyUploadTicket(ticketToken);
+    if (!ticket) {
+      return respond(400, { success: false, message: 'Your upload session has expired. Please try submitting again.' });
+    }
+    uploadedPaths = [ticket.cvPath, ticket.idPath];
 
     if (!formData || !formData.name || !formData.idNumber || !formData.phone || !formData.jobId) {
-      return respond(400, { success: false, message: 'Please fill in all required fields.' });
-    }
-    if (!cvFileData || !idFileData) {
-      return respond(400, { success: false, message: 'Please upload both your CV and ID document.' });
+      return fail(400, 'Please fill in all required fields.');
     }
     if (!formData.gender || !formData.maritalStatus) {
-      return respond(400, { success: false, message: 'Please select your gender and marital status.' });
+      return fail(400, 'Please select your gender and marital status.');
     }
 
     const idStr = formData.idNumber.toString().replace(/\D/g, '');
-    if (idStr.length !== 13) {
-      return respond(400, { success: false, message: 'Please enter a valid 13-digit South African ID number.' });
+    if (!isValidSouthAfricanId(idStr)) {
+      return fail(400, 'Please enter a valid 13-digit South African ID number.');
     }
 
     const phoneStr = formData.phone.toString().replace(/\D/g, '');
     if (phoneStr.length < 10) {
-      return respond(400, { success: false, message: 'Please enter a valid 10-digit phone number.' });
+      return fail(400, 'Please enter a valid 10-digit phone number.');
     }
-    
-    const cvBuffer = Buffer.from(cvFileData.data, 'base64');
-    const idBuffer = Buffer.from(idFileData.data, 'base64');
-    if (cvBuffer.length > MAX_BYTES) {
-      return respond(400, { success: false, message: 'Your CV file is too large. Maximum size is 5MB.' });
+
+    const jobIdStr = formData.jobId.toString().trim();
+    if (idStr !== ticket.idNumber || jobIdStr !== ticket.jobId) {
+      return fail(400, 'Your details do not match the uploaded documents. Please try submitting again.');
     }
-    if (idBuffer.length > MAX_BYTES) {
-      return respond(400, { success: false, message: 'Your ID document is too large. Maximum size is 5MB.' });
+
+    for (const path of uploadedPaths) {
+      const { data: blob, error: downloadErr } = await supabase.storage.from('applications').download(path);
+      if (downloadErr || !blob) {
+        return fail(400, 'One of your documents did not upload correctly. Please try again.');
+      }
+      const buffer = Buffer.from(await blob.arrayBuffer());
+      if (buffer.length === 0 || buffer.length > MAX_BYTES) {
+        return fail(400, 'One of your documents is empty or larger than 5MB.');
+      }
+      if (!matchesSignature(extensionOf(path), buffer)) {
+        return fail(400, 'One of your documents is not a valid file of the type it claims to be. Please upload a PDF, Word document or image.');
+      }
     }
 
     const { data: existingApp } = await supabase
       .from('applications')
       .select('id')
       .eq('id_number', idStr)
-      .eq('job_id', formData.jobId.toString().trim())
+      .eq('job_id', jobIdStr)
       .maybeSingle();
 
     if (existingApp) {
-      return respond(409, {
-        success: false,
-        message: 'You have already submitted an application for this position. Please check your application status.'
-      });
+      return fail(409, 'You have already submitted an application for this position. Please check your application status.');
     }
 
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = now.toLocaleString('en-US', { month: 'long' });
-    const safeName = formData.name.toString().trim().replace(/[^a-zA-Z0-9 _-]/g, '');
-    const folderPath = `${year}/${month}/${formData.jobId}/${safeName}_${now.getTime()}`;
-
-    const cvPath = `${folderPath}/CV_${cvFileData.name}`;
-    const idPath = `${folderPath}/ID_${idFileData.name}`;
-
-    const { error: cvUploadErr } = await supabase.storage
-      .from('applications')
-      .upload(cvPath, cvBuffer, { contentType: cvFileData.type || 'application/pdf' });
-    if (cvUploadErr) throw cvUploadErr;
-
-    const { error: idUploadErr } = await supabase.storage
-      .from('applications')
-      .upload(idPath, idBuffer, { contentType: idFileData.type || 'application/pdf' });
-    if (idUploadErr) throw idUploadErr;
+    const email = (formData.email || '').toString().toLowerCase().trim();
 
     const { error: insertErr } = await supabase.from('applications').insert({
       name: formData.name.toString().trim(),
       id_number: idStr,
       phone: phoneStr,
-      email: (formData.email || '').toString().trim(),
+      email,
+      user_email: ticket.userEmail || null,
       gender: formData.gender,
       marital_status: formData.maritalStatus,
-      job_id: formData.jobId.toString().trim(),
-      cv_url: cvPath,
-      id_url: idPath,
-      folder_url: folderPath,
+      job_id: jobIdStr,
+      cv_url: ticket.cvPath,
+      id_url: ticket.idPath,
+      folder_url: ticket.folder,
       status: 'Pending'
     });
 
-    if (insertErr) throw insertErr;
+    if (insertErr) {
+      if (insertErr.code === '23505') {
+        return fail(409, 'You have already submitted an application for this position. Please check your application status.');
+      }
+      throw insertErr;
+    }
+    uploadedPaths = [];
 
     await supabase.from('application_events').insert({
-      applicant_email: formData.email || '',
-      applicant_name: formData.name,
-      job_id: formData.jobId,
+      applicant_email: email,
+      user_email: ticket.userEmail || null,
+      applicant_name: formData.name.toString().trim(),
+      job_id: jobIdStr,
       event_type: 'Submitted',
-      detail: 'Application submitted for: ' + (formData.jobTitle || formData.jobId),
+      detail: 'Application submitted for: ' + (formData.jobTitle || jobIdStr),
       triggered_by: 'Applicant'
     });
 
     return respond(200, {
       success: true,
-      message: 'Application submitted successfully!' +
-        (formData.email && formData.email.trim() !== ''
-          ? ' A confirmation email has been sent to ' + formData.email + '.'
-          : ' Please sign in to track your application status.')
+      message: ticket.userEmail
+        ? 'Application submitted successfully! You can follow its status under My Applications.'
+        : 'Application submitted successfully! To follow your applications in future, sign in before you apply.'
     });
 
   } catch (err) {
     console.error('submit-application error:', err);
+    await discardUploads();
     return respond(500, { success: false, message: 'Submission failed due to a server error. Please try again.' });
   }
 };

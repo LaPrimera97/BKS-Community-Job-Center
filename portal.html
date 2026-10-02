@@ -1419,28 +1419,46 @@ document.getElementById('appForm').addEventListener('submit',function(e){
   var fd={name:document.getElementById('name').value,idNumber:document.getElementById('idNumber').value,
     phone:document.getElementById('phone').value,email:document.getElementById('email').value||'',
     gender:gender,maritalStatus:marital,jobId:currentJobId,jobTitle:document.getElementById('modalTitle').textContent};
-  var done=0,cvData=null,idData=null;
-  function send(){
-    if(done===2){
-      fetch('/api/submit-application', {
+  function resetBtn(){btn.textContent=(I18N[BKS_LANG]||I18N.en).applySubmit;btn.disabled=false;}
+  function putFile(url,file){
+    var form=new FormData();
+    form.append('cacheControl','3600');
+    form.append('',file);
+    return fetch(url,{method:'PUT',body:form}).then(function(res){
+      if(!res.ok)throw new Error('File upload failed. Please check your connection and try again.');
+    });
+  }
+  var startHeaders={'Content-Type':'application/json'};
+  if(currentUser&&currentUser.token)startHeaders['Authorization']='Bearer '+currentUser.token;
+  fetch('/api/create-upload-urls', {
+    method: 'POST',
+    headers: startHeaders,
+    body: JSON.stringify({ name: fd.name, idNumber: fd.idNumber, jobId: fd.jobId,
+      cv: { name: cvFile.name, size: cvFile.size }, id: { name: idFile.name, size: idFile.size } })
+  })
+    .then(function(r){ return r.json(); })
+    .then(function(t){
+      if(!t.success)throw new Error(t.message||'Could not start your upload.');
+      return Promise.all([putFile(t.uploads.cv.signedUrl,cvFile),putFile(t.uploads.id.signedUrl,idFile)])
+        .then(function(){ return t.ticket; });
+    })
+    .then(function(ticket){
+      return fetch('/api/submit-application', {
         method: 'POST',
         headers: {'Content-Type':'application/json'},
-        body: JSON.stringify({ formData: fd, cvFileData: cvData, idFileData: idData })
-      })
-        .then(function(r){ return r.json(); })
-        .then(function(r){
-          alert(r.message);
-          if(r.success) closeModal();
-          btn.textContent=(I18N[BKS_LANG]||I18N.en).applySubmit; btn.disabled=false;
-        })
-        .catch(function(err){
-          alert('Error: '+(err.message||err));
-          btn.textContent=(I18N[BKS_LANG]||I18N.en).applySubmit; btn.disabled=false;
-        });
-    }
-  }
-  var r1=new FileReader();r1.onload=function(){cvData={data:r1.result.split(',')[1],type:cvFile.type,name:cvFile.name};done++;send();};r1.readAsDataURL(cvFile);
-  var r2=new FileReader();r2.onload=function(){idData={data:r2.result.split(',')[1],type:idFile.type,name:idFile.name};done++;send();};r2.readAsDataURL(idFile);
+        body: JSON.stringify({ formData: fd, ticket: ticket })
+      });
+    })
+    .then(function(r){ return r.json(); })
+    .then(function(r){
+      alert(r.message);
+      if(r.success) closeModal();
+      resetBtn();
+    })
+    .catch(function(err){
+      alert(err.message||String(err));
+      resetBtn();
+    });
 });
 document.getElementById('idNumber').addEventListener('input',function(){this.value=this.value.replace(/[^0-9]/g,'').slice(0,13);});
 document.getElementById('phone').addEventListener('input',function(){this.value=this.value.replace(/[^0-9]/g,'').slice(0,10);});
@@ -1484,7 +1502,7 @@ document.getElementById('doSignInBtn').addEventListener('click',function(){
     .then(function(r){ return r.json(); })
     .then(function(r){
       if(r.success){
-        currentUser={fullName:r.fullName,email:r.email,phone:r.phone,idNumber:r.idNumber};
+        currentUser={token:r.token,fullName:r.fullName,email:r.email,phone:r.phone,idNumber:r.idNumber};
         sessionStorage.setItem('bksUser',JSON.stringify(currentUser));
         closeAuthModal(); updateNavAuthState();
       } else {
@@ -1556,10 +1574,18 @@ function openTrackerModal(){
   document.getElementById('trackerContent').innerHTML='<div class="loading"><div class="spinner"></div><p style="margin-top:14px;color:#78716c;">Loading your applications\u2026</p></div>';
   fetch('/api/get-my-applications', {
     method: 'POST',
-    headers: {'Content-Type':'application/json'},
-    body: JSON.stringify({ email: currentUser.email })
+    headers: {'Content-Type':'application/json','Authorization':'Bearer '+(currentUser.token||'')},
+    body: '{}'
   })
-    .then(function(r){ return r.json(); })
+    .then(function(r){
+      if(r.status===401){
+        currentUser=null;sessionStorage.removeItem('bksUser');updateNavAuthState();
+        document.getElementById('trackerModal').style.display='none';
+        openAuthModal();
+        throw new Error('Your session has expired. Please sign in again.');
+      }
+      return r.json();
+    })
     .then(function(result){ renderMyApplications(result.apps, result.events); })
     .catch(function(err){ document.getElementById('trackerContent').innerHTML='<p style="color:#dc2626;padding:20px;">Error: '+(err.message||err)+'</p>'; });
 }

@@ -1,23 +1,21 @@
 const { supabase } = require('./lib/supabaseClient');
+const { requireUser } = require('./lib/tokens');
 
 exports.handler = async function (event) {
   if (event.httpMethod !== 'POST') {
     return { statusCode: 405, body: JSON.stringify({ error: 'Method not allowed' }) };
   }
 
+  const email = requireUser(event);
+  if (!email) {
+    return respond(401, { apps: [], events: [], message: 'Please sign in again.' });
+  }
+
   try {
-    const { email } = JSON.parse(event.body || '{}');
-
-    if (!email) {
-      return respond(200, { apps: [], events: [] });
-    }
-
-    const eLow = email.toLowerCase().trim();
-
     const { data: apps, error: appsErr } = await supabase
       .from('applications')
       .select('submitted_at, name, job_id, status')
-      .eq('email', eLow)
+      .eq('user_email', email)
       .order('submitted_at', { ascending: false });
 
     if (appsErr) throw appsErr;
@@ -25,7 +23,7 @@ exports.handler = async function (event) {
     const { data: events, error: eventsErr } = await supabase
       .from('application_events')
       .select('created_at, job_id, event_type, detail, triggered_by')
-      .eq('applicant_email', eLow)
+      .eq('user_email', email)
       .order('created_at', { ascending: true });
 
     if (eventsErr) throw eventsErr;

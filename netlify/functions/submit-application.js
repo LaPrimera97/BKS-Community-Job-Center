@@ -3,6 +3,8 @@ const { verifyUploadTicket } = require('./lib/tokens');
 const { isValidSouthAfricanId } = require('./lib/saId');
 const { MAX_BYTES, extensionOf, matchesSignature } = require('./lib/uploads');
 
+const PRIVACY_NOTICE_VERSION = '2026-10-02';
+
 exports.handler = async function (event) {
   if (event.httpMethod !== 'POST') {
     return { statusCode: 405, body: JSON.stringify({ error: 'Method not allowed' }) };
@@ -35,6 +37,9 @@ exports.handler = async function (event) {
 
     if (!formData || !formData.name || !formData.idNumber || !formData.phone || !formData.jobId) {
       return fail(400, 'Please fill in all required fields.');
+    }
+    if (formData.consent !== true) {
+      return fail(400, 'Please accept the consent to submit your application.');
     }
     if (!formData.gender || !formData.maritalStatus) {
       return fail(400, 'Please select your gender and marital status.');
@@ -94,7 +99,9 @@ exports.handler = async function (event) {
       cv_url: ticket.cvPath,
       id_url: ticket.idPath,
       folder_url: ticket.folder,
-      status: 'Pending'
+      status: 'Pending',
+      consent_at: new Date().toISOString(),
+      consent_version: PRIVACY_NOTICE_VERSION
     });
 
     if (insertErr) {

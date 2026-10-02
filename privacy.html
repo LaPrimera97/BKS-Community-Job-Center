@@ -216,7 +216,7 @@ body{
     <div class="header-text">
       <h1>Privacy Notice</h1>
       <p>BKS Community Job Center &mdash; Atok, Ga-Selepe, 0749</p>
-      <div class="effective-badge">Effective Date: 1 January 2026 &nbsp;&bull;&nbsp; POPIA Compliant</div>
+      <div class="effective-badge">Effective Date: 2 October 2026 &nbsp;&bull;&nbsp; Built around POPIA</div>
     </div>
   </div>
 </div>
@@ -254,6 +254,8 @@ body{
       <p>BKS Community Job Center ("BKS", "we", "us", "our") is a community-operated job facilitation service based in Atok, Ga-Selepe, Limpopo (postal code 0749), South Africa. We operate this online portal to help connect local community members with employment opportunities at mines.</p>
       <p>BKS acts as the <strong>Responsible Party</strong> as defined under the Protection of Personal Information Act, 4 of 2013 (POPIA), and is responsible for the lawful, fair, and transparent processing of your personal information.</p>
       <div class="highlight"><strong>Our commitment:</strong> We collect only what we need, store it securely, share it only with those who need it to process your application, and delete it when it is no longer required.</div>
+      <div class="warning"><strong>Current status:</strong> BKS is built and online but is not yet in operation. No mining company, local committee or traditional authority currently receives applicant information through this portal. This notice explains how your information is handled and how it will be handled if the portal begins operating.</div>
+      <p><strong>Information Officer:</strong> Brian Kagiso Sekgobela, the founder of BKS, is our Information Officer, registered with the Information Regulator of South Africa on 14 May 2026 (registration number 2026-015573). He is responsible for POPIA compliance and for handling your requests. His contact details are in Section 12.</p>
     </div>
 
     <div class="section-block" id="s2">
@@ -266,13 +268,14 @@ body{
         <tbody>
           <tr><td><strong>Identity</strong></td><td>Full name, South African ID number, gender, marital status</td><td>On application submission</td></tr>
           <tr><td><strong>Contact</strong></td><td>Phone number, email address</td><td>On registration &amp; application</td></tr>
-          <tr><td><strong>Account</strong></td><td>Email address, password (stored as SHA-256 hash — never readable)</td><td>On account creation</td></tr>
+          <tr><td><strong>Account</strong></td><td>Email address, password (stored only as a bcrypt hash — never readable)</td><td>On account creation</td></tr>
           <tr><td><strong>Application Documents</strong></td><td>Curriculum Vitae (CV/résumé), ID document scan or photograph</td><td>On application submission</td></tr>
           <tr><td><strong>Location</strong></td><td>GPS coordinates (eligibility verification only — never stored)</td><td>On portal entry (optional)</td></tr>
           <tr><td><strong>Usage &amp; Events</strong></td><td>Application submission timestamps, status change history</td><td>Automatically on each event</td></tr>
+          <tr><td><strong>Consent record</strong></td><td>The date and time you gave consent and the version of this notice that applied</td><td>On application submission</td></tr>
         </tbody>
       </table></div>
-      <div class="highlight"><strong>Password security:</strong> Your password is converted to a SHA-256 cryptographic hash before it is saved. Not even BKS administrators can see your original password. The hash cannot be reversed.</div>
+      <div class="highlight"><strong>Password security:</strong> Your password is converted to a salted bcrypt hash before it is saved. Not even BKS administrators can see your original password. The hash cannot be reversed.</div>
       <h3>Information We Do Not Collect</h3>
       <ul>
         <li>Banking or financial account details</li>
@@ -290,7 +293,7 @@ body{
       <ol>
         <li><strong>To process your job application</strong> — matching your details and qualifications to available positions and sharing your application with recruitment personnel.</li>
         <li><strong>To verify your eligibility</strong> — confirming that you reside within the eligible community area.</li>
-        <li><strong>To communicate with you</strong> — sending confirmation emails on application receipt, and status update emails when your application status changes.</li>
+        <li><strong>To keep you informed</strong> — your application status is shown under My Applications when you are signed in. We do not currently send emails about applications. If we add email notifications, we will update this notice first and use only the email address you gave us.</li>
         <li><strong>To maintain a transparent record</strong> — creating a time-stamped, auditable record of all applications accessible to the Local Committee and the mine.</li>
         <li><strong>To manage your account</strong> — allowing you to sign in securely, pre-fill application forms, and track your application history.</li>
         <li><strong>To comply with legal obligations</strong> — retaining records as required under applicable South African labour and community development regulations.</li>
@@ -302,7 +305,7 @@ body{
       <h2><span class="icon">&#9878;&#65039;</span>4. Legal Basis for Processing</h2>
       <p>Under POPIA, we are required to have a lawful basis for processing your personal information. Our legal bases are:</p>
       <ul>
-        <li><strong>Consent</strong> — You provide explicit consent by ticking the consent checkbox when submitting your application. You may withdraw consent at any time by contacting us.</li>
+        <li><strong>Consent</strong> — You provide explicit consent by ticking the consent checkbox when submitting your application. We record the date, time and notice version when you consent. You may withdraw consent at any time by contacting us.</li>
         <li><strong>Contractual necessity</strong> — Processing is necessary to take steps at your request prior to entering into employment.</li>
         <li><strong>Legitimate interest</strong> — Maintaining an accurate, accountable record of all applications, in line with the mine's Social and Labour Plan (SLP) obligations.</li>
         <li><strong>Legal compliance</strong> — Retaining records as required by South African law.</li>
@@ -314,12 +317,17 @@ body{
       <p>All data is stored within Supabase's cloud infrastructure (a managed PostgreSQL database and secure file storage), which operates data centres with industry-standard security certifications.</p>
       <h3>Technical safeguards in place:</h3>
       <ul>
-        <li><strong>Password hashing:</strong> All passwords are hashed using SHA-256 before storage. The original password is never stored anywhere.</li>
+        <li><strong>Password hashing:</strong> All passwords are hashed with bcrypt before storage. The original password is never stored anywhere.</li>
         <li><strong>Access control:</strong> The admin portal is password-protected, verified server-side. Only authorised BKS administrators and authorised committee personnel can access it.</li>
         <li><strong>Encrypted transmission:</strong> All data is transmitted over HTTPS (TLS encryption).</li>
         <li><strong>Private document storage:</strong> Uploaded CVs and ID documents are stored in a private storage bucket, accessible only via time-limited secure links generated for authorised staff.</li>
         <li><strong>No public exposure:</strong> No personal data is publicly accessible.</li>
+        <li><strong>Sign-in protection:</strong> Repeated failed sign-in attempts are temporarily blocked, and you can only view your own applications.</li>
       </ul>
+      <h3>Where your information is processed</h3>
+      <p>Our cloud providers may store or process information on servers outside South Africa. Where this happens, we rely on providers whose data processing terms require protection comparable to POPIA, as section 72 of POPIA requires.</p>
+      <h3>If something goes wrong</h3>
+      <p>If your personal information is accessed by an unauthorised person, we will notify the Information Regulator and the people affected as soon as reasonably possible, as section 22 of POPIA requires.</p>
       <div class="highlight"><strong>Location data:</strong> GPS coordinates are used only in your browser to calculate distance. They are <strong>never transmitted to or stored on</strong> our servers.</div>
     </div>
 
@@ -337,12 +345,12 @@ body{
           <tr><td>Location data (GPS)</td><td>Not retained — deleted immediately after eligibility check</td><td>Used only client-side for verification</td></tr>
         </tbody>
       </table></div>
-      <p>After the retention period, personal information will be securely deleted or anonymised so that it can no longer be linked to you.</p>
+      <p>We review stored records at least every six months and securely delete anything past its retention period. If you ask us to delete your information earlier, we will do so within 30 days unless the law requires us to keep it.</p>
     </div>
 
     <div class="section-block" id="s7">
       <h2><span class="icon">&#128101;</span>7. Who We Share Your Information With</h2>
-      <p>We share your information only where necessary for the purposes described in this notice:</p>
+      <p>No mine, committee or traditional authority currently receives applicant information through this portal. If that changes, we will update this notice before any sharing begins, and we will share information only with partners who agree in writing to handle it in line with POPIA. The parties below are those that may receive it once the portal is operating:</p>
       <ul>
         <li><strong>Mine &amp; HR Team:</strong> Your application details are shared with the mine's authorised recruitment personnel for candidate evaluation and shortlisting.</li>
         <li><strong>Local Community Committee:</strong> The committee may review the application register for governance and accountability purposes.</li>
@@ -366,8 +374,9 @@ body{
       <p>To exercise any of these rights, contact us using the details in Section 12. We will respond within 30 days.</p>
       <div class="highlight">
         <strong>Information Regulator of South Africa</strong><br>
-        Website: <a href="https://www.justice.gov.za/inforeg/" target="_blank" style="color:var(--green-mid);">www.justice.gov.za/inforeg</a><br>
-        Email: inforeg@justice.gov.za &nbsp;&bull;&nbsp; Phone: 010 023 5207
+        Website: <a href="https://inforegulator.org.za" target="_blank" style="color:var(--green-mid);">inforegulator.org.za</a><br>
+        Complaints: <a href="mailto:POPIAComplaints@inforegulator.org.za" style="color:var(--green-mid);">POPIAComplaints@inforegulator.org.za</a><br>
+        General enquiries: <a href="mailto:enquiries@inforegulator.org.za" style="color:var(--green-mid);">enquiries@inforegulator.org.za</a> &nbsp;&bull;&nbsp; 010 023 5200 &nbsp;&bull;&nbsp; Toll free 0800 017 160
       </div>
     </div>
 
@@ -397,6 +406,7 @@ body{
       <div class="contact-box">
         <h3>BKS Community Job Center — Privacy Contact</h3>
         <div class="contact-row"><span class="contact-label">Name</span><span class="contact-val">BKS Community Job Center</span></div>
+        <div class="contact-row"><span class="contact-label">Information Officer</span><span class="contact-val">Brian Kagiso Sekgobela (Regulator registration 2026-015573)</span></div>
         <div class="contact-row"><span class="contact-label">Address</span><span class="contact-val">Atok, Ga-Selepe, Limpopo, 0749, South Africa</span></div>
         <div class="contact-row"><span class="contact-label">Email</span><span class="contact-val"><a href="mailto:briankagisokingsley@gmail.com">briankagisokingsley@gmail.com</a></span></div>
         <div class="contact-row"><span class="contact-label">Phone</span><span class="contact-val"><a href="tel:0714469504">071 446 9504</a></span></div>
@@ -414,7 +424,7 @@ body{
     &bull;
     BKS Community Job Center &copy; 2026
     &bull;
-    Fair. Transparent. Merit-Based. POPIA Compliant.
+    Fair. Transparent. Merit-Based. Built around POPIA.
   </p>
 </div>
 

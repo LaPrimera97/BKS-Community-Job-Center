@@ -1085,8 +1085,8 @@ footer .container { position: relative; z-index: 2; }
         <div class="value-tooltip" data-i18n="vbMeritTip">Selection is guided by qualifications, experience, and the requirements of the job — not by personal connections or random draws. BKS ensures the right people are seen for the right opportunities, strengthening both the community and the mine.</div>
       </button>
       <button class="value-btn" id="vbPopia" data-vb="popia">
-        <span class="vb-label" data-i18n="vbPopiaLabel">&#9670; POPIA Compliant</span>
-        <div class="value-tooltip" data-i18n="vbPopiaTip">Your personal information — including your ID document and CV — is stored securely and handled in full compliance with the Protection of Personal Information Act (POPIA). Your data is never shared without your consent.</div>
+        <span class="vb-label" data-i18n="vbPopiaLabel">&#9670; Built Around POPIA</span>
+        <div class="value-tooltip" data-i18n="vbPopiaTip">Your personal information — including your ID document and CV — is stored securely and handled in line with the Protection of Personal Information Act (POPIA). Your information is not shared with any mine or third party at this time.</div>
       </button>
     </div>
     <div class="hero-btns">
@@ -1127,7 +1127,7 @@ footer .container { position: relative; z-index: 2; }
         </div>
         <div class="feature-card">
           <div class="feature-icon"><svg fill="none" stroke="#0F6E56" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
-          <div><h4>POPIA compliant &amp; secure</h4><p>Your personal information is handled with full legal compliance and kept strictly private.</p></div>
+          <div><h4>Built around POPIA &amp; secure</h4><p>Your personal information is handled in line with POPIA principles and kept private.</p></div>
         </div>
       </div>
     </div>
@@ -1135,7 +1135,7 @@ footer .container { position: relative; z-index: 2; }
       <div class="stat-item"><div class="val">100%</div><div class="lbl">Community focused</div></div>
       <div class="stat-item"><div class="val">Secure</div><div class="lbl">Cloud-based storage</div></div>
       <div class="stat-item"><div class="val">Fair</div><div class="lbl">Merit-based selection</div></div>
-      <div class="stat-item"><div class="val">POPIA</div><div class="lbl">Legally compliant</div></div>
+      <div class="stat-item"><div class="val">POPIA</div><div class="lbl">Privacy by design</div></div>
     </div>
   </div>
 </div>
@@ -1242,7 +1242,7 @@ footer .container { position: relative; z-index: 2; }
   <div class="container">
     <p class="footer-name">BKS Community Job Center</p>
     <p class="footer-tagline">Built to Connect Our Homes to Mine Opportunities</p>
-    <div class="footer-pills"><span class="footer-pill">Fair Access</span><span class="footer-pill">POPIA Compliant</span><span class="footer-pill">Merit-Based</span></div>
+    <div class="footer-pills"><span class="footer-pill">Fair Access</span><span class="footer-pill">Built Around POPIA</span><span class="footer-pill">Merit-Based</span></div>
     <div class="footer-links">
       <a id="footerPrivacyLink" href="/privacy.html" target="_blank">Privacy Notice</a>
       <a id="footerAdminLink" href="/admin.html" target="_blank">Admin Portal</a>
@@ -1418,7 +1418,7 @@ document.getElementById('appForm').addEventListener('submit',function(e){
   btn.textContent='Submitting\u2026 please wait';btn.disabled=true;
   var fd={name:document.getElementById('name').value,idNumber:document.getElementById('idNumber').value,
     phone:document.getElementById('phone').value,email:document.getElementById('email').value||'',
-    gender:gender,maritalStatus:marital,jobId:currentJobId,jobTitle:document.getElementById('modalTitle').textContent};
+    gender:gender,maritalStatus:marital,consent:document.getElementById('consent').checked,jobId:currentJobId,jobTitle:document.getElementById('modalTitle').textContent};
   function resetBtn(){btn.textContent=(I18N[BKS_LANG]||I18N.en).applySubmit;btn.disabled=false;}
   function putFile(url,file){
     var form=new FormData();
@@ -1658,8 +1658,8 @@ var I18N={
     vbTransparentTip:'Every application submitted is recorded with a date and time stamp. Nothing is lost, changed, or deleted quietly. The Local Committee and Traditional Authority can review the full record at any time \u2014 creating accountability for all.',
     vbMeritLabel:'\u25C6 Merit-Based',
     vbMeritTip:'Selection is guided by qualifications, experience, and the requirements of the job \u2014 not by personal connections or random draws. BKS ensures the right people are seen for the right opportunities, strengthening both the community and the mine.',
-    vbPopiaLabel:'\u25C6 POPIA Compliant',
-    vbPopiaTip:'Your personal information \u2014 including your ID document and CV \u2014 is stored securely and handled in full compliance with the Protection of Personal Information Act (POPIA). Your data is never shared without your consent.'
+    vbPopiaLabel:'\u25C6 Built Around POPIA',
+    vbPopiaTip:'Your personal information \u2014 including your ID document and CV \u2014 is stored securely and handled in line with the Protection of Personal Information Act (POPIA). Your information is not shared with any mine or third party at this time.'
   },
   nso:{
     navHome:'Gae',navJobs:'Me\u0161omo',navAbout:'Ka Rena',navContact:'Ikopanye',navSignIn:'Tsena',
@@ -1694,7 +1694,7 @@ var I18N={
     vbMeritLabel:'\u25C6 Maemo a tsebo',
     vbMeritTip:'Kgetho e hlahlojwa ka dithuto, boitemogelo, le dinyakwa t\u0161a mo\u0161omo \u2014 e seng ka dikgokagano t\u0161a batho goba gono "topa yes". BKS e netefat\u0161a gore batho ba maleba ba boniwa menyetleng ya maleba, go matlafat\u0161a set\u0161haba le moepo.',
     vbPopiaLabel:'\u25C6 Molao wa POPIA',
-    vbPopiaTip:'Tshedimo\u0161o ya gago ya motho \u2014 go akaret\u0161wa tokomane ya boitsebi\u0161o le CV \u2014 di bolokwa ka polokego mme e laolwa ka go latela melao ya Popia ya T\u0161hiret\u0161o ya Tshedimo\u0161o ya Motho (POPIA) ka botlalo. Data ya gago ga e fetiswe ntle le tumelo ya gago.'
+    vbPopiaTip:'Tshedimo\u0161o ya gago ya motho \u2014 go akaret\u0161wa tokomane ya boitsebi\u0161o le CV \u2014 di bolokwa ka polokego mme e laolwa ka go latela melao ya Popia ya T\u0161hiret\u0161o ya Tshedimo\u0161o ya Motho (POPIA). Tshedimo\u0161o ya gago ga e abelwe moepo goba mokgatlo o mongwe ga bjale.'
   }
 };
 

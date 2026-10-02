@@ -6,7 +6,7 @@ const fs = require('fs');
 const app = express();
 app.use(express.json({ limit: '1mb' }));
 
-const PRIVATE_PATHS = /^\/(server\.js|package(-lock)?\.json|dockerfile|docker-compose\.yml|supabase-migration\.sql|netlify(\/.*)?|node_modules(\/.*)?|.*\.py)$/i;
+const PRIVATE_PATHS = /^\/(server\.js|package(-lock)?\.json|dockerfile|docker-compose\.yml|supabase-migration\.sql|netlify(\/.*)?|node_modules(\/.*)?|.*\.(py|sql))$/i;
 
 app.use((req, res, next) => {
   let decoded;

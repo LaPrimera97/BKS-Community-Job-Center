@@ -3,3 +3,11 @@ node_modules/
 .env.local
 *.db
 *.sqlite
+
+*.pdf
+*.patch
+*.zip
+*.csv
+private/
+.env.*
+!.env.example

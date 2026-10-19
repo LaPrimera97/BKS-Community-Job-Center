@@ -11,3 +11,4 @@ node_modules/
 private/
 .env.*
 !.env.example
+hero-originals/

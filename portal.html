@@ -75,6 +75,12 @@ body {
 }
 #heroCanvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; }
 
+.hero-slides { position: absolute; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
+.hero-slide { position: absolute; inset: 0; background-size: cover; background-position: center; opacity: 0; transition: opacity 1.6s ease-in-out; }
+.hero-slide.active { opacity: 1; }
+.hero-slides::after { content: ""; position: absolute; inset: 0; background: linear-gradient(160deg, rgba(2,18,12,0.80) 0%, rgba(4,46,36,0.64) 55%, rgba(4,46,36,0.74) 100%); }
+
+
 
 
 
@@ -1003,6 +1009,7 @@ footer .container { position: relative; z-index: 2; }
 }
 
 </style>
+<link rel="preload" as="image" href="images/hero/hero-1.jpg">
 </head>
 <body>
 
@@ -1033,6 +1040,13 @@ footer .container { position: relative; z-index: 2; }
 </div>
 
 <div class="hero">
+  <div class="hero-slides" id="heroSlides" aria-hidden="true">
+    <div class="hero-slide" data-src="images/hero/hero-1.jpg"></div>
+    <div class="hero-slide" data-src="images/hero/hero-2.jpg"></div>
+    <div class="hero-slide" data-src="images/hero/hero-3.jpg"></div>
+    <div class="hero-slide" data-src="images/hero/hero-4.jpg"></div>
+    <div class="hero-slide" data-src="images/hero/hero-5.jpg"></div>
+  </div>
   <canvas id="heroCanvas" aria-hidden="true"></canvas>
 
   <nav class="hero-nav">
@@ -1257,6 +1271,7 @@ var _cfg       = document.getElementById('bks-config');
 var LOC_LAT    = parseFloat(_cfg.getAttribute('data-lat'))  || -24.454;
 var LOC_LNG    = parseFloat(_cfg.getAttribute('data-lng'))  || 30.033;
 var LOC_KM     = parseFloat(_cfg.getAttribute('data-km'))   || 25;
+var LOC_GATE_ENABLED = false;
 var currentJobId = '';
 var allJobs      = [];
 var currentUser  = null;
@@ -1726,7 +1741,7 @@ function startApp(){
   initLang();
   var sv=sessionStorage.getItem('bksUser');if(sv){try{currentUser=JSON.parse(sv);}catch(e){currentUser=null;}}
   updateNavAuthState();
-  showLocGate();
+  if(LOC_GATE_ENABLED)showLocGate();
   loadJobs();
   startAnimations();
 }
@@ -1820,6 +1835,27 @@ function startAnimations(){
   window.addEventListener('scroll',onScroll,{passive:true});
   onScroll();
 }
+</script>
+<script>
+(function(){
+  var wrap=document.getElementById('heroSlides');if(!wrap)return;
+  var slides=wrap.querySelectorAll('.hero-slide');if(slides.length<2)return;
+  var i=0,timer=null,INTERVAL=6000;
+  function load(s){if(!s.style.backgroundImage){s.style.backgroundImage='url('+s.getAttribute('data-src')+')';}}
+  load(slides[0]);slides[0].classList.add('active');
+  function show(n){slides[i].classList.remove('active');i=n;slides[i].classList.add('active');}
+  function next(){
+    var n=(i+1)%slides.length;
+    var img=new Image();
+    img.onload=img.onerror=function(){load(slides[n]);show(n);};
+    img.src=slides[n].getAttribute('data-src');
+  }
+  function start(){if(!timer)timer=setInterval(next,INTERVAL);}
+  function stop(){clearInterval(timer);timer=null;}
+  if(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+  document.addEventListener('visibilitychange',function(){document.hidden?stop():start();});
+  window.addEventListener('load',start);
+})();
 </script>
 </body>
 </html>

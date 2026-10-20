@@ -868,6 +868,8 @@ footer .container { position: relative; z-index: 2; }
 }
 .loc-notice-head svg { width: 16px; height: 16px; flex: none; }
 .loc-box .loc-notice p { font-size: 13px; line-height: 1.6; color: #5c4a14; margin: 0; }
+.jobs-notice { max-width: 760px; margin: 0 auto 28px; position: relative; z-index: 2; }
+.jobs-notice p { font-size: 13.5px; line-height: 1.6; color: #5c4a14; margin: 0; }
 .loc-allow-btn {
   width: 100%;
   background: linear-gradient(135deg, #1ab87f, #0a7a52);
@@ -1160,6 +1162,13 @@ footer .container { position: relative; z-index: 2; }
     <div style="text-align:center;margin-bottom:10px;"><span class="section-badge">MINE OPPORTUNITIES</span></div>
     <h2 class="section-title reveal" data-i18n="jobsTitle">Current Job Openings</h2>
     <p class="section-subtitle reveal" data-i18n="jobsSub">Jobs allocated for local communities — fair, transparent, and merit-based</p>
+    <div class="loc-notice jobs-notice" role="note">
+      <div class="loc-notice-head">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <span data-i18n="locNoticeTitle">Not currently operating</span>
+      </div>
+      <p data-i18n="locNoticeBody">BKS is built and online, but it is not yet in operation. No mining partner has endorsed or piloted the platform, so no real job allocations are being made through it.</p>
+    </div>
     <div class="jobs-filter">
       <input type="text" id="jobSearch" placeholder="Search by job title or keyword...">
       <select id="jobCategory">

@@ -596,6 +596,10 @@ footer {
   position: relative; overflow: hidden;
 }
 footer .container { position: relative; z-index: 2; }
+.net-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+.mid-wrap { position: relative; isolation: isolate; display: flow-root; background: linear-gradient(160deg, #042e24 0%, #064e3b 55%, #042e24 100%); }
+.mid-wrap > .container, .mid-wrap > .page { position: relative; z-index: 1; }
+
 .footer-logo { max-width: 112px; margin: 0 auto 22px; display: block; opacity: 0.82; }
 .footer-name {
   font-family: var(--font-display); font-size: 18px; font-weight: 700;
@@ -1261,6 +1265,7 @@ footer .container { position: relative; z-index: 2; }
 </div>
 
 <footer>
+  <canvas class="net-bg" data-net-bg data-density="9000" aria-hidden="true"></canvas>
   <div id="footerParticles" class="particle-layer" aria-hidden="true"></div>
   <div class="container">
     <p class="footer-name">BKS Community Job Center</p>
@@ -1866,5 +1871,6 @@ function startAnimations(){
   window.addEventListener('load',start);
 })();
 </script>
+<script src="/bg-network.js" defer></script>
 </body>
 </html>

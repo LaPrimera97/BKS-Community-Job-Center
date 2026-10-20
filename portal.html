@@ -926,6 +926,43 @@ footer .container { position: relative; z-index: 2; }
 @keyframes dropdownIn { from { opacity: 0; transform: translateY(-8px) scale(.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
 
 
+.nav-account { position: fixed; top: 18px; right: 26px; z-index: 9999; display: flex; align-items: center; gap: 10px; transition: top var(--transition-slow); }
+.nav-account .nav-auth-btn { background: var(--green-vivid); border-color: var(--green-vivid); color: #fff; padding: 10px 22px; font-size: 13px; }
+.nav-account .nav-auth-btn:hover { background: var(--green-vivid); filter: brightness(1.12); }
+.nav-avatar-wrap { position: relative; display: none; }
+.nav-account.signed-in .nav-avatar-wrap { display: block; }
+.nav-account.signed-in .nav-auth-btn, .nav-account.signed-in .lang-switcher { display: none; }
+.nav-avatar {
+  width: 42px; height: 42px; border-radius: 50%; padding: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--gold); color: var(--green-dark);
+  border: 2px solid rgba(255, 255, 255, 0.28);
+  font-size: 14px; font-weight: 800; letter-spacing: 0.02em; cursor: pointer;
+  font-family: var(--font-body);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, .3);
+  transition: border-color var(--transition-fast), transform var(--transition-fast);
+}
+.nav-avatar:hover, .nav-avatar.open { border-color: var(--green-vivid); transform: translateY(-1px); }
+.nav-acct-drop { left: auto; right: 0; min-width: 230px; }
+.nav-acct-head { padding: 10px 14px 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.12); margin-bottom: 6px; }
+.nav-acct-name { color: #fff; font-weight: 700; font-size: 14px; font-family: var(--font-body); }
+.nav-acct-link {
+  display: block; padding: 10px 16px; border-radius: 11px;
+  color: rgba(255, 255, 255, 0.85); text-decoration: none;
+  font-size: 13px; font-weight: 600; font-family: var(--font-body);
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+.nav-acct-link:hover { background: rgba(255, 255, 255, 0.08); color: #fff; }
+.nav-scrolled .nav-account { top: 9px; }
+.nav-scrolled .nav-account .nav-auth-btn { padding: 8px 18px; font-size: 12px; }
+.nav-scrolled .nav-avatar { width: 38px; height: 38px; font-size: 13px; }
+.nav-scrolled .nav-drop-lang .lang-btn { padding: 8px 0; font-size: 11px; }
+@media (max-width: 768px) {
+  .nav-account { top: 10px; right: 10px; }
+  .nav-account .lang-switcher { display: none; }
+  .nav-avatar { width: 40px; height: 40px; }
+}
+
 @media (max-width: 768px) {
   /* Always collapse to hamburger on mobile — don't wait for scroll */
   .hero-nav { top: 10px; left: 10px; gap: 0; padding: 7px 12px; max-width: none; }
@@ -1075,17 +1112,30 @@ footer .container { position: relative; z-index: 2; }
           <button class="lang-btn active" id="btnLangENMobile">ENG</button>
           <button class="lang-btn" id="btnLangNSOMobile">Sepedi</button>
         </div>
-        <button class="nav-drop-authbtn" id="navAuthBtnMobile" data-i18n="navSignIn">Sign In</button>
       </div>
     </div>
-    <div class="nav-divider"></div>
-    <span id="navUser" style="display:none;color:rgba(255,255,255,.85);font-size:13px;"></span>
-    <div class="lang-switcher" title="Language / Polelo">
+  </nav>
+
+  <div class="nav-account" id="navAccount">
+    <div class="lang-switcher" id="navLangDesktop" title="Language / Polelo">
       <button class="lang-btn active" id="btnLangEN">ENG</button>
       <button class="lang-btn" id="btnLangNSO">Sepedi</button>
     </div>
     <button class="nav-auth-btn" id="navAuthBtn" data-i18n="navSignIn">Sign In</button>
-  </nav>
+    <div class="nav-avatar-wrap">
+      <button class="nav-avatar" id="navAvatarBtn" aria-label="Account menu" aria-haspopup="true" aria-expanded="false"><span id="navAvatarInitials">?</span></button>
+      <div class="nav-dropdown nav-acct-drop" id="navAcctDrop">
+        <div class="nav-acct-head"><div class="nav-acct-name" id="navAcctName"></div></div>
+        <a href="#" class="nav-acct-link" id="myAppsLink">My Applications</a>
+        <div class="nav-drop-divider"></div>
+        <div class="nav-drop-lang">
+          <button class="lang-btn active" data-lang="en">ENG</button>
+          <button class="lang-btn" data-lang="nso">Sepedi</button>
+        </div>
+        <button class="nav-drop-authbtn signed-in" id="navSignOutBtn">Sign Out</button>
+      </div>
+    </div>
+  </div>
 
   <div class="hero-content">
     <div class="hero-badge" data-i18n="heroBadge">BKS COMMUNITY JOB CENTER</div>
@@ -1565,36 +1615,54 @@ document.getElementById('doSignUpBtn').addEventListener('click',function(){
 
 
 function updateNavAuthState(){
-  var btn=document.getElementById('navAuthBtn'),span=document.getElementById('navUser');
-  var mbtn=document.getElementById('navAuthBtnMobile');
-  if(mbtn){
-    mbtn.textContent = currentUser ? ((BKS_LANG==='nso')?'Tswa':'Sign Out') : ((BKS_LANG==='nso')?'Tsena':'Sign In');
-    mbtn.classList.toggle('signed-in', !!currentUser);
+  var acct=document.getElementById('navAccount');
+  var signIn=document.getElementById('navAuthBtn');
+  var nso=(BKS_LANG==='nso');
+  signIn.textContent=nso?'Tsena':'Sign In';
+  acct.classList.toggle('signed-in',!!currentUser);
+  if(!currentUser){
+    document.getElementById('navAcctDrop').classList.remove('open');
+    document.getElementById('navAvatarBtn').classList.remove('open');
+    return;
   }
-  if(currentUser){
-    btn.textContent=(BKS_LANG==='nso')?'Tswa':'Sign Out';btn.classList.add('signed-in');
-    span.style.display='inline';
-    span.innerHTML='<a id="myAppsLink" style="color:rgba(255,255,255,.85);font-weight:600;text-decoration:none;cursor:pointer;" href="#">'+(BKS_LANG==='nso'?'&#128203; Dikgopelo Tša Ka':'&#128203; My Applications')+'</a>&nbsp;|&nbsp;'+escHtml(currentUser.fullName);
-    var lk=document.getElementById('myAppsLink');
-    if(lk)lk.addEventListener('click',function(e){e.preventDefault();sessionStorage.setItem('bksUser',JSON.stringify(currentUser));window.open('/tracker.html','_blank');});
-  }else{
-    btn.textContent=(BKS_LANG==='nso')?'Tsena':'Sign In';btn.classList.remove('signed-in');
-    span.style.display='none';span.innerHTML='';
-  }
+  var parts=String(currentUser.fullName||'').trim().split(/\s+/).filter(Boolean);
+  var ini=parts.length?(parts[0].charAt(0)+(parts.length>1?parts[parts.length-1].charAt(0):'')).toUpperCase():'?';
+  document.getElementById('navAvatarInitials').textContent=ini;
+  document.getElementById('navAcctName').textContent=currentUser.fullName||'';
+  document.getElementById('myAppsLink').textContent=nso?'Dikgopelo Tša Ka':'My Applications';
+  document.getElementById('navSignOutBtn').textContent=nso?'Tswa':'Sign Out';
 }
-document.getElementById('navAuthBtn').addEventListener('click',function(){
-  if(currentUser){if(confirm('Sign out of your account?')){currentUser=null;sessionStorage.removeItem('bksUser');updateNavAuthState();}}
-  else openAuthModal();
+function closeAcctDrop(){
+  var b=document.getElementById('navAvatarBtn');
+  document.getElementById('navAcctDrop').classList.remove('open');
+  b.classList.remove('open');
+  b.setAttribute('aria-expanded','false');
+}
+document.getElementById('navAuthBtn').addEventListener('click',function(){openAuthModal();});
+document.getElementById('navAvatarBtn').addEventListener('click',function(e){
+  e.stopPropagation();
+  var d=document.getElementById('navAcctDrop');
+  var wasOpen=d.classList.contains('open');
+  d.classList.toggle('open',!wasOpen);
+  this.classList.toggle('open',!wasOpen);
+  this.setAttribute('aria-expanded',String(!wasOpen));
 });
-var navAuthBtnMobileEl = document.getElementById('navAuthBtnMobile');
-if(navAuthBtnMobileEl){
-  navAuthBtnMobileEl.addEventListener('click',function(){
-    document.getElementById('navDropdown').classList.remove('open');
-    document.getElementById('navMenuBtn').classList.remove('open');
-    if(currentUser){if(confirm('Sign out of your account?')){currentUser=null;sessionStorage.removeItem('bksUser');updateNavAuthState();}}
-    else openAuthModal();
-  });
-}
+document.addEventListener('click',function(e){
+  if(!e.target.closest('.nav-avatar-wrap')) closeAcctDrop();
+});
+document.getElementById('myAppsLink').addEventListener('click',function(e){
+  e.preventDefault();
+  sessionStorage.setItem('bksUser',JSON.stringify(currentUser));
+  window.open('/tracker.html','_blank');
+  closeAcctDrop();
+});
+document.getElementById('navSignOutBtn').addEventListener('click',function(){
+  closeAcctDrop();
+  if(confirm('Sign out of your account?')){currentUser=null;sessionStorage.removeItem('bksUser');updateNavAuthState();}
+});
+document.querySelectorAll('.nav-acct-drop .lang-btn').forEach(function(b){
+  b.addEventListener('click',function(){applyLang(b.getAttribute('data-lang'));});
+});
 
 
 function openTrackerModal(){
@@ -1736,6 +1804,7 @@ function applyLang(lang){
   document.getElementById('btnLangNSO').classList.toggle('active',lang==='nso');
   if(btnLangENMobileEl) btnLangENMobileEl.classList.toggle('active',lang==='en');
   if(btnLangNSOMobileEl) btnLangNSOMobileEl.classList.toggle('active',lang==='nso');
+  document.querySelectorAll('.nav-acct-drop .lang-btn').forEach(function(b){b.classList.toggle('active',b.getAttribute('data-lang')===lang);});
   updateNavAuthState();
   renderJobs(allJobs);
   var dropLinks=document.querySelectorAll('.nav-drop-link[data-i18n]');

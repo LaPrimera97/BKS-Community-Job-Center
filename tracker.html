@@ -368,6 +368,18 @@ body{
 .empty-big-icon{width:56px;height:56px;margin:0 auto 20px;font-size:0;color:var(--green-mid);}
 .empty-big-icon svg{width:56px;height:56px;}
 @media(max-width:680px){.sum-line{gap:10px 22px;}}
+
+.signin-wall{border-top:none;border-radius:16px;box-shadow:0 24px 60px rgba(0,0,0,.28);padding:44px 40px 40px;}
+.wall-icon{width:52px;height:52px;margin:0 auto 22px;border-radius:14px;background:var(--green-pale);border:1px solid #c6e8d4;color:var(--green-mid);font-size:0;display:flex;align-items:center;justify-content:center;}
+.wall-icon svg{width:24px;height:24px;}
+.signin-wall h2{font-size:24px;line-height:1.25;}
+.auth-tabs{border-bottom:1px solid var(--border);}
+.auth-tab{font-size:13px;letter-spacing:.02em;border-bottom-width:3px;}
+.auth-tab.active{border-bottom-color:var(--gold);color:var(--green-deep);}
+.form-group input{border-radius:10px;background:#fff;}
+.form-group input:-webkit-autofill,.form-group input:-webkit-autofill:hover,.form-group input:-webkit-autofill:focus{-webkit-box-shadow:0 0 0 100px #fff inset;-webkit-text-fill-color:#1a2e20;caret-color:#1a2e20;}
+.btn-green{background:var(--green-mid);box-shadow:none;border-radius:10px;letter-spacing:.04em;}
+.btn-green:hover{background:var(--green-dark);transform:none;box-shadow:none;}
 </style>
 </head>
 <body>
@@ -654,7 +666,7 @@ function renderSignIn(){
   var p=document.getElementById('mainPage');
   p.innerHTML=
     '<div class="signin-wall">'+
-    '<div class="wall-icon">&#128274;</div>'+
+    '<div class="wall-icon">'+svgIcon('<rect x="4" y="11" width="16" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>')+'</div>'+
     '<h2>'+escHtml(tl('wallTitle'))+'</h2>'+
     '<p>'+escHtml(tl('wallSub'))+'</p>'+
     '<div class="auth-tabs">'+

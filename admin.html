@@ -97,13 +97,26 @@ tr:hover td{background:rgba(29,158,117,0.05);}
 .form-group textarea{min-height:90px;resize:vertical;}
 .modal-actions{display:flex;gap:12px;margin-top:20px;}
 .modal-actions button{flex:1;padding:11px;border:none;border-radius:6px;cursor:pointer;font-weight:600;font-size:13px;}
+
+#loginScreen{background:radial-gradient(ellipse at 50% 0%,#0a4a38 0%,#042e24 55%,#03241c 100%);}
+.login-box{background:#06382c;border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:44px 40px;box-shadow:0 30px 70px -20px rgba(0,0,0,.6);}
+.lock-tile{width:48px;height:48px;border-radius:12px;background:rgba(255,215,0,.1);border:1px solid rgba(255,215,0,.28);color:#ffd700;display:flex;align-items:center;justify-content:center;margin-bottom:22px;}
+.lock-tile svg{width:22px;height:22px;}
+.login-box h1{font-size:28px;letter-spacing:-.01em;}
+.login-box .subtitle{color:#8fc5aa;}
+.login-box label{color:#b9d9c8;}
+.login-box input{background:#042e24;border:1px solid rgba(255,255,255,.16);}
+.login-box input:focus{border-color:#1D9E75;box-shadow:0 0 0 3px rgba(29,158,117,.25);}
+.login-box input:-webkit-autofill,.login-box input:-webkit-autofill:focus{-webkit-box-shadow:0 0 0 100px #042e24 inset;-webkit-text-fill-color:#f1f5f9;caret-color:#f1f5f9;}
+.back-link{color:#a7e3c8;}
+.back-link:hover{color:#fff;}
 </style>
 </head>
 <body>
 
 <div id="loginScreen">
   <div class="login-box">
-    <h1>&#128274; Admin Portal</h1>
+    <div class="lock-tile"><svg fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="11" width="16" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></div><h1>Admin Portal</h1>
     <div class="subtitle">BKS Community Job Center</div>
     <label>Password</label>
     <input type="password" id="password" placeholder="Enter admin password">

@@ -1317,7 +1317,7 @@ footer .container { position: relative; z-index: 2; }
 
 <div id="trackerModal" class="modal">
   <div class="modal-content" style="max-width:620px;">
-    <div class="modal-header"><h3>&#128203; My Applications</h3><button class="close-btn" id="closeTrackerModal">&times;</button></div>
+    <div class="modal-header"><h3>My Applications</h3><button class="close-btn" id="closeTrackerModal">&times;</button></div>
     <div id="trackerContent">
       <div class="loading"><div class="spinner"></div><p style="margin-top:14px;color:#78716c;">Loading...</p></div>
     </div>
@@ -1456,10 +1456,10 @@ function renderJobs(jobs){
     var sid=String(j.id).replace(/\\/g,'\\\\').replace(/'/g,"\\'");
     var stl=String(j.title).replace(/\\/g,'\\\\').replace(/'/g,"\\'");
     html+='<div class="job-card"><h3>'+escHtml(j.title)+'</h3>';
-    html+='<div class="closing">&#128197; '+(I18N[BKS_LANG]||I18N.en).jobsClosing+' '+escHtml(j.closing)+'</div>';
+    html+='<div class="closing">'+(I18N[BKS_LANG]||I18N.en).jobsClosing+' '+escHtml(j.closing)+'</div>';
     html+='<div class="desc">'+escHtml(j.description)+'</div>';
     if(j.requirements&&j.requirements.trim())
-      html+='<div class="req-section"><h4>&#9989; '+(I18N[BKS_LANG]||I18N.en).jobsReqs+'</h4><p>'+escHtml(j.requirements)+'</p></div>';
+      html+='<div class="req-section"><h4>'+(I18N[BKS_LANG]||I18N.en).jobsReqs+'</h4><p>'+escHtml(j.requirements)+'</p></div>';
     html+='<button class="apply-btn" onclick="openApply(\''+sid+'\',\''+stl+'\')">'+(I18N[BKS_LANG]||I18N.en).jobsApplyBtn+'</button></div>';
   }
   jl.innerHTML=html;
@@ -1703,7 +1703,7 @@ function renderMyApplications(apps,events){
   }
   var counts={Pending:0,Reviewed:0,Shortlisted:0,Rejected:0};
   apps.forEach(function(a){if(counts[a.status]!==undefined)counts[a.status]++;else counts.Pending++;});
-  var html='<div class="tracker-panel"><h4>&#128203; Your Application History</h4><div class="tracker-summary">';
+  var html='<div class="tracker-panel"><h4>Your Application History</h4><div class="tracker-summary">';
   html+='<div class="tracker-summary-card"><div class="ts-num">'+apps.length+'</div><div class="ts-lbl">Total</div></div>';
   html+='<div class="tracker-summary-card"><div class="ts-num" style="color:#854d0e;">'+counts.Pending+'</div><div class="ts-lbl">Pending</div></div>';
   html+='<div class="tracker-summary-card"><div class="ts-num" style="color:#065f46;">'+counts.Shortlisted+'</div><div class="ts-lbl">Shortlisted</div></div>';
@@ -1711,7 +1711,7 @@ function renderMyApplications(apps,events){
   html+='</div>';
   apps.forEach(function(app){
     var cls='status-'+(app.status||'Pending');
-    html+='<div class="app-row"><div class="app-row-header"><div><div class="job-title">&#128188; '+escHtml(app.jobId)+'</div><div class="app-date">Submitted: '+escHtml(app.timestamp)+'</div></div><span class="status-pill '+cls+'">'+escHtml(app.status)+'</span></div>';
+    html+='<div class="app-row"><div class="app-row-header"><div><div class="job-title">'+escHtml(app.jobId)+'</div><div class="app-date">Submitted: '+escHtml(app.timestamp)+'</div></div><span class="status-pill '+cls+'">'+escHtml(app.status)+'</span></div>';
     var jobEvs=(events||[]).filter(function(ev){return ev.jobId===app.jobId;});
     if(jobEvs.length){
       html+='<div class="timeline">';

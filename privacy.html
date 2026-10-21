@@ -15,197 +15,163 @@
   --green-dark:#064e3b;
   --green-mid:#0F6E56;
   --green-vivid:#1D9E75;
-  --green-light:#E1F5EE;
-  --green-pale:#f0faf5;
   --gold:#ffd700;
+  --gold-deep:#b8960b;
   --cream:#faf6f0;
   --ink:#1a2e20;
-  --muted:#57534e;
-  --border:#e5e0dc;
+  --muted:#4a4540;
+  --rule:#e3ddd3;
   --font-display:'Playfair Display',Georgia,serif;
   --font-body:'DM Sans',Arial,sans-serif;
-  --radius-sm:10px;
-  --radius-md:16px;
-  --radius-lg:24px;
-  --shadow-sm:0 1px 6px rgba(6,78,59,.07);
-  --shadow-md:0 4px 20px rgba(6,78,59,.12);
 }
 
 *{margin:0;padding:0;box-sizing:border-box;}
 html{scroll-behavior:smooth;}
 body{
   font-family:var(--font-body);
-  background:var(--cream);
+  background:var(--green-deep);
   color:var(--ink);
   font-size:16px;
   line-height:1.75;
   -webkit-font-smoothing:antialiased;
 }
 
+.container{max-width:1120px;margin:0 auto;padding:0 28px;}
 
 .page-header{
   background:linear-gradient(135deg,var(--green-deep) 0%,var(--green-dark) 55%,#0a6b50 100%);
-  color:white;padding:52px 0 44px;
+  color:#fff;padding:48px 0 40px;
   position:relative;overflow:hidden;
-}
-.page-header::before{
-  content:"";position:absolute;top:0;left:0;right:0;bottom:0;
-  background:radial-gradient(ellipse at 80% 50%, rgba(255,215,0,.06) 0%, transparent 60%);
-  pointer-events:none;
 }
 #headerCanvas{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:1;}
 .page-header .container{display:flex;align-items:center;gap:28px;flex-wrap:wrap;position:relative;z-index:2;}
-.header-logo{max-width:150px;display:block;cursor:pointer;transition:opacity .2s,transform .2s;}
-.header-logo:hover{opacity:.9;transform:scale(1.03);}
-.header-text h1{font-family:var(--font-display);font-size:clamp(22px,4vw,32px);font-weight:700;margin-bottom:7px;letter-spacing:-.01em;}
-.header-text p{font-size:13px;color:rgba(255,255,255,.6);margin-bottom:0;font-weight:400;}
+.header-logo{max-width:110px;display:block;cursor:pointer;transition:opacity .2s;}
+.header-logo:hover{opacity:.85;}
+.header-text h1{font-family:var(--font-display);font-size:clamp(26px,4.5vw,40px);font-weight:700;margin-bottom:6px;letter-spacing:-.01em;line-height:1.15;}
+.header-text p{font-size:14px;color:rgba(255,255,255,.65);}
 .effective-badge{
-  display:inline-block;
-  background:rgba(255,215,0,.12);border:1px solid rgba(255,215,0,.3);
-  color:rgba(255,215,0,.9);font-size:10px;font-weight:700;
-  padding:5px 16px;border-radius:20px;letter-spacing:.07em;margin-top:12px;
-  font-family:var(--font-body);text-transform:uppercase;
+  display:inline-block;margin-top:14px;padding-top:12px;
+  border-top:1px solid rgba(255,215,0,.35);
+  color:var(--gold);font-size:11px;font-weight:700;
+  letter-spacing:.12em;text-transform:uppercase;
 }
 
-
-.back-bar{background:white;border-bottom:1px solid var(--border);padding:14px 0;box-shadow:var(--shadow-sm);}
+.back-bar{background:#03241c;border-bottom:1px solid rgba(255,255,255,.08);padding:12px 0;}
 .back-bar a{
-  color:var(--green-mid);text-decoration:none;font-size:14px;font-weight:600;
-  display:inline-flex;align-items:center;gap:7px;
-  transition:color .2s,gap .2s;font-family:var(--font-body);
+  color:rgba(255,255,255,.75);text-decoration:none;font-size:13px;font-weight:600;
+  display:inline-flex;align-items:center;gap:8px;transition:color .2s,gap .2s;
 }
-.back-bar a:hover{color:var(--green-dark);gap:10px;}
+.back-bar a:hover{color:var(--gold);gap:11px;}
 
+.mid-wrap{position:relative;isolation:isolate;display:flow-root;background:linear-gradient(160deg,#042e24 0%,#064e3b 55%,#042e24 100%);padding:48px 0 88px;}
+.mid-wrap > .container{position:relative;z-index:1;}
+.net-bg{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;}
 
-.container{max-width:880px;margin:0 auto;padding:0 28px;}
+.layout{display:grid;grid-template-columns:230px minmax(0,1fr);gap:48px;align-items:start;}
 
-
-.toc-card{
-  background:white;border:1px solid var(--border);border-radius:var(--radius-lg);
-  padding:28px 32px;margin:40px 0 36px;
-  box-shadow:var(--shadow-sm);
-  border-left:5px solid var(--green-vivid);
+.toc{position:sticky;top:28px;max-height:calc(100vh - 56px);overflow:auto;}
+.toc h2{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin-bottom:14px;}
+.toc ol{list-style:none;}
+.toc a{
+  display:flex;gap:12px;padding:7px 0 7px 14px;
+  border-left:2px solid rgba(255,255,255,.14);
+  color:rgba(255,255,255,.65);text-decoration:none;
+  font-size:13.5px;line-height:1.4;transition:color .2s,border-color .2s;
 }
-.toc-card h2{
-  font-family:var(--font-body);font-size:11px;font-weight:700;
-  color:var(--green-mid);text-transform:uppercase;letter-spacing:.1em;margin-bottom:18px;
-}
-.toc-list{list-style:none;display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:6px 24px;}
-.toc-list li a{
-  color:var(--green-mid);text-decoration:none;font-size:14px;font-weight:500;
-  display:flex;align-items:center;gap:10px;padding:4px 0;
-  transition:color .2s,gap .15s;font-family:var(--font-body);
-}
-.toc-list li a::before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--green-vivid);flex-shrink:0;}
-.toc-list li a:hover{color:var(--green-dark);}
+.toc a span{font-size:11px;font-weight:700;min-width:18px;padding-top:2px;opacity:.6;}
+.toc a:hover{color:#fff;}
+.toc a.active{color:var(--gold);border-left-color:var(--gold);}
 
-
-.content{padding-bottom:80px;}
-.section-block{
-  background:white;border:1px solid var(--border);border-radius:var(--radius-lg);
-  padding:32px 36px;margin-bottom:20px;
-  box-shadow:var(--shadow-sm);
-  transition:box-shadow .3s ease;
+.paper{
+  background:var(--cream);
+  border-radius:18px;
+  padding:56px 64px;
+  box-shadow:0 24px 70px rgba(0,0,0,.3);
 }
-.section-block:hover{box-shadow:var(--shadow-md);}
-.section-block h2{
-  font-family:var(--font-display);font-size:20px;font-weight:700;color:var(--green-dark);
-  margin-bottom:16px;padding-bottom:14px;
-  border-bottom:2px solid var(--green-light);
-  display:flex;align-items:center;gap:12px;
-}
-.section-block h2 .icon{
-  width:36px;height:36px;border-radius:50%;background:var(--green-light);
-  display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:16px;
-}
-.section-block h3{font-size:15px;font-weight:700;color:var(--ink);margin:20px 0 8px;font-family:var(--font-body);}
-.section-block p{font-size:14px;color:var(--muted);margin-bottom:12px;line-height:1.8;}
-.section-block p:last-child{margin-bottom:0;}
-.section-block ul,.section-block ol{padding-left:20px;font-size:14px;color:var(--muted);margin-bottom:12px;line-height:1.8;}
-.section-block ul li,.section-block ol li{margin-bottom:8px;}
-.section-block ul li:last-child,.section-block ol li:last-child{margin-bottom:0;}
 
+.sec{padding:44px 0;border-top:1px solid var(--rule);scroll-margin-top:24px;}
+.sec:first-child{padding-top:0;border-top:none;}
+.sec:last-child{padding-bottom:0;}
+.sec-head{display:flex;align-items:baseline;gap:16px;margin-bottom:20px;}
+.sec-num{font-size:12px;font-weight:700;letter-spacing:.14em;color:var(--green-vivid);}
+.sec h2{font-family:var(--font-display);font-size:clamp(22px,3vw,28px);font-weight:700;color:var(--green-deep);line-height:1.25;letter-spacing:-.005em;}
+.sec h3{font-size:15px;font-weight:700;color:var(--ink);margin:26px 0 8px;}
+.sec p{font-size:15px;color:var(--muted);margin-bottom:14px;line-height:1.8;}
+.sec p:last-child{margin-bottom:0;}
+.sec ul,.sec ol.plain{padding-left:22px;font-size:15px;color:var(--muted);margin-bottom:14px;line-height:1.8;}
+.sec li{margin-bottom:9px;padding-left:4px;}
+.sec li:last-child{margin-bottom:0;}
+.sec li::marker{color:var(--green-vivid);font-weight:700;}
+.sec strong{color:var(--ink);}
+.sec a{color:var(--green-mid);text-underline-offset:3px;}
+.sec a:hover{color:var(--green-dark);}
 
-.highlight{
-  background:var(--green-pale);border:1.5px solid #c6e8d4;
-  border-radius:var(--radius-sm);padding:16px 18px;margin:16px 0;
-  font-size:13px;color:var(--ink);line-height:1.75;
+.highlight,.warning{
+  margin:22px 0;padding:16px 20px;
+  font-size:14px;line-height:1.75;color:var(--muted);
+  border-left:3px solid var(--green-vivid);
+  background:rgba(29,158,117,.07);
+  border-radius:0 10px 10px 0;
 }
 .highlight strong{color:var(--green-dark);}
-.warning{
-  background:#fffbeb;border:1.5px solid #fde68a;
-  border-radius:var(--radius-sm);padding:16px 18px;margin:16px 0;
-  font-size:13px;color:var(--muted);line-height:1.75;
+.warning{border-left-color:var(--gold-deep);background:rgba(184,150,11,.09);}
+.warning strong{color:#7a5f00;}
+
+.data-table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:20px 0;}
+.data-table{width:100%;border-collapse:collapse;font-size:14px;min-width:520px;}
+.data-table th{
+  text-align:left;padding:10px 16px 10px 0;
+  font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--green-mid);border-bottom:2px solid var(--green-deep);
 }
-.warning strong{color:#854d0e;}
-
-
-.data-table{width:100%;border-collapse:collapse;font-size:13px;margin:16px 0;border-radius:var(--radius-sm);overflow:hidden;}
-.data-table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:var(--radius-sm);}
-.data-table thead{background:linear-gradient(135deg,var(--green-dark),var(--green-mid));}
-.data-table th{color:white;text-align:left;padding:12px 15px;font-weight:700;font-family:var(--font-body);font-size:12px;letter-spacing:.04em;}
-.data-table td{padding:12px 15px;border-bottom:1px solid var(--border);color:var(--muted);vertical-align:top;}
-.data-table tbody tr:hover td{background:#fafaf8;}
+.data-table td{padding:14px 16px 14px 0;border-bottom:1px solid var(--rule);color:var(--muted);vertical-align:top;line-height:1.6;}
+.data-table td:first-child{color:var(--ink);white-space:nowrap;padding-right:24px;}
 .data-table tbody tr:last-child td{border-bottom:none;}
 
+.rights{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 48px;margin:22px 0;}
+.right-item{padding:18px 0;border-top:1px solid var(--rule);}
+.right-item h4{font-family:var(--font-display);font-size:17px;font-weight:700;color:var(--green-deep);margin-bottom:4px;}
+.right-item p{font-size:14px;color:var(--muted);margin:0;line-height:1.65;}
 
-.rights-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:14px;margin:18px 0;}
-.right-card{
-  background:var(--green-pale);border:1.5px solid #c6e8d4;
-  border-radius:var(--radius-md);padding:18px;
-  transition:transform .25s ease,box-shadow .25s ease;
-}
-.right-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-md);}
-.right-card .right-icon{font-size:22px;margin-bottom:8px;}
-.right-card h4{font-size:13px;font-weight:700;color:var(--green-dark);margin-bottom:5px;font-family:var(--font-body);}
-.right-card p{font-size:12px;color:var(--muted);margin:0;line-height:1.6;}
-
-
-.contact-box{
-  background:linear-gradient(135deg,var(--green-deep) 0%,var(--green-dark) 100%);
-  border-radius:var(--radius-lg);padding:28px 32px;color:white;margin-top:22px;
-  position:relative;overflow:hidden;
-}
-.contact-box::before{
-  content:"";position:absolute;top:-30px;right:-30px;
-  width:140px;height:140px;border-radius:50%;
-  background:rgba(255,215,0,.06);pointer-events:none;
-}
-.contact-box h3{font-family:var(--font-display);font-size:17px;font-weight:700;margin-bottom:18px;color:#a7f3d0;}
-.contact-row{display:flex;gap:12px;align-items:flex-start;margin-bottom:12px;font-size:14px;}
-.contact-row:last-child{margin-bottom:0;}
-.contact-label{color:rgba(255,255,255,.5);min-width:72px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;padding-top:2px;font-family:var(--font-body);}
-.contact-val{color:rgba(255,255,255,.9);line-height:1.6;}
-.contact-val a{color:#6ee7b7;text-decoration:none;transition:color .2s;}
+.contact-box{background:var(--green-deep);border-radius:14px;padding:28px 32px;color:#fff;margin-top:26px;}
+.contact-box h3{font-family:var(--font-display);font-size:18px;font-weight:700;margin:0 0 14px;color:#a7f3d0;}
+.contact-row{display:grid;grid-template-columns:150px 1fr;gap:14px;padding:11px 0;border-top:1px solid rgba(255,255,255,.1);font-size:14px;}
+.contact-label{color:rgba(255,255,255,.5);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;padding-top:3px;}
+.contact-val{color:rgba(255,255,255,.92);line-height:1.6;}
+.contact-val a{color:#6ee7b7;text-decoration:none;}
 .contact-val a:hover{color:#a7f3d0;text-decoration:underline;}
-
 
 .page-footer{
   background:linear-gradient(135deg,var(--green-deep),#0a1f17);
   padding:36px 0;text-align:center;position:relative;overflow:hidden;
 }
 #footerCanvas{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;}
-.net-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
-.mid-wrap { position: relative; isolation: isolate; display: flow-root; background: linear-gradient(160deg, #042e24 0%, #064e3b 55%, #042e24 100%); }
-.mid-wrap > .container, .mid-wrap > .page { position: relative; z-index: 1; }
+.page-footer p{font-size:12px;color:rgba(255,255,255,.35);position:relative;z-index:2;}
+.page-footer a{color:rgba(255,255,255,.5);text-decoration:none;margin:0 10px;transition:color .2s;font-weight:500;}
+.page-footer a:hover{color:rgba(255,255,255,.8);}
 
-.page-footer p{font-size:12px;color:rgba(255,255,255,.3);position:relative;z-index:2;}
-.page-footer a{color:rgba(255,255,255,.45);text-decoration:none;margin:0 10px;transition:color .2s;font-weight:500;}
-.page-footer a:hover{color:rgba(255,255,255,.75);}
-
+@media(max-width:960px){
+  .layout{grid-template-columns:1fr;gap:28px;}
+  .toc{position:static;max-height:none;overflow:visible;}
+  .paper{padding:40px 36px;}
+}
 
 @media(max-width:640px){
-  .page-header .container{flex-direction:column;align-items:flex-start;}
-  .section-block{padding:22px 20px;}
-  .toc-card{padding:20px;}
-  .data-table{font-size:12px;}
-  .data-table th,.data-table td{padding:9px 10px;}
-  .toc-list{grid-template-columns:1fr;}
-  .container{padding:0 18px;}
+  .container{padding:0 16px;}
+  .page-header .container{flex-direction:column;align-items:flex-start;gap:18px;}
+  .mid-wrap{padding:32px 0 64px;}
+  .paper{padding:30px 22px;border-radius:14px;}
+  .sec{padding:34px 0;}
+  .sec-head{gap:12px;}
+  .rights{grid-template-columns:1fr;}
+  .contact-box{padding:22px 20px;}
+  .contact-row{grid-template-columns:1fr;gap:2px;}
+  .data-table{font-size:13px;}
 }
 
 @media(prefers-reduced-motion:reduce){
   *{animation:none!important;transition:none!important;}
+  html{scroll-behavior:auto;}
 }
 </style>
 </head>
@@ -234,38 +200,39 @@ body{
 <div class="mid-wrap">
 <canvas class="net-bg" data-net-bg aria-hidden="true"></canvas>
 <div class="container">
+<div class="layout">
 
-  <div class="toc-card">
+  <nav class="toc" aria-label="Contents">
     <h2>Contents</h2>
-    <ul class="toc-list">
-      <li><a href="#s1">1. Who We Are</a></li>
-      <li><a href="#s2">2. What Information We Collect</a></li>
-      <li><a href="#s3">3. Why We Collect Your Information</a></li>
-      <li><a href="#s4">4. Legal Basis for Processing</a></li>
-      <li><a href="#s5">5. How We Store and Protect Your Information</a></li>
-      <li><a href="#s6">6. How Long We Keep Your Information</a></li>
-      <li><a href="#s7">7. Who We Share Your Information With</a></li>
-      <li><a href="#s8">8. Your Rights Under POPIA</a></li>
-      <li><a href="#s9">9. Cookies and Location Data</a></li>
-      <li><a href="#s10">10. Children's Privacy</a></li>
-      <li><a href="#s11">11. Changes to This Notice</a></li>
-      <li><a href="#s12">12. How to Contact Us</a></li>
-    </ul>
-  </div>
+    <ol>
+      <li><a href="#s1"><span>01</span>Who We Are</a></li>
+      <li><a href="#s2"><span>02</span>What Information We Collect</a></li>
+      <li><a href="#s3"><span>03</span>Why We Collect Your Information</a></li>
+      <li><a href="#s4"><span>04</span>Legal Basis for Processing</a></li>
+      <li><a href="#s5"><span>05</span>How We Store and Protect Your Information</a></li>
+      <li><a href="#s6"><span>06</span>How Long We Keep Your Information</a></li>
+      <li><a href="#s7"><span>07</span>Who We Share Your Information With</a></li>
+      <li><a href="#s8"><span>08</span>Your Rights Under POPIA</a></li>
+      <li><a href="#s9"><span>09</span>Cookies and Location Data</a></li>
+      <li><a href="#s10"><span>10</span>Children's Privacy</a></li>
+      <li><a href="#s11"><span>11</span>Changes to This Notice</a></li>
+      <li><a href="#s12"><span>12</span>How to Contact Us</a></li>
+    </ol>
+  </nav>
 
-  <div class="content">
+  <article class="paper">
 
-    <div class="section-block" id="s1">
-      <h2><span class="icon">&#127968;</span>1. Who We Are</h2>
+    <section class="sec" id="s1">
+      <div class="sec-head"><span class="sec-num">01</span><h2>Who We Are</h2></div>
       <p>BKS Community Job Center ("BKS", "we", "us", "our") is a community-operated job facilitation service based in Atok, Ga-Selepe, Limpopo (postal code 0749), South Africa. We operate this online portal to help connect local community members with employment opportunities at mines.</p>
       <p>BKS acts as the <strong>Responsible Party</strong> as defined under the Protection of Personal Information Act, 4 of 2013 (POPIA), and is responsible for the lawful, fair, and transparent processing of your personal information.</p>
       <div class="highlight"><strong>Our commitment:</strong> We collect only what we need, store it securely, share it only with those who need it to process your application, and delete it when it is no longer required.</div>
       <div class="warning"><strong>Current status:</strong> BKS is built and online but is not yet in operation. No mining company, local committee or traditional authority currently receives applicant information through this portal. This notice explains how your information is handled and how it will be handled if the portal begins operating.</div>
       <p><strong>Information Officer:</strong> Brian Kagiso Sekgobela, the founder of BKS, is our Information Officer, registered with the Information Regulator of South Africa on 14 May 2026 (registration number 2026-015573). He is responsible for POPIA compliance and for handling your requests. His contact details are in Section 12.</p>
-    </div>
+    </section>
 
-    <div class="section-block" id="s2">
-      <h2><span class="icon">&#128196;</span>2. What Information We Collect</h2>
+    <section class="sec" id="s2">
+      <div class="sec-head"><span class="sec-num">02</span><h2>What Information We Collect</h2></div>
       <p>When you register an account or submit a job application through this portal, we collect the following categories of personal information:</p>
       <div class="data-table-wrap"><table class="data-table">
         <thead>
@@ -291,12 +258,12 @@ body{
         <li>Criminal records</li>
         <li>Biometric data</li>
       </ul>
-    </div>
+    </section>
 
-    <div class="section-block" id="s3">
-      <h2><span class="icon">&#127919;</span>3. Why We Collect Your Information</h2>
+    <section class="sec" id="s3">
+      <div class="sec-head"><span class="sec-num">03</span><h2>Why We Collect Your Information</h2></div>
       <p>We process your personal information for the following specific purposes only:</p>
-      <ol>
+      <ol class="plain">
         <li><strong>To process your job application</strong> — matching your details and qualifications to available positions and sharing your application with recruitment personnel.</li>
         <li><strong>To verify your eligibility</strong> — confirming that you reside within the eligible community area.</li>
         <li><strong>To keep you informed</strong> — your application status is shown under My Applications when you are signed in. We do not currently send emails about applications. If we add email notifications, we will update this notice first and use only the email address you gave us.</li>
@@ -305,10 +272,10 @@ body{
         <li><strong>To comply with legal obligations</strong> — retaining records as required under applicable South African labour and community development regulations.</li>
       </ol>
       <div class="warning"><strong>We will never:</strong> sell your information, use it for marketing purposes, share it with any party not involved in the recruitment process, or use it for any purpose other than those listed above.</div>
-    </div>
+    </section>
 
-    <div class="section-block" id="s4">
-      <h2><span class="icon">&#9878;&#65039;</span>4. Legal Basis for Processing</h2>
+    <section class="sec" id="s4">
+      <div class="sec-head"><span class="sec-num">04</span><h2>Legal Basis for Processing</h2></div>
       <p>Under POPIA, we are required to have a lawful basis for processing your personal information. Our legal bases are:</p>
       <ul>
         <li><strong>Consent</strong> — You provide explicit consent by ticking the consent checkbox when submitting your application. We record the date, time and notice version when you consent. You may withdraw consent at any time by contacting us.</li>
@@ -316,10 +283,10 @@ body{
         <li><strong>Legitimate interest</strong> — Maintaining an accurate, accountable record of all applications, in line with the mine's Social and Labour Plan (SLP) obligations.</li>
         <li><strong>Legal compliance</strong> — Retaining records as required by South African law.</li>
       </ul>
-    </div>
+    </section>
 
-    <div class="section-block" id="s5">
-      <h2><span class="icon">&#128274;</span>5. How We Store and Protect Your Information</h2>
+    <section class="sec" id="s5">
+      <div class="sec-head"><span class="sec-num">05</span><h2>How We Store and Protect Your Information</h2></div>
       <p>All data is stored within Supabase's cloud infrastructure (a managed PostgreSQL database and secure file storage), which operates data centres with industry-standard security certifications.</p>
       <h3>Technical safeguards in place:</h3>
       <ul>
@@ -335,10 +302,10 @@ body{
       <h3>If something goes wrong</h3>
       <p>If your personal information is accessed by an unauthorised person, we will notify the Information Regulator and the people affected as soon as reasonably possible, as section 22 of POPIA requires.</p>
       <div class="highlight"><strong>Location data:</strong> GPS coordinates are used only in your browser to calculate distance. They are <strong>never transmitted to or stored on</strong> our servers.</div>
-    </div>
+    </section>
 
-    <div class="section-block" id="s6">
-      <h2><span class="icon">&#128197;</span>6. How Long We Keep Your Information</h2>
+    <section class="sec" id="s6">
+      <div class="sec-head"><span class="sec-num">06</span><h2>How Long We Keep Your Information</h2></div>
       <div class="data-table-wrap"><table class="data-table">
         <thead>
           <tr><th>Data Type</th><th>Retention Period</th><th>Reason</th></tr>
@@ -352,10 +319,10 @@ body{
         </tbody>
       </table></div>
       <p>We review stored records at least every six months and securely delete anything past its retention period. If you ask us to delete your information earlier, we will do so within 30 days unless the law requires us to keep it.</p>
-    </div>
+    </section>
 
-    <div class="section-block" id="s7">
-      <h2><span class="icon">&#128101;</span>7. Who We Share Your Information With</h2>
+    <section class="sec" id="s7">
+      <div class="sec-head"><span class="sec-num">07</span><h2>Who We Share Your Information With</h2></div>
       <p>No mine, committee or traditional authority currently receives applicant information through this portal. If that changes, we will update this notice before any sharing begins, and we will share information only with partners who agree in writing to handle it in line with POPIA. The parties below are those that may receive it once the portal is operating:</p>
       <ul>
         <li><strong>Mine &amp; HR Team:</strong> Your application details are shared with the mine's authorised recruitment personnel for candidate evaluation and shortlisting.</li>
@@ -364,50 +331,50 @@ body{
         <li><strong>Infrastructure providers (data processors):</strong> Supabase and Netlify provide the underlying cloud infrastructure. These providers process data strictly as processors under our instruction and do not use your data for their own purposes.</li>
       </ul>
       <div class="warning"><strong>We do not share your information</strong> with any third-party advertisers, data brokers, marketing companies, or any entity not listed above.</div>
-    </div>
+    </section>
 
-    <div class="section-block" id="s8">
-      <h2><span class="icon">&#9878;&#65039;</span>8. Your Rights Under POPIA</h2>
+    <section class="sec" id="s8">
+      <div class="sec-head"><span class="sec-num">08</span><h2>Your Rights Under POPIA</h2></div>
       <p>As a data subject under POPIA, 4 of 2013, you have the following rights:</p>
-      <div class="rights-grid">
-        <div class="right-card"><div class="right-icon">&#128269;</div><h4>Right of Access</h4><p>Request a copy of the personal information we hold about you.</p></div>
-        <div class="right-card"><div class="right-icon">&#9999;&#65039;</div><h4>Right to Correction</h4><p>Request correction of inaccurate, misleading, or incomplete information.</p></div>
-        <div class="right-card"><div class="right-icon">&#128683;</div><h4>Right to Object</h4><p>Object to the processing of your information in certain circumstances.</p></div>
-        <div class="right-card"><div class="right-icon">&#128465;&#65039;</div><h4>Right to Deletion</h4><p>Request deletion of your information where we have no lawful reason to retain it.</p></div>
-        <div class="right-card"><div class="right-icon">&#128274;</div><h4>Withdraw Consent</h4><p>Withdraw your consent to processing at any time by contacting us.</p></div>
-        <div class="right-card"><div class="right-icon">&#128222;</div><h4>Right to Complain</h4><p>Lodge a complaint with the Information Regulator of South Africa.</p></div>
+      <div class="rights">
+        <div class="right-item"><h4>Right of Access</h4><p>Request a copy of the personal information we hold about you.</p></div>
+        <div class="right-item"><h4>Right to Correction</h4><p>Request correction of inaccurate, misleading, or incomplete information.</p></div>
+        <div class="right-item"><h4>Right to Object</h4><p>Object to the processing of your information in certain circumstances.</p></div>
+        <div class="right-item"><h4>Right to Deletion</h4><p>Request deletion of your information where we have no lawful reason to retain it.</p></div>
+        <div class="right-item"><h4>Withdraw Consent</h4><p>Withdraw your consent to processing at any time by contacting us.</p></div>
+        <div class="right-item"><h4>Right to Complain</h4><p>Lodge a complaint with the Information Regulator of South Africa.</p></div>
       </div>
       <p>To exercise any of these rights, contact us using the details in Section 12. We will respond within 30 days.</p>
       <div class="highlight">
         <strong>Information Regulator of South Africa</strong><br>
-        Website: <a href="https://inforegulator.org.za" target="_blank" style="color:var(--green-mid);">inforegulator.org.za</a><br>
-        Complaints: <a href="mailto:POPIAComplaints@inforegulator.org.za" style="color:var(--green-mid);">POPIAComplaints@inforegulator.org.za</a><br>
-        General enquiries: <a href="mailto:enquiries@inforegulator.org.za" style="color:var(--green-mid);">enquiries@inforegulator.org.za</a> &nbsp;&bull;&nbsp; 010 023 5200 &nbsp;&bull;&nbsp; Toll free 0800 017 160
+        Website: <a href="https://inforegulator.org.za" target="_blank" rel="noopener">inforegulator.org.za</a><br>
+        Complaints: <a href="mailto:POPIAComplaints@inforegulator.org.za">POPIAComplaints@inforegulator.org.za</a><br>
+        General enquiries: <a href="mailto:enquiries@inforegulator.org.za">enquiries@inforegulator.org.za</a> &nbsp;&bull;&nbsp; 010 023 5200 &nbsp;&bull;&nbsp; Toll free 0800 017 160
       </div>
-    </div>
+    </section>
 
-    <div class="section-block" id="s9">
-      <h2><span class="icon">&#127759;</span>9. Cookies and Location Data</h2>
+    <section class="sec" id="s9">
+      <div class="sec-head"><span class="sec-num">09</span><h2>Cookies and Location Data</h2></div>
       <h3>Session Storage</h3>
       <p>This portal uses your browser's <strong>sessionStorage</strong> (not cookies) to keep you signed in during your visit. This data is temporary — it is automatically cleared when you close your browser tab. No persistent tracking cookies are set by BKS.</p>
       <h3>Location Data</h3>
       <p>When you visit the portal, you are asked to share your device's GPS location solely to verify that you reside within the eligible Atok, Ga-Selepe, 0749 service area. The verification happens entirely within your browser — your coordinates are <strong>never sent to our servers and never stored</strong>. You may decline location access at any time.</p>
       <h3>Third-Party Services</h3>
-      <p>This portal is hosted on Netlify with data stored via Supabase. Their respective privacy policies apply: <a href="https://www.netlify.com/privacy/" target="_blank" style="color:var(--green-mid);">netlify.com/privacy</a> and <a href="https://supabase.com/privacy" target="_blank" style="color:var(--green-mid);">supabase.com/privacy</a></p>
-    </div>
+      <p>This portal is hosted on Netlify with data stored via Supabase. Their respective privacy policies apply: <a href="https://www.netlify.com/privacy/" target="_blank" rel="noopener">netlify.com/privacy</a> and <a href="https://supabase.com/privacy" target="_blank" rel="noopener">supabase.com/privacy</a></p>
+    </section>
 
-    <div class="section-block" id="s10">
-      <h2><span class="icon">&#128100;</span>10. Children's Privacy</h2>
+    <section class="sec" id="s10">
+      <div class="sec-head"><span class="sec-num">10</span><h2>Children's Privacy</h2></div>
       <p>This portal is intended for adults seeking employment. We do not knowingly collect personal information from persons under the age of 18. If you are under 18, please do not submit an application without the consent of a parent or legal guardian. If we become aware that we have inadvertently collected information from a minor, we will delete it promptly.</p>
-    </div>
+    </section>
 
-    <div class="section-block" id="s11">
-      <h2><span class="icon">&#128260;</span>11. Changes to This Notice</h2>
+    <section class="sec" id="s11">
+      <div class="sec-head"><span class="sec-num">11</span><h2>Changes to This Notice</h2></div>
       <p>We may update this Privacy Notice from time to time to reflect changes in our practices or legal requirements. When we make material changes, we will update the effective date shown at the top of this page. We encourage you to review this notice periodically. Continued use of the portal after changes are posted constitutes your acceptance of the updated notice.</p>
-    </div>
+    </section>
 
-    <div class="section-block" id="s12">
-      <h2><span class="icon">&#128222;</span>12. How to Contact Us</h2>
+    <section class="sec" id="s12">
+      <div class="sec-head"><span class="sec-num">12</span><h2>How to Contact Us</h2></div>
       <p>If you have any questions about this Privacy Notice, wish to exercise your rights, or want to raise a concern, please contact us:</p>
       <div class="contact-box">
         <h3>BKS Community Job Center — Privacy Contact</h3>
@@ -418,9 +385,11 @@ body{
         <div class="contact-row"><span class="contact-label">Phone</span><span class="contact-val"><a href="tel:0714469504">071 446 9504</a></span></div>
         <div class="contact-row"><span class="contact-label">Hours</span><span class="contact-val">Monday – Friday, 08:00 – 17:00 SAST</span></div>
       </div>
-    </div>
+    </section>
 
-  </div>
+  </article>
+
+</div>
 </div>
 </div>
 
@@ -464,6 +433,22 @@ body{
 
   makeParticles(document.getElementById('headerCanvas'), true);
   makeParticles(document.getElementById('footerCanvas'), true);
+})();
+
+(function(){
+  if(!('IntersectionObserver' in window)) return;
+  var links = [].slice.call(document.querySelectorAll('.toc a'));
+  var byId = {};
+  links.forEach(function(a){ byId[a.getAttribute('href').slice(1)] = a; });
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(e.isIntersecting){
+        links.forEach(function(l){ l.classList.remove('active'); });
+        if(byId[e.target.id]) byId[e.target.id].classList.add('active');
+      }
+    });
+  }, {rootMargin:'-15% 0px -75% 0px'});
+  document.querySelectorAll('.sec').forEach(function(s){ io.observe(s); });
 })();
 </script>
 <script src="/bg-network.js" defer></script>

@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="robots" content="noindex">
+<link rel="icon" href="/favicon.ico?v=3" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png?v=3">
+<link rel="icon" type="image/png" sizes="192x192" href="/favicon-192.png?v=3">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=3">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<title>Apply — BKS Community Job Center</title>
+<style>
+:root{
+  --green-deep:#042e24;
+  --green-dark:#064e3b;
+  --green-mid:#0F6E56;
+  --green-vivid:#1D9E75;
+  --gold:#ffd700;
+  --cream:#f7f4ef;
+  --ink:#121a14;
+  --muted:#5a6460;
+  --rule:#ddd6cc;
+  --font-display:'Playfair Display',Georgia,serif;
+  --font-body:'DM Sans',Arial,sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  font-family:var(--font-body);
+  background:var(--cream);
+  color:var(--ink);
+  font-size:16px;
+  line-height:1.7;
+  min-height:100vh;
+  display:flex;flex-direction:column;
+  -webkit-font-smoothing:antialiased;
+}
+
+.net-bg{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;}
+
+.site-header{
+  background:linear-gradient(135deg,var(--green-deep) 0%,var(--green-dark) 60%,#0a6b50 100%);
+  border-bottom:3px solid var(--gold);
+  position:relative;overflow:hidden;
+}
+.header-inner{
+  max-width:1040px;margin:0 auto;padding:18px 28px;
+  display:flex;align-items:center;gap:16px;flex-wrap:wrap;
+  position:relative;z-index:2;
+}
+.hdr-title{flex:1;min-width:0;}
+.hdr-title h1{font-family:var(--font-display);font-size:clamp(16px,2.8vw,20px);font-weight:700;color:#fff;line-height:1.2;}
+.hdr-title p{font-size:11px;color:rgba(255,255,255,.7);margin-top:3px;text-transform:uppercase;letter-spacing:.07em;}
+.hdr-back{
+  color:rgba(255,255,255,.85);text-decoration:none;font-size:12px;font-weight:600;
+  padding:7px 15px;border-radius:20px;border:1px solid rgba(255,255,255,.25);
+  transition:background .2s,color .2s;white-space:nowrap;
+}
+.hdr-back:hover{background:rgba(255,255,255,.12);color:#fff;}
+
+main{flex:1;width:100%;max-width:760px;margin:0 auto;padding:48px 28px 80px;}
+
+.job-title{font-family:var(--font-display);font-size:clamp(28px,5vw,40px);font-weight:700;color:var(--green-deep);line-height:1.2;letter-spacing:-.01em;}
+.job-closing{margin-top:8px;font-size:13px;font-weight:700;color:var(--green-mid);letter-spacing:.04em;}
+.job-body{margin-top:22px;font-size:15.5px;color:var(--muted);line-height:1.85;white-space:pre-line;}
+.job-reqs{margin-top:24px;}
+.job-reqs h2{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--green-mid);margin-bottom:6px;}
+.job-reqs p{font-size:15px;color:var(--ink);line-height:1.8;white-space:pre-line;}
+
+.form-wrap{margin-top:44px;padding-top:36px;border-top:1px solid var(--rule);}
+.form-wrap h2{font-family:var(--font-display);font-size:24px;color:var(--green-deep);margin-bottom:22px;}
+.form-group{margin-bottom:20px;}
+.form-group label{display:block;margin-bottom:6px;font-size:11px;font-weight:700;color:var(--ink);text-transform:uppercase;letter-spacing:.06em;}
+.form-group input[type=text],
+.form-group input[type=tel],
+.form-group input[type=email],
+.form-group select{
+  width:100%;padding:12px 14px;border:1.5px solid #cfc8bd;border-radius:10px;
+  font-size:15px;font-family:var(--font-body);color:var(--ink);background:#fff;outline:none;
+  transition:border-color .2s,box-shadow .2s;
+}
+.form-group input:focus,.form-group select:focus{border-color:var(--green-vivid);box-shadow:0 0 0 4px rgba(29,158,117,.12);}
+.form-group input[type=file]{
+  width:100%;padding:10px 12px;border:1.5px dashed #b9b1a6;border-radius:10px;
+  font-size:14px;font-family:var(--font-body);color:var(--ink);background:#fff;
+}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.consent{margin:8px 0 26px;font-size:14px;color:var(--muted);}
+.consent label{display:flex;gap:10px;align-items:flex-start;cursor:pointer;line-height:1.6;}
+.consent input{width:auto;margin-top:5px;}
+.consent a{color:var(--green-mid);font-weight:600;text-underline-offset:3px;}
+.actions{display:flex;align-items:center;gap:22px;flex-wrap:wrap;}
+.btn-submit{
+  background:var(--green-mid);color:#fff;border:none;border-radius:10px;
+  padding:14px 34px;font-size:15px;font-weight:700;letter-spacing:.03em;
+  font-family:var(--font-body);cursor:pointer;transition:background .2s;
+}
+.btn-submit:hover{background:var(--green-dark);}
+.btn-submit:disabled{background:#b9b3ab;cursor:not-allowed;}
+.btn-cancel{color:var(--muted);font-size:14px;font-weight:600;text-decoration:underline;text-underline-offset:3px;}
+.btn-cancel:hover{color:var(--ink);}
+.form-msg{display:none;margin-bottom:20px;font-size:14px;line-height:1.6;padding-left:14px;border-left:3px solid #dc2626;color:#991b1b;}
+.form-msg.show{display:block;}
+
+.state{padding:40px 0;}
+.state h2{font-family:var(--font-display);font-size:28px;color:var(--green-deep);margin-bottom:10px;}
+.state p{color:var(--muted);font-size:16px;margin-bottom:22px;max-width:560px;}
+.state .links{display:flex;gap:22px;flex-wrap:wrap;}
+.state a{color:var(--green-mid);font-weight:700;text-underline-offset:3px;}
+.loading{padding:60px 0;text-align:center;color:var(--muted);}
+
+.site-footer{
+  background:linear-gradient(135deg,var(--green-deep),#0a1f17);
+  padding:28px;text-align:center;position:relative;overflow:hidden;
+}
+.site-footer p{font-size:12px;color:rgba(255,255,255,.7);position:relative;z-index:2;}
+.site-footer a{color:rgba(255,255,255,.85);text-decoration:none;margin:0 10px;font-weight:500;}
+.site-footer a:hover{color:#fff;}
+
+@media(max-width:640px){
+  .header-inner{padding:14px 18px;}
+  main{padding:32px 18px 60px;}
+  .form-row{grid-template-columns:1fr;gap:0;}
+}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;}}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <canvas class="net-bg" data-net-bg aria-hidden="true"></canvas>
+  <div class="header-inner">
+    <div class="hdr-title">
+      <h1>Job Application</h1>
+      <p>BKS Community Job Center</p>
+    </div>
+    <a class="hdr-back" href="/portal.html#jobs">&#8592; Back to Jobs</a>
+  </div>
+</header>
+
+<main id="main">
+  <div class="loading">Loading job details&hellip;</div>
+</main>
+
+<footer class="site-footer">
+  <canvas class="net-bg" data-net-bg aria-hidden="true"></canvas>
+  <p>
+    <a href="/portal.html">&#8592; Job Portal</a>
+    &bull; BKS Community Job Center &copy; 2026 &bull;
+    <a href="/privacy.html">Privacy Notice</a>
+  </p>
+</footer>
+
+<script>
+(function(){
+  var main = document.getElementById('main');
+  var params = new URLSearchParams(window.location.search);
+  var jobId = (params.get('job') || '').trim();
+  var currentUser = null;
+  try { currentUser = JSON.parse(sessionStorage.getItem('bksUser') || 'null'); } catch(e) { currentUser = null; }
+
+  function el(tag, cls, text){
+    var n = document.createElement(tag);
+    if(cls) n.className = cls;
+    if(text !== undefined) n.textContent = text;
+    return n;
+  }
+
+  function showState(title, message, withTracker){
+    main.innerHTML = '';
+    var box = el('div', 'state');
+    box.appendChild(el('h2', '', title));
+    box.appendChild(el('p', '', message));
+    var links = el('div', 'links');
+    var a = el('a', '', 'Back to jobs');
+    a.href = '/portal.html#jobs';
+    links.appendChild(a);
+    if(withTracker){
+      var t = el('a', '', 'My Applications');
+      t.href = '/tracker.html';
+      links.appendChild(t);
+    }
+    box.appendChild(links);
+    main.appendChild(box);
+    window.scrollTo(0, 0);
+  }
+
+  if(!jobId){
+    showState('No job selected', 'Please choose a position from the job list to apply.', false);
+    return;
+  }
+
+  fetch('/api/get-jobs')
+    .then(function(r){ return r.json(); })
+    .then(function(jobs){
+      var job = (Array.isArray(jobs) ? jobs : []).filter(function(j){ return String(j.id) === jobId; })[0];
+      if(!job){
+        showState('Position not found', 'This position is no longer open or the link is not valid.', false);
+        return;
+      }
+      render(job);
+    })
+    .catch(function(){
+      showState('Something went wrong', 'We could not load this position. Please check your connection and try again.', false);
+    });
+
+  function render(job){
+    document.title = job.title + ' — Apply — BKS Community Job Center';
+    main.innerHTML = '';
+
+    main.appendChild(el('h1', 'job-title', job.title));
+    main.appendChild(el('div', 'job-closing', 'Closing: ' + job.closing));
+    if(job.description) main.appendChild(el('div', 'job-body', job.description));
+    if(job.requirements && job.requirements.trim()){
+      var reqs = el('div', 'job-reqs');
+      reqs.appendChild(el('h2', '', 'Requirements'));
+      reqs.appendChild(el('p', '', job.requirements));
+      main.appendChild(reqs);
+    }
+
+    var wrap = el('div', 'form-wrap');
+    wrap.innerHTML =
+      '<h2>Your application</h2>' +
+      '<form id="appForm" novalidate>' +
+        '<div class="form-group"><label for="name">Full Name *</label><input type="text" id="name" placeholder="Enter your full name"></div>' +
+        '<div class="form-row">' +
+          '<div class="form-group"><label for="idNumber">ID Number *</label><input type="text" id="idNumber" maxlength="13" inputmode="numeric" placeholder="13-digit SA ID"></div>' +
+          '<div class="form-group"><label for="phone">Phone *</label><input type="tel" id="phone" inputmode="numeric" placeholder="e.g. 0821234567"></div>' +
+        '</div>' +
+        '<div class="form-group"><label for="gender">Gender *</label><select id="gender"><option value="">-- Select --</option><option value="Male">Male</option><option value="Female">Female</option></select></div>' +
+        '<div class="form-group"><label for="email">Email (optional — needed for status updates)</label><input type="email" id="email" placeholder="your@email.com"></div>' +
+        '<div class="form-group"><label for="cv">CV (PDF only, max 5MB) *</label><input type="file" id="cv" accept=".pdf"></div>' +
+        '<div class="form-group"><label for="idDoc">ID Document (PDF, JPG or PNG, max 5MB) *</label><input type="file" id="idDoc" accept=".pdf,.jpg,.jpeg,.png"></div>' +
+        '<div class="form-group"><label for="residenceDoc">Proof of Residence (PDF, JPG or PNG, max 5MB) *</label><input type="file" id="residenceDoc" accept=".pdf,.jpg,.jpeg,.png"></div>' +
+        '<div class="consent"><label><input type="checkbox" id="consent"><span>I consent to the collection and processing of my personal information for job application purposes in accordance with POPIA. <a href="/privacy.html" target="_blank" rel="noopener">View Privacy Notice</a></span></label></div>' +
+        '<div class="form-msg" id="formMsg" role="alert"></div>' +
+        '<div class="actions"><button type="submit" class="btn-submit" id="submitBtn">Submit Application</button><a class="btn-cancel" href="/portal.html#jobs">Cancel</a></div>' +
+      '</form>';
+    main.appendChild(wrap);
+
+    var $ = function(id){ return document.getElementById(id); };
+
+    if(currentUser){
+      $('name').value = currentUser.fullName || '';
+      $('email').value = currentUser.email || '';
+      $('phone').value = currentUser.phone || '';
+      $('idNumber').value = currentUser.idNumber || '';
+    }
+
+    $('idNumber').addEventListener('input', function(){ this.value = this.value.replace(/[^0-9]/g, '').slice(0, 13); });
+    $('phone').addEventListener('input', function(){ this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10); });
+
+    function msg(text){
+      var m = $('formMsg');
+      m.textContent = text || '';
+      m.className = 'form-msg' + (text ? ' show' : '');
+      if(text) m.scrollIntoView({behavior: 'smooth', block: 'center'});
+    }
+
+    function putFile(url, file){
+      var form = new FormData();
+      form.append('cacheControl', '3600');
+      form.append('', file);
+      return fetch(url, {method: 'PUT', body: form}).then(function(res){
+        if(!res.ok) throw new Error('File upload failed. Please check your connection and try again.');
+      });
+    }
+
+    $('appForm').addEventListener('submit', function(e){
+      e.preventDefault();
+      msg('');
+      var name = $('name').value.trim();
+      var idNumber = $('idNumber').value.trim();
+      var phone = $('phone').value.trim();
+      var gender = $('gender').value;
+      var email = $('email').value.trim();
+      var cvFile = $('cv').files[0];
+      var idFile = $('idDoc').files[0];
+      var resFile = $('residenceDoc').files[0];
+
+      if(!name || !idNumber || !phone){ msg('Please fill in your name, ID number and phone number.'); return; }
+      if(!gender){ msg('Please select your gender.'); return; }
+      if(!cvFile || !idFile || !resFile){ msg('Please upload your CV, ID document and proof of residence.'); return; }
+      if(!$('consent').checked){ msg('Please accept the POPIA consent to submit.'); return; }
+
+      var btn = $('submitBtn');
+      btn.textContent = 'Submitting\u2026 please wait';
+      btn.disabled = true;
+      function resetBtn(){ btn.textContent = 'Submit Application'; btn.disabled = false; }
+
+      var fd = {name: name, idNumber: idNumber, phone: phone, email: email, gender: gender,
+        consent: true, jobId: String(job.id), jobTitle: job.title};
+
+      var headers = {'Content-Type': 'application/json'};
+      if(currentUser && currentUser.token) headers['Authorization'] = 'Bearer ' + currentUser.token;
+
+      fetch('/api/create-upload-urls', {
+        method: 'POST',
+        headers: headers,
+        body: JSON.stringify({
+          name: name, idNumber: idNumber, jobId: fd.jobId,
+          cv: {name: cvFile.name, size: cvFile.size},
+          id: {name: idFile.name, size: idFile.size},
+          residence: {name: resFile.name, size: resFile.size}
+        })
+      })
+        .then(function(r){ return r.json(); })
+        .then(function(t){
+          if(!t.success) throw new Error(t.message || 'Could not start your upload.');
+          return Promise.all([
+            putFile(t.uploads.cv.signedUrl, cvFile),
+            putFile(t.uploads.id.signedUrl, idFile),
+            putFile(t.uploads.residence.signedUrl, resFile)
+          ]).then(function(){ return t.ticket; });
+        })
+        .then(function(ticket){
+          return fetch('/api/submit-application', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({formData: fd, ticket: ticket})
+          });
+        })
+        .then(function(r){ return r.json(); })
+        .then(function(r){
+          if(r.success){
+            showState('Application submitted', r.message, !!(currentUser && currentUser.token));
+          } else {
+            msg(r.message || 'Submission failed. Please try again.');
+            resetBtn();
+          }
+        })
+        .catch(function(err){
+          msg(err.message || String(err));
+          resetBtn();
+        });
+    });
+  }
+})();
+</script>
+<script src="/bg-network.js" defer></script>
+</body>
+</html>

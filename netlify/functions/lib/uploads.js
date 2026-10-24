@@ -17,6 +17,15 @@ const KINDS = {
       jpeg: 'image/jpeg',
       png: 'image/png'
     }
+  },
+  residence: {
+    label: 'proof of residence',
+    types: {
+      pdf: 'application/pdf',
+      jpg: 'image/jpeg',
+      jpeg: 'image/jpeg',
+      png: 'image/png'
+    }
   }
 };
 

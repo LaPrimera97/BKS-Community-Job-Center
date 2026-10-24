@@ -355,8 +355,8 @@ function loadApplications(){
     .then(function(data){
       var apps = data.apps||[];
       appsData = apps;
-      var html = '<table><tr><th>Date</th><th>Name</th><th>Job ID</th><th>Gender</th><th>Marital</th><th>Contact</th><th>Documents</th><th>Status</th><th>Update</th></tr>';
-      if(!apps||apps.length===0){ html+='<tr class="empty-row"><td colspan="9">No applications yet</td></tr>'; }
+      var html = '<table><tr><th>Date</th><th>Name</th><th>Job ID</th><th>Gender</th><th>Contact</th><th>Documents</th><th>Status</th><th>Update</th></tr>';
+      if(!apps||apps.length===0){ html+='<tr class="empty-row"><td colspan="8">No applications yet</td></tr>'; }
       else { apps.forEach(function(app){
         var b = getBadge(app.status);
         var aid = app.id.toString().replace(/'/g,"\\'");
@@ -365,11 +365,11 @@ function loadApplications(){
         html += '<td style="font-weight:600;color:#f1f5f9;">'+app.name+'</td>';
         html += '<td>'+app.jobId+'</td>';
         html += '<td>'+(app.gender||'—')+'</td>';
-        html += '<td>'+(app.maritalStatus||'—')+'</td>';
         html += '<td>'+app.phone+'<br><span style="font-size:11px;color:#6b9e7e;">'+app.email+'</span></td>';
         html += '<td>';
         if(app.cvUrl)    html += '<a href="'+app.cvUrl+'" target="_blank" class="doc-link">CV</a>';
         if(app.idUrl)    html += '<a href="'+app.idUrl+'" target="_blank" class="doc-link">ID</a>';
+        if(app.residenceUrl) html += '<a href="'+app.residenceUrl+'" target="_blank" class="doc-link">Residence</a>';
         html += '</td>';
         html += '<td><span class="badge '+b+'">'+app.status+'</span></td>';
         html += '<td><select onchange="updateAppStatus(\''+aid+'\',this.value)">';

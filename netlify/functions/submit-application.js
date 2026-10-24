@@ -33,7 +33,10 @@ exports.handler = async function (event) {
     if (!ticket) {
       return respond(400, { success: false, message: 'Your upload session has expired. Please try submitting again.' });
     }
-    uploadedPaths = [ticket.cvPath, ticket.idPath];
+    uploadedPaths = [ticket.cvPath, ticket.idPath, ticket.residencePath].filter(Boolean);
+    if (!ticket.residencePath) {
+      return fail(400, 'Your upload session has expired. Please try submitting again.');
+    }
 
     if (!formData || !formData.name || !formData.idNumber || !formData.phone || !formData.jobId) {
       return fail(400, 'Please fill in all required fields.');
@@ -41,8 +44,8 @@ exports.handler = async function (event) {
     if (formData.consent !== true) {
       return fail(400, 'Please accept the consent to submit your application.');
     }
-    if (!formData.gender || !formData.maritalStatus) {
-      return fail(400, 'Please select your gender and marital status.');
+    if (!formData.gender) {
+      return fail(400, 'Please select your gender.');
     }
 
     const idStr = formData.idNumber.toString().replace(/\D/g, '');
@@ -94,10 +97,10 @@ exports.handler = async function (event) {
       email,
       user_email: ticket.userEmail || null,
       gender: formData.gender,
-      marital_status: formData.maritalStatus,
       job_id: jobIdStr,
       cv_url: ticket.cvPath,
       id_url: ticket.idPath,
+      residence_url: ticket.residencePath,
       folder_url: ticket.folder,
       status: 'Pending',
       consent_at: new Date().toISOString(),

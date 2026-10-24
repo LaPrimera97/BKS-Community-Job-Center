@@ -1065,6 +1065,20 @@ footer .container { position: relative; z-index: 2; }
   .reveal, .reveal-stagger > * { opacity: 1; transform: none; }
 }
 
+
+.jobs-grid{display:block;}
+.job-row{padding:28px 0;border-top:1px solid var(--border);}
+.job-row:last-child{border-bottom:1px solid var(--border);}
+.job-row h3{font-family:var(--font-display);font-size:22px;color:var(--green-deep);font-weight:700;letter-spacing:-.01em;margin-bottom:4px;}
+.job-row .closing{color:var(--green-mid);font-size:13px;font-weight:700;margin-bottom:12px;}
+.job-detail{max-width:760px;}
+.job-detail p{font-size:15px;color:var(--muted);line-height:1.8;margin:0 0 8px;white-space:pre-line;}
+.job-detail .reqs strong{color:var(--ink);}
+.job-detail.clamped{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;}
+.see-more{display:block;background:none;border:none;padding:0;margin:4px 0 0;color:var(--green-mid);font-weight:700;font-size:14px;cursor:pointer;text-decoration:underline;text-underline-offset:3px;font-family:var(--font-body);}
+.see-more[hidden]{display:none;}
+.apply-link{display:inline-block;margin-top:16px;background:var(--green-mid);color:#fff;padding:11px 28px;border-radius:10px;font-weight:700;font-size:14px;text-decoration:none;letter-spacing:.03em;transition:background var(--transition-base);}
+.apply-link:hover{background:var(--green-dark);}
 </style>
 <link rel="preload" as="image" href="images/hero/hero-1.jpg">
 </head>
@@ -1249,34 +1263,6 @@ footer .container { position: relative; z-index: 2; }
   </div>
 </div>
 
-<div id="modal" class="modal">
-  <div class="modal-content">
-    <div class="modal-header"><h3 id="modalTitle"></h3><button class="close-btn" id="closeAppModal">&times;</button></div>
-    <form id="appForm">
-      <input type="hidden" id="jobId">
-      <div class="form-group"><label>Full Name *</label><input type="text" id="name" required placeholder="Enter your full name"></div>
-      <div class="form-row">
-        <div class="form-group"><label>ID Number *</label><input type="text" id="idNumber" maxlength="13" placeholder="13-digit SA ID"></div>
-        <div class="form-group"><label>Phone *</label><input type="tel" id="phone" placeholder="e.g. 0821234567"></div>
-      </div>
-      <div class="form-row">
-        <div class="form-group"><label>Gender *</label><select id="gender" required><option value="">-- Select --</option><option value="Male">Male</option><option value="Female">Female</option></select></div>
-        <div class="form-group"><label>Marital Status *</label><select id="maritalStatus" required><option value="">-- Select --</option><option value="Single">Single</option><option value="Married">Married</option></select></div>
-      </div>
-      <div class="form-group"><label>Email (optional — needed for status updates)</label><input type="email" id="email" placeholder="your@email.com"></div>
-      <div class="form-group"><label>CV (PDF only, max 5MB) *</label><input type="file" id="cv" accept=".pdf"></div>
-      <div class="form-group"><label>ID Document (PDF, JPG or PNG, max 5MB) *</label><input type="file" id="idDoc" accept=".pdf,.jpg,.jpeg,.png"></div>
-      <div class="consent">
-        <label><input type="checkbox" id="consent" style="width:auto;margin-right:8px;margin-top:3px;">I consent to the collection and processing of my personal information for job application purposes in accordance with POPIA. <a id="privacyLink" href="/privacy.html" target="_blank" style="color:#0F6E56;font-weight:600;">View Privacy Notice</a></label>
-      </div>
-      <div class="modal-btns">
-        <button type="button" class="btn-cancel" id="cancelAppBtn">Cancel</button>
-        <button type="submit" class="btn-submit" id="submitAppBtn">Submit Application</button>
-      </div>
-    </form>
-  </div>
-</div>
-
 <div id="authModal" class="modal">
   <div class="modal-content" style="max-width:460px;">
     <div class="modal-header"><h3>My Account</h3><button class="close-btn" id="closeAuthModal">&times;</button></div>
@@ -1346,7 +1332,6 @@ var LOC_LAT    = parseFloat(_cfg.getAttribute('data-lat'))  || -24.454;
 var LOC_LNG    = parseFloat(_cfg.getAttribute('data-lng'))  || 30.033;
 var LOC_KM     = parseFloat(_cfg.getAttribute('data-km'))   || 25;
 var LOC_GATE_ENABLED = false;
-var currentJobId = '';
 var allJobs      = [];
 var currentUser  = null;
 
@@ -1450,25 +1435,39 @@ function renderJobs(jobs){
     jl.innerHTML='<div class="empty-state"><div class="empty-icon"><svg width="24" height="24" fill="none" stroke="#0F6E56" stroke-width="1.5" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/></svg></div><h3>'+(I18N[BKS_LANG]||I18N.en).jobsEmpty+'</h3><p>'+(I18N[BKS_LANG]||I18N.en).jobsEmptySub+'</p></div>';
     return;
   }
+  var T=I18N[BKS_LANG]||{},E=I18N.en;
+  var seeMore=T.jobsSeeMore||E.jobsSeeMore,seeLess=T.jobsSeeLess||E.jobsSeeLess;
   var html='';
   for(var i=0;i<jobs.length;i++){
     var j=jobs[i];
-    var sid=String(j.id).replace(/\\/g,'\\\\').replace(/'/g,"\\'");
-    var stl=String(j.title).replace(/\\/g,'\\\\').replace(/'/g,"\\'");
-    html+='<div class="job-card"><h3>'+escHtml(j.title)+'</h3>';
-    html+='<div class="closing">'+(I18N[BKS_LANG]||I18N.en).jobsClosing+' '+escHtml(j.closing)+'</div>';
-    html+='<div class="desc">'+escHtml(j.description)+'</div>';
-    if(j.requirements&&j.requirements.trim())
-      html+='<div class="req-section"><h4>'+(I18N[BKS_LANG]||I18N.en).jobsReqs+'</h4><p>'+escHtml(j.requirements)+'</p></div>';
-    html+='<button class="apply-btn" onclick="openApply(\''+sid+'\',\''+stl+'\')">'+(I18N[BKS_LANG]||I18N.en).jobsApplyBtn+'</button></div>';
+    var reqs=(j.requirements&&j.requirements.trim())?j.requirements:'';
+    html+='<article class="job-row"><h3>'+escHtml(j.title)+'</h3>';
+    html+='<div class="closing">'+(T.jobsClosing||E.jobsClosing)+' '+escHtml(j.closing)+'</div>';
+    html+='<div class="job-detail clamped"><p class="desc">'+escHtml(j.description||'')+'</p>';
+    if(reqs)html+='<p class="reqs"><strong>'+(T.jobsReqs||E.jobsReqs)+':</strong> '+escHtml(reqs)+'</p>';
+    html+='</div>';
+    html+='<button type="button" class="see-more" hidden data-more="'+seeMore+'" data-less="'+seeLess+'" aria-expanded="false">'+seeMore+'</button>';
+    html+='<a class="apply-link" href="/apply.html?job='+encodeURIComponent(j.id)+'">'+(T.jobsApplyBtn||E.jobsApplyBtn)+'</a></article>';
   }
   jl.innerHTML=html;
-  jl.querySelectorAll('.job-card').forEach(function(card,i){
-    card.style.opacity='0';card.style.transform='translateY(24px)';
-    card.style.transition='opacity .5s ease,transform .5s ease';
-    card.style.transitionDelay=(i*.07)+'s';
-    setTimeout(function(){card.style.opacity='1';card.style.transform='none';},30);
+  function measure(){
+    jl.querySelectorAll('.job-row').forEach(function(row){
+      var d=row.querySelector('.job-detail'),b=row.querySelector('.see-more');
+      if(d.classList.contains('clamped'))b.hidden=!(d.scrollHeight>d.clientHeight+2);
+    });
+  }
+  jl.querySelectorAll('.job-row').forEach(function(row){
+    var d=row.querySelector('.job-detail'),b=row.querySelector('.see-more');
+    b.addEventListener('click',function(){
+      var open=!d.classList.toggle('clamped');
+      b.textContent=open?b.getAttribute('data-less'):b.getAttribute('data-more');
+      b.setAttribute('aria-expanded',String(open));
+    });
   });
+  measure();
+  if(document.fonts&&document.fonts.ready)document.fonts.ready.then(measure);
+  window._jobMeasure=measure;
+  if(!window._jobResizeBound){window.addEventListener('resize',function(){if(window._jobMeasure)window._jobMeasure();});window._jobResizeBound=true;}
 }
 
 function escHtml(s){if(!s)return '';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
@@ -1479,78 +1478,6 @@ document.getElementById('jobSearch').addEventListener('input',function(){
 });
 
 
-function openApply(jobId,title){
-  currentJobId=jobId;
-  document.getElementById('modalTitle').textContent=title;
-  document.getElementById('jobId').value=jobId;
-  if(currentUser){
-    document.getElementById('name').value=currentUser.fullName||'';
-    document.getElementById('email').value=currentUser.email||'';
-    document.getElementById('phone').value=currentUser.phone||'';
-    document.getElementById('idNumber').value=currentUser.idNumber||'';
-  }
-  document.getElementById('modal').style.display='flex';
-}
-function closeModal(){document.getElementById('modal').style.display='none';document.getElementById('appForm').reset();}
-document.getElementById('closeAppModal').addEventListener('click',closeModal);
-document.getElementById('cancelAppBtn').addEventListener('click',closeModal);
-
-document.getElementById('appForm').addEventListener('submit',function(e){
-  e.preventDefault();
-  if(!document.getElementById('consent').checked){alert('Please accept the POPIA consent to submit.');return;}
-  var gender=document.getElementById('gender').value,marital=document.getElementById('maritalStatus').value;
-  if(!gender){alert('Please select your gender.');return;}
-  if(!marital){alert('Please select your marital status.');return;}
-  var cvFile=document.getElementById('cv').files[0],idFile=document.getElementById('idDoc').files[0];
-  if(!cvFile||!idFile){alert('Please upload both your CV and ID document.');return;}
-  var btn=document.getElementById('submitAppBtn');
-  btn.textContent='Submitting\u2026 please wait';btn.disabled=true;
-  var fd={name:document.getElementById('name').value,idNumber:document.getElementById('idNumber').value,
-    phone:document.getElementById('phone').value,email:document.getElementById('email').value||'',
-    gender:gender,maritalStatus:marital,consent:document.getElementById('consent').checked,jobId:currentJobId,jobTitle:document.getElementById('modalTitle').textContent};
-  function resetBtn(){btn.textContent=(I18N[BKS_LANG]||I18N.en).applySubmit;btn.disabled=false;}
-  function putFile(url,file){
-    var form=new FormData();
-    form.append('cacheControl','3600');
-    form.append('',file);
-    return fetch(url,{method:'PUT',body:form}).then(function(res){
-      if(!res.ok)throw new Error('File upload failed. Please check your connection and try again.');
-    });
-  }
-  var startHeaders={'Content-Type':'application/json'};
-  if(currentUser&&currentUser.token)startHeaders['Authorization']='Bearer '+currentUser.token;
-  fetch('/api/create-upload-urls', {
-    method: 'POST',
-    headers: startHeaders,
-    body: JSON.stringify({ name: fd.name, idNumber: fd.idNumber, jobId: fd.jobId,
-      cv: { name: cvFile.name, size: cvFile.size }, id: { name: idFile.name, size: idFile.size } })
-  })
-    .then(function(r){ return r.json(); })
-    .then(function(t){
-      if(!t.success)throw new Error(t.message||'Could not start your upload.');
-      return Promise.all([putFile(t.uploads.cv.signedUrl,cvFile),putFile(t.uploads.id.signedUrl,idFile)])
-        .then(function(){ return t.ticket; });
-    })
-    .then(function(ticket){
-      return fetch('/api/submit-application', {
-        method: 'POST',
-        headers: {'Content-Type':'application/json'},
-        body: JSON.stringify({ formData: fd, ticket: ticket })
-      });
-    })
-    .then(function(r){ return r.json(); })
-    .then(function(r){
-      alert(r.message);
-      if(r.success) closeModal();
-      resetBtn();
-    })
-    .catch(function(err){
-      alert(err.message||String(err));
-      resetBtn();
-    });
-});
-document.getElementById('idNumber').addEventListener('input',function(){this.value=this.value.replace(/[^0-9]/g,'').slice(0,13);});
-document.getElementById('phone').addEventListener('input',function(){this.value=this.value.replace(/[^0-9]/g,'').slice(0,10);});
 
 
 function openAuthModal(){document.getElementById('authModal').style.display='flex';switchAuthTab('signin');}
@@ -1753,7 +1680,7 @@ var I18N={
     jobsError:'Error loading jobs. Please refresh the page.',
     jobsEmpty:'No openings at the moment',
     jobsEmptySub:'New opportunities are posted as they become available. Please check back soon.',
-    jobsApplyBtn:'Apply Now',jobsClosing:'Closing:',jobsReqs:'Requirements',
+    jobsApplyBtn:'Apply Now',jobsSeeMore:'See more',jobsSeeLess:'See less',jobsClosing:'Closing:',jobsReqs:'Requirements',
     applySubmit:'Submit Application',applySubmitting:'Submitting\u2026 please wait',
     passWeak:'Weak',passMedium:'Medium',passStrong:'Strong',
     vbFairLabel:'\u25C6 Fair',

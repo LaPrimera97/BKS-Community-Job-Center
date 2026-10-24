@@ -35,6 +35,7 @@ exports.handler = async function (event) {
     const formattedApps = await Promise.all((apps || []).map(async (a) => {
       let cvSignedUrl = '';
       let idSignedUrl = '';
+      let residenceSignedUrl = '';
       try {
         if (a.cv_url) {
           const { data } = await supabase.storage.from('applications').createSignedUrl(a.cv_url, 3600);
@@ -43,6 +44,10 @@ exports.handler = async function (event) {
         if (a.id_url) {
           const { data } = await supabase.storage.from('applications').createSignedUrl(a.id_url, 3600);
           idSignedUrl = data ? data.signedUrl : '';
+        }
+        if (a.residence_url) {
+          const { data } = await supabase.storage.from('applications').createSignedUrl(a.residence_url, 3600);
+          residenceSignedUrl = data ? data.signedUrl : '';
         }
       } catch (signErr) {
         console.error('Signed URL error for application', a.id, signErr);
@@ -56,10 +61,10 @@ exports.handler = async function (event) {
         phone: a.phone,
         email: a.email,
         gender: a.gender,
-        maritalStatus: a.marital_status,
         jobId: a.job_id,
         cvUrl: cvSignedUrl,
         idUrl: idSignedUrl,
+        residenceUrl: residenceSignedUrl,
         folderUrl: a.folder_url,
         status: a.status
       };

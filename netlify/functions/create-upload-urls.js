@@ -27,6 +27,8 @@ exports.handler = async function (event) {
     if (!cv.ok) return respond(400, { success: false, message: cv.message });
     const idDoc = checkDeclaredFile('id', body.id);
     if (!idDoc.ok) return respond(400, { success: false, message: idDoc.message });
+    const residence = checkDeclaredFile('residence', body.residence);
+    if (!residence.ok) return respond(400, { success: false, message: residence.message });
 
     const ipKey = 'upload-ip:' + clientIp(event);
     const idKey = 'upload-id:' + idStr;
@@ -59,17 +61,21 @@ exports.handler = async function (event) {
     const folder = `${year}/${month}/${safeJob}/${safeName}_${now.getTime()}_${suffix}`;
     const cvPath = `${folder}/CV_${cv.base}.${cv.ext}`;
     const idPath = `${folder}/ID_${idDoc.base}.${idDoc.ext}`;
+    const residencePath = `${folder}/RES_${residence.base}.${residence.ext}`;
 
     const bucket = supabase.storage.from('applications');
     const cvSigned = await bucket.createSignedUploadUrl(cvPath);
     if (cvSigned.error) throw cvSigned.error;
     const idSigned = await bucket.createSignedUploadUrl(idPath);
     if (idSigned.error) throw idSigned.error;
+    const residenceSigned = await bucket.createSignedUploadUrl(residencePath);
+    if (residenceSigned.error) throw residenceSigned.error;
 
     const ticket = issueUploadTicket({
       folder,
       cvPath,
       idPath,
+      residencePath,
       idNumber: idStr,
       jobId,
       userEmail: requireUser(event)
@@ -80,7 +86,8 @@ exports.handler = async function (event) {
       ticket,
       uploads: {
         cv: { signedUrl: cvSigned.data.signedUrl, contentType: cv.contentType },
-        id: { signedUrl: idSigned.data.signedUrl, contentType: idDoc.contentType }
+        id: { signedUrl: idSigned.data.signedUrl, contentType: idDoc.contentType },
+        residence: { signedUrl: residenceSigned.data.signedUrl, contentType: residence.contentType }
       }
     });
 

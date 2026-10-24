@@ -251,10 +251,10 @@ body{background:var(--cream);}
           <tr><th>Category</th><th>Information Collected</th><th>When</th></tr>
         </thead>
         <tbody>
-          <tr><td><strong>Identity</strong></td><td>Full name, South African ID number, gender, marital status</td><td>On application submission</td></tr>
+          <tr><td><strong>Identity</strong></td><td>Full name, South African ID number, gender</td><td>On application submission</td></tr>
           <tr><td><strong>Contact</strong></td><td>Phone number, email address</td><td>On registration &amp; application</td></tr>
           <tr><td><strong>Account</strong></td><td>Email address, password (stored only as a bcrypt hash — never readable)</td><td>On account creation</td></tr>
-          <tr><td><strong>Application Documents</strong></td><td>Curriculum Vitae (CV/résumé), ID document scan or photograph</td><td>On application submission</td></tr>
+          <tr><td><strong>Application Documents</strong></td><td>Curriculum Vitae (CV/résumé), ID document scan or photograph, proof of residence</td><td>On application submission</td></tr>
           <tr><td><strong>Location</strong></td><td>GPS coordinates (eligibility verification only — never stored)</td><td>On portal entry (optional)</td></tr>
           <tr><td><strong>Usage &amp; Events</strong></td><td>Application submission timestamps, status change history</td><td>Automatically on each event</td></tr>
           <tr><td><strong>Consent record</strong></td><td>The date and time you gave consent and the version of this notice that applied</td><td>On application submission</td></tr>
@@ -305,7 +305,7 @@ body{background:var(--cream);}
         <li><strong>Password hashing:</strong> All passwords are hashed with bcrypt before storage. The original password is never stored anywhere.</li>
         <li><strong>Access control:</strong> The admin portal is password-protected, verified server-side. Only authorised BKS administrators and authorised committee personnel can access it.</li>
         <li><strong>Encrypted transmission:</strong> All data is transmitted over HTTPS (TLS encryption).</li>
-        <li><strong>Private document storage:</strong> Uploaded CVs and ID documents are stored in a private storage bucket, accessible only via time-limited secure links generated for authorised staff.</li>
+        <li><strong>Private document storage:</strong> Uploaded CVs, ID documents and proofs of residence are stored in a private storage bucket, accessible only via time-limited secure links generated for authorised staff.</li>
         <li><strong>No public exposure:</strong> No personal data is publicly accessible.</li>
         <li><strong>Sign-in protection:</strong> Repeated failed sign-in attempts are temporarily blocked, and you can only view your own applications.</li>
       </ul>
@@ -324,7 +324,7 @@ body{background:var(--cream);}
         </thead>
         <tbody>
           <tr><td>Job application records</td><td>3 years from submission date</td><td>Accountability, auditing, and regulatory compliance</td></tr>
-          <tr><td>Uploaded documents (CV, ID)</td><td>3 years from submission date</td><td>Recruitment record keeping</td></tr>
+          <tr><td>Uploaded documents (CV, ID, proof of residence)</td><td>3 years from submission date</td><td>Recruitment record keeping</td></tr>
           <tr><td>Account information</td><td>Until account deletion is requested</td><td>Ongoing access to application history</td></tr>
           <tr><td>Application event logs</td><td>3 years from last event</td><td>Transparency and audit trail</td></tr>
           <tr><td>Location data (GPS)</td><td>Not retained — deleted immediately after eligibility check</td><td>Used only client-side for verification</td></tr>

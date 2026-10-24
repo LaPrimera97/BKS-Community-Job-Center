@@ -380,6 +380,42 @@ body{
 .form-group input:-webkit-autofill,.form-group input:-webkit-autofill:hover,.form-group input:-webkit-autofill:focus{-webkit-box-shadow:0 0 0 100px #fff inset;-webkit-text-fill-color:#1a2e20;caret-color:#1a2e20;}
 .btn-green{background:var(--green-mid);box-shadow:none;border-radius:10px;letter-spacing:.04em;}
 .btn-green:hover{background:var(--green-dark);transform:none;box-shadow:none;}
+
+:root{--cream:#f7f4ef;--rule:#ddd6cc;--soft:#6b645e;}
+body{background:var(--cream);}
+.mid-wrap{background:var(--cream);}
+.mid-wrap .loading-state p{color:var(--muted);}
+.mid-wrap .sec-heading{color:var(--green-mid);}
+.mid-wrap .sec-heading::after{background:linear-gradient(to right,var(--green-vivid) 0%,transparent 100%);}
+.welcome-bar{background:none;border:none;border-radius:0;box-shadow:none;padding:0;margin-bottom:22px;}
+.welcome-greet{color:var(--green-deep);font-size:clamp(24px,4vw,32px);line-height:1.2;}
+.welcome-sub{color:var(--muted);font-size:14px;}
+.signout-btn{color:var(--green-deep);border-color:#bfb8ae;}
+.sum-item{color:var(--muted);}
+.sum-item b{color:#9a938a;}
+.sum-item.on b{color:var(--green-mid);}
+.app-card{background:none;border-radius:0;border:none;border-top:1px solid var(--rule);margin-bottom:0;padding:8px 0 28px;overflow:visible;}
+.card-head.h-Pending,.card-head.h-Reviewed,.card-head.h-Shortlisted,.card-head.h-Rejected{background:none;border:none;padding-left:0;padding-right:0;}
+.card-meta{color:var(--soft);}
+.meta-sep{background:#a8a29e;}
+.stepper-wrap,.status-msg-wrap,.timeline-wrap{border-bottom:none;padding-left:0;padding-right:0;}
+.step-circle{background:var(--cream);border-color:#b9b1a6;color:var(--soft);}
+.step-lbl{color:var(--soft);}
+.step-bar{background:#cfc8bd;}
+.status-msg-box.bx-Pending{background:rgba(245,158,11,.10);}
+.status-msg-box.bx-Reviewed{background:rgba(59,130,246,.08);}
+.status-msg-box.bx-Shortlisted{background:rgba(29,158,117,.10);}
+.status-msg-box.bx-Rejected{background:rgba(220,38,38,.07);}
+.msg-next{color:#4a4540;}
+.hero-strip-badge{display:none;}
+.tl-heading{color:var(--soft);}
+.tl-heading::after{background:var(--rule);}
+.tl-vline{background:#cfc8bd;}
+.tl-ev-time{color:var(--soft);}
+.tl-ev-time .sep{color:#a8a29e;}
+.empty-state{background:none;box-shadow:none;border-radius:0;border-top:1px solid var(--rule);}
+.signin-wall{background:#fff;box-shadow:0 1px 0 var(--rule);border:1px solid var(--rule);}
+@media(max-width:680px){.app-card{padding-bottom:22px;}}
 </style>
 </head>
 <body>
@@ -387,11 +423,6 @@ body{
 <header class="site-header">
   <canvas id="headerCanvas" aria-hidden="true"></canvas>
   <div class="header-inner">
-    <div class="hdr-logo">
-      <a id="hdrLogoLink" href="/portal.html">
-        <img src="https://drive.google.com/thumbnail?id=1idJ5CgHUVJ98YP8frCLbeDexMPkmraLn&sz=w300" alt="BKS Logo">
-      </a>
-    </div>
     <div class="hdr-title">
       <h1 id="hdrH1">My Applications</h1>
       <p id="hdrSub">BKS Community Job Center — Application Tracker</p>
@@ -424,7 +455,6 @@ body{
 </div>
 
 <div class="mid-wrap">
-<canvas class="net-bg" data-net-bg aria-hidden="true"></canvas>
 <main class="page" id="mainPage">
   <div class="loading-state">
     <div class="spinner"></div>
@@ -887,7 +917,7 @@ function loadData(){
       document.getElementById('mainPage').innerHTML=
         '<div class="empty-state"><div class="empty-big-icon">'+svgIcon(ICONS.Alert)+'</div>'+
         '<h3>'+escHtml(tl('errTitle'))+'</h3><p>'+escHtml(tl('errSub'))+'</p>'+
-        '<p style="font-size:11px;color:#a8a29e;margin-top:6px;">'+(e.message||e)+'</p></div>';
+        '<p style="font-size:11px;color:#6b645e;margin-top:6px;">'+(e.message||e)+'</p></div>';
     });
 }
 

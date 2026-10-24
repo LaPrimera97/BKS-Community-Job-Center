@@ -43,7 +43,6 @@ body{
   color:#fff;padding:48px 0 40px;
   position:relative;overflow:hidden;
 }
-#headerCanvas{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:1;}
 .page-header .container{display:flex;align-items:center;gap:28px;flex-wrap:wrap;position:relative;z-index:2;}
 .header-logo{max-width:110px;display:block;cursor:pointer;transition:opacity .2s;}
 .header-logo:hover{opacity:.85;}
@@ -145,7 +144,6 @@ body{
   background:linear-gradient(135deg,var(--green-deep),#0a1f17);
   padding:36px 0;text-align:center;position:relative;overflow:hidden;
 }
-#footerCanvas{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;}
 .page-footer p{font-size:12px;color:rgba(255,255,255,.35);position:relative;z-index:2;}
 .page-footer a{color:rgba(255,255,255,.5);text-decoration:none;margin:0 10px;transition:color .2s;font-weight:500;}
 .page-footer a:hover{color:rgba(255,255,255,.8);}
@@ -173,16 +171,31 @@ body{
   *{animation:none!important;transition:none!important;}
   html{scroll-behavior:auto;}
 }
+
+:root{--cream:#f7f4ef;}
+body{background:var(--cream);}
+.mid-wrap{background:var(--cream);}
+.paper{background:none;border-radius:0;padding:0;box-shadow:none;}
+.toc h2{color:var(--green-mid);}
+.toc a{border-left-color:#cfc8bd;color:var(--muted);}
+.toc a span{opacity:.75;}
+.toc a:hover{color:var(--ink);border-left-color:var(--green-vivid);}
+.toc a.active{color:var(--green-deep);border-left-color:var(--green-mid);font-weight:600;}
+.contact-box{background:none;border-radius:0;padding:6px 0 0;color:var(--ink);border-top:2px solid var(--green-deep);}
+.contact-box h3{color:var(--green-deep);margin:18px 0 10px;}
+.contact-row{border-top:1px solid var(--rule);}
+.contact-label{color:var(--muted);}
+.contact-val{color:var(--ink);}
+.contact-val a{color:var(--green-mid);text-decoration:underline;text-underline-offset:3px;}
+.contact-val a:hover{color:var(--green-dark);}
+@media(max-width:640px){.paper{padding:0;border-radius:0;}.contact-box{padding:6px 0 0;}}
 </style>
 </head>
 <body>
 
 <div class="page-header">
-  <canvas id="headerCanvas" aria-hidden="true"></canvas>
+  <canvas class="net-bg" data-net-bg aria-hidden="true"></canvas>
   <div class="container">
-    <a id="pvLogoLink" href="/portal.html">
-      <img class="header-logo" src="https://drive.google.com/thumbnail?id=1idJ5CgHUVJ98YP8frCLbeDexMPkmraLn&sz=w300" alt="BKS Logo">
-    </a>
     <div class="header-text">
       <h1>Privacy Notice</h1>
       <p>BKS Community Job Center &mdash; Atok, Ga-Selepe, 0749</p>
@@ -198,7 +211,6 @@ body{
 </div>
 
 <div class="mid-wrap">
-<canvas class="net-bg" data-net-bg aria-hidden="true"></canvas>
 <div class="container">
 <div class="layout">
 
@@ -394,7 +406,7 @@ body{
 </div>
 
 <div class="page-footer">
-  <canvas id="footerCanvas" aria-hidden="true"></canvas>
+  <canvas class="net-bg" data-net-bg aria-hidden="true"></canvas>
   <p>
     <a id="pvFooterLink" href="/portal.html">&#8592; Job Portal</a>
     &bull;
@@ -405,36 +417,6 @@ body{
 </div>
 
 <script>
-(function(){
-  function makeParticles(canvasEl, gold){
-    if(!canvasEl) return;
-    var ctx = canvasEl.getContext('2d'), W, H, pts = [];
-    function rsz(){
-      W = canvasEl.width  = canvasEl.parentElement.offsetWidth  || window.innerWidth;
-      H = canvasEl.height = canvasEl.parentElement.offsetHeight || 200;
-    }
-    rsz(); window.addEventListener('resize', rsz, {passive:true});
-    var col = gold ? '255,215,0' : '29,158,117';
-    for(var i = 0; i < 40; i++){
-      pts.push({x:Math.random()*1920,y:Math.random()*400,r:Math.random()*1.6+.4,
-        dx:(Math.random()-.5)*.28,dy:(Math.random()-.5)*.22,o:Math.random()*.22+.06});
-    }
-    (function draw(){
-      ctx.clearRect(0,0,W,H);
-      pts.forEach(function(p){
-        ctx.beginPath();ctx.arc(p.x%W,p.y%H,p.r,0,Math.PI*2);
-        ctx.fillStyle='rgba('+col+','+p.o+')';ctx.fill();
-        p.x+=p.dx;p.y+=p.dy;
-        if(p.x<0)p.x=W;if(p.x>W)p.x=0;if(p.y<0)p.y=H;if(p.y>H)p.y=0;
-      });
-      requestAnimationFrame(draw);
-    })();
-  }
-
-  makeParticles(document.getElementById('headerCanvas'), true);
-  makeParticles(document.getElementById('footerCanvas'), true);
-})();
-
 (function(){
   if(!('IntersectionObserver' in window)) return;
   var links = [].slice.call(document.querySelectorAll('.toc a'));

@@ -1332,8 +1332,8 @@ footer .container { position: relative; z-index: 2; }
     <p class="footer-tagline">Built to Connect Our Homes to Mine Opportunities</p>
     <div class="footer-pills"><span class="footer-pill">Fair Access</span><span class="footer-pill">Built Around POPIA</span><span class="footer-pill">Merit-Based</span></div>
     <div class="footer-links">
-      <a id="footerPrivacyLink" href="/privacy.html" target="_blank">Privacy Notice</a>
-      <a id="footerAdminLink" href="/admin.html" target="_blank">Admin Portal</a>
+      <a id="footerPrivacyLink" href="/privacy.html">Privacy Notice</a>
+      <a id="footerAdminLink" href="/admin.html">Admin Portal</a>
     </div>
     <p class="footer-copy">&copy; 2026 BKS Community Job Center. All rights reserved.</p>
   </div>
@@ -1663,7 +1663,7 @@ document.addEventListener('click',function(e){
 document.getElementById('myAppsLink').addEventListener('click',function(e){
   e.preventDefault();
   sessionStorage.setItem('bksUser',JSON.stringify(currentUser));
-  window.open('/tracker.html','_blank');
+  window.location.href='/tracker.html';
   closeAcctDrop();
 });
 document.getElementById('navSignOutBtn').addEventListener('click',function(){

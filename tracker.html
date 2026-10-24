@@ -416,12 +416,15 @@ body{background:var(--cream);}
 .empty-state{background:none;box-shadow:none;border-radius:0;border-top:1px solid var(--rule);}
 .signin-wall{background:#fff;box-shadow:0 1px 0 var(--rule);border:1px solid var(--rule);}
 @media(max-width:680px){.app-card{padding-bottom:22px;}}
+
+.status-msg-box.bx-Pending,.status-msg-box.bx-Reviewed,.status-msg-box.bx-Shortlisted,.status-msg-box.bx-Rejected{background:none;border:none;border-radius:0;padding-left:0;padding-right:0;}
+.msg-next{border-top:1px solid var(--rule);}
 </style>
 </head>
 <body>
 
 <header class="site-header">
-  <canvas id="headerCanvas" aria-hidden="true"></canvas>
+  <canvas class="net-bg" data-net-bg aria-hidden="true"></canvas>
   <div class="header-inner">
     <div class="hdr-title">
       <h1 id="hdrH1">My Applications</h1>
@@ -440,20 +443,6 @@ body{background:var(--cream);}
   </div>
 </header>
 
-<div class="hero-strip" id="heroStrip" style="display:none;">
-  <canvas id="heroCanvas" aria-hidden="true"></canvas>
-  <div class="hero-strip-inner">
-    <div class="hero-strip-text">
-      <h2 id="heroTitle">Track Your <span class="gold">Journey</span></h2>
-      <p id="heroSub">Real-time status updates on every application you have submitted through BKS.</p>
-    </div>
-    <div class="hero-strip-badge">
-      <div class="badge-num" id="badgeNum">0</div>
-      <div class="badge-lbl" id="badgeLbl">Applications</div>
-    </div>
-  </div>
-</div>
-
 <div class="mid-wrap">
 <main class="page" id="mainPage">
   <div class="loading-state">
@@ -464,7 +453,7 @@ body{background:var(--cream);}
 </div>
 
 <footer class="site-footer">
-  <canvas id="footerCanvas" aria-hidden="true"></canvas>
+  <canvas class="net-bg" data-net-bg aria-hidden="true"></canvas>
   <p>
     <a id="ftPortalLink" href="/portal.html">&#8592; Job Portal</a>
     &bull; BKS Community Job Center &copy; 2026 &bull;
@@ -476,46 +465,6 @@ body{background:var(--cream);}
 
 var currentUser = null;
 var LANG        = 'en';
-
-
-function makeParticles(canvasEl, gold, count){
-  if(!canvasEl) return;
-  var ctx = canvasEl.getContext('2d'), W, H, pts = [];
-  function rsz(){
-    W = canvasEl.width  = canvasEl.parentElement.offsetWidth  || window.innerWidth;
-    H = canvasEl.height = canvasEl.parentElement.offsetHeight || 200;
-  }
-  rsz(); window.addEventListener('resize', rsz, {passive:true});
-  var col = gold ? '255,215,0' : '29,158,117';
-  var alpha = gold ? 0.22 : 0.14;
-  for(var i = 0; i < (count||40); i++){
-    pts.push({
-      x:Math.random()*2000, y:Math.random()*600,
-      r:Math.random()*1.8+.4,
-      dx:(Math.random()-.5)*.28, dy:(Math.random()-.5)*.22,
-      o:Math.random()*alpha+alpha*.4
-    });
-  }
-  (function draw(){
-    ctx.clearRect(0,0,W,H);
-    pts.forEach(function(p){
-      ctx.beginPath(); ctx.arc(p.x%W, p.y%H, p.r, 0, Math.PI*2);
-      ctx.fillStyle = 'rgba('+col+','+p.o+')'; ctx.fill();
-      p.x+=p.dx; p.y+=p.dy;
-      if(p.x<0)p.x=W; if(p.x>W)p.x=0; if(p.y<0)p.y=H; if(p.y>H)p.y=0;
-    });
-    requestAnimationFrame(draw);
-  })();
-}
-
-
-makeParticles(document.getElementById('headerCanvas'), true, 40);
-makeParticles(document.getElementById('footerCanvas'), true, 35);
-
-
-function initHeroParticles(){
-  makeParticles(document.getElementById('heroCanvas'), true, 50);
-}
 
 
 var T = {
@@ -638,9 +587,6 @@ function applyLang(lang){
   document.getElementById('hdrH1').textContent         = tl('hdrH1');
   document.getElementById('hdrSub').textContent        = tl('hdrSub');
   document.getElementById('hdrBackLabel').textContent  = tl('hdrBack');
-  document.getElementById('heroTitle').innerHTML       = tl('heroTitle');
-  document.getElementById('heroSub').textContent       = tl('heroSub');
-  document.getElementById('badgeLbl').textContent      = tl('badgeLbl');
   if(currentUser && document.getElementById('signoutBtn')){
     renderTracker(window._lastApps||[], window._lastEvents||[]);
   } else if(!currentUser){
@@ -692,12 +638,10 @@ function elapsed(ts){
 
 
 function renderSignIn(){
-  document.getElementById('heroStrip').style.display='none';
   var p=document.getElementById('mainPage');
   p.innerHTML=
     '<div class="signin-wall">'+
     '<div class="wall-icon">'+svgIcon('<rect x="4" y="11" width="16" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>')+'</div>'+
-    '<h2>'+escHtml(tl('wallTitle'))+'</h2>'+
     '<p>'+escHtml(tl('wallSub'))+'</p>'+
     '<div class="auth-tabs">'+
     '<div class="auth-tab active" id="tabSI">'+escHtml(tl('tabIn'))+'</div>'+
@@ -788,11 +732,6 @@ function renderSignIn(){
 function renderTracker(apps, events){
   window._lastApps   = apps;
   window._lastEvents = events;
-  var strip = document.getElementById('heroStrip');
-  strip.style.display='';
-  document.getElementById('badgeNum').textContent = apps.length;
-  initHeroParticles();
-
   var p=document.getElementById('mainPage'), html='';
 
   html+='<div class="welcome-bar">';
@@ -889,7 +828,6 @@ function afterRender(){
   if(sob) sob.addEventListener('click',function(){
     sessionStorage.removeItem('bksUser');
     currentUser=null;
-    document.getElementById('heroStrip').style.display='none';
     renderSignIn();
   });
 }

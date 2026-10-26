@@ -8,6 +8,8 @@
     var nodes = [], W = 0, H = 0, raf = null, visible = true;
     var LINK = parseFloat(cv.getAttribute('data-link')) || 150;
     var DENSITY = parseFloat(cv.getAttribute('data-density')) || 15000;
+    var DM = parseFloat(cv.getAttribute('data-density-mobile'));
+    if (DM && window.innerWidth <= 768) DENSITY = DM;
 
     function size() {
       var r = cv.parentNode.getBoundingClientRect();

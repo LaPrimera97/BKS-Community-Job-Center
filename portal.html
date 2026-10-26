@@ -1074,13 +1074,27 @@ footer .container { position: relative; z-index: 2; }
 .job-detail{max-width:760px;}
 .job-detail p{font-size:15px;color:var(--muted);line-height:1.8;margin:0 0 8px;white-space:pre-line;}
 .job-detail .reqs strong{color:var(--ink);}
-.job-detail.clamped{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;}
+.job-detail.clamped{display:-webkit-box;-webkit-line-clamp:3;line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;}
 .see-more{display:block;background:none;border:none;padding:0;margin:4px 0 0;color:var(--green-mid);font-weight:700;font-size:14px;cursor:pointer;text-decoration:underline;text-underline-offset:3px;font-family:var(--font-body);}
 .see-more[hidden]{display:none;}
 .apply-link{display:inline-block;margin-top:16px;background:var(--green-mid);color:#fff;padding:11px 28px;border-radius:10px;font-weight:700;font-size:14px;text-decoration:none;letter-spacing:.03em;transition:background var(--transition-base);}
 .apply-link:hover{background:var(--green-dark);}
+
+/* ===== Mobile single-view navigation (<=768px) ===== */
+@media (max-width: 768px) {
+  .about-section, .jobs-section { display: none; }
+  html[data-view="about"] .about-section,
+  html[data-view="jobs"] .jobs-section {
+    display: block; padding-top: 96px; min-height: 70vh; min-height: 70svh;
+  }
+  html[data-view="about"] .hero,
+  html[data-view="jobs"] .hero { min-height: 0; height: 0; }
+  html[data-view="about"] .hero-content,
+  html[data-view="jobs"] .hero-content { display: none; }
+}
 </style>
 <link rel="preload" as="image" href="images/hero/hero-1.jpg">
+<script>(function(){var v=location.hash.replace('#','');document.documentElement.setAttribute('data-view',(v==='about'||v==='jobs')?v:'home');})();</script>
 </head>
 <body>
 
@@ -1834,12 +1848,13 @@ function startAnimations(){
     var sy=window.scrollY;
     var pct=(sy/(document.body.scrollHeight-window.innerHeight))*100;
     bar.style.width=Math.min(pct,100)+'%';
-    document.body.classList.toggle('nav-scrolled',sy>60);
+    document.body.classList.toggle('nav-scrolled',sy>60||(isMobile()&&curView()!=='home'));
     var active='#';
     allSecs.slice(1).forEach(function(s){
       var sec=document.getElementById(s.id);
       if(sec&&sy+140>=sec.offsetTop)active=s.href;
     });
+    if(isMobile()){var cv=curView();active=(cv==='home')?'#':'#'+cv;}
     allSecs.forEach(function(s){
       var a=getNavLink(s.href);var d=getDropLink(s.href);
       if(a)a.classList.toggle('nav-active',s.href===active);
@@ -1848,8 +1863,17 @@ function startAnimations(){
     var activeDropLink=document.querySelector('.nav-drop-link.nav-active');
     if(navMenuLabel) navMenuLabel.textContent=activeDropLink?activeDropLink.textContent:'Menu';
   }
+  function isMobile(){return window.matchMedia('(max-width: 768px)').matches;}
+  function curView(){var v=location.hash.replace('#','');return (v==='about'||v==='jobs')?v:'home';}
+  function applyView(scrollTop){
+    document.documentElement.setAttribute('data-view',curView());
+    if(scrollTop&&isMobile())window.scrollTo({top:0,left:0,behavior:'instant'});
+    onScroll();
+  }
+  window.addEventListener('hashchange',function(){applyView(true);});
+  window.addEventListener('resize',function(){onScroll();});
   window.addEventListener('scroll',onScroll,{passive:true});
-  onScroll();
+  applyView(false);
 }
 </script>
 <script>

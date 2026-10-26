@@ -484,7 +484,19 @@ footer{
 @media(prefers-reduced-motion:reduce){
   *{animation:none !important;transition:none !important}
 }
+
+/* ===== Mobile single-view navigation (<=860px) ===== */
+.mobile-menu a.active{color:var(--green)}
+@media(max-width:860px){
+  .trust,#about,#contact{display:none}
+  html[data-view="about"] .hero,
+  html[data-view="contact"] .hero{display:none}
+  html[data-view="about"] .trust{display:flex;margin-top:5.5rem}
+  html[data-view="about"] #about{display:block;padding-top:4rem;min-height:60vh;min-height:60svh}
+  html[data-view="contact"] #contact{display:block;padding-top:7.5rem;min-height:70vh;min-height:70svh}
+}
 </style>
+<script>(function(){var v=location.hash.replace('#','');document.documentElement.setAttribute('data-view',(v==='about'||v==='contact')?v:'home');})();</script>
 </head>
 <body>
 
@@ -506,6 +518,7 @@ footer{
 </nav>
 
 <div class="mobile-menu" id="mobileMenu">
+  <a href="#home" class="mm-link">Home</a>
   <a href="#about" class="mm-link">About</a>
   <a href="#contact" class="mm-link">Contact</a>
 <a href="/portal.html" class="mm-link mobile-cta">Visit Site</a>
@@ -714,7 +727,21 @@ document.addEventListener('visibilitychange',()=>{
 
 
 const nav=document.getElementById('nav');
-window.addEventListener('scroll',()=>nav.classList.toggle('scrolled',scrollY>60));
+const VIEWS=['about','contact'];
+const mobMQ=window.matchMedia('(max-width: 860px)');
+function curView(){const v=location.hash.replace('#','');return VIEWS.includes(v)?v:'home';}
+function syncNav(){nav.classList.toggle('scrolled',scrollY>60||(mobMQ.matches&&curView()!=='home'));}
+function applyView(scrollTop){
+  const v=curView();
+  document.documentElement.setAttribute('data-view',v);
+  document.querySelectorAll('.mm-link').forEach(a=>a.classList.toggle('active',a.getAttribute('href')==='#'+v));
+  if(scrollTop&&mobMQ.matches)window.scrollTo({top:0,left:0,behavior:'instant'});
+  syncNav();
+}
+window.addEventListener('scroll',syncNav);
+window.addEventListener('resize',syncNav);
+window.addEventListener('hashchange',()=>applyView(true));
+applyView(false);
 
 const hbg=document.getElementById('hamburger');
 const mm=document.getElementById('mobileMenu');

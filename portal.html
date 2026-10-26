@@ -1134,6 +1134,19 @@ footer .container { position: relative; z-index: 2; }
   }
   #navDropdown .nav-drop-divider { display: none; }
 }
+
+/* ===== Mobile performance: no live blur, no endless animation, stable nav size (<=768px) ===== */
+@media (max-width: 768px) {
+  .hero-nav, .nav-scrolled .hero-nav, .hero-badge, .value-btn, .btn-outline {
+    backdrop-filter: none; -webkit-backdrop-filter: none;
+  }
+  .hero-nav { background: rgba(2, 18, 12, 0.78); transition: background 0.25s ease; }
+  .nav-scrolled .hero-nav { top: 10px; gap: 0; padding: 7px 12px; background: rgba(2, 14, 9, 0.94); }
+  .nav-account { transition: none; }
+  .nav-scrolled .nav-account { top: 10px; }
+  .nav-account .nav-auth-btn, .nav-scrolled .nav-account .nav-auth-btn { padding: 8px 18px; font-size: 12px; }
+  .btn-primary { animation: none; }
+}
 </style>
 <link rel="preload" as="image" href="images/hero/hero-1.jpg">
 <script>(function(){var v=location.hash.replace('#','');document.documentElement.setAttribute('data-view',(v==='about'||v==='jobs')?v:'home');})();</script>
@@ -1413,7 +1426,7 @@ function createGoldParticles(container, count, opacity, dark) {
       o:Math.random()*alpha + alpha*.4
     });
   }
-  (function draw(){
+  function draw(){
     ctx.clearRect(0,0,W,H);
     pts.forEach(function(p){
       ctx.beginPath();
@@ -1424,8 +1437,15 @@ function createGoldParticles(container, count, opacity, dark) {
       if(p.x < 0) p.x = W; if(p.x > W) p.x = 0;
       if(p.y < 0) p.y = H; if(p.y > H) p.y = 0;
     });
-    requestAnimationFrame(draw);
-  })();
+    if(inView&&!document.hidden)requestAnimationFrame(draw);else running=false;
+  }
+  var inView=true,running=true;
+  function kick(){if(!running&&inView&&!document.hidden){running=true;requestAnimationFrame(draw);}}
+  if('IntersectionObserver' in window){
+    new IntersectionObserver(function(en){inView=en[0].isIntersecting;if(inView)rsz();kick();}).observe(container);
+  }
+  document.addEventListener('visibilitychange',kick);
+  draw();
 }
 
 
@@ -1891,24 +1911,37 @@ function startAnimations(){
   var allSecs=[{id:'',href:'#'},{id:'jobs',href:'#jobs'},{id:'about',href:'#about'}];
   function getNavLink(href){return document.querySelector('.nav-links a[href="'+href+'"]');}
   function getDropLink(href){return document.querySelector('.nav-drop-link[href="'+href+'"]');}
-  function onScroll(){
+  var ticking=false,lastScrolled=null,lastPct=-1,lastLabel=null;
+  function runScroll(){
+    ticking=false;
     var sy=window.scrollY;
-    var pct=(sy/(document.body.scrollHeight-window.innerHeight))*100;
-    bar.style.width=Math.min(pct,100)+'%';
-    document.body.classList.toggle('nav-scrolled',sy>60||(isMobile()&&curView()!=='home'));
+    var mobile=isMobile();
+    var view=curView();
+    var scrolled=sy>60||(mobile&&view!=='home');
+    if(scrolled!==lastScrolled){document.body.classList.toggle('nav-scrolled',scrolled);lastScrolled=scrolled;}
+    var max=document.documentElement.scrollHeight-window.innerHeight;
+    var pct=max>0?Math.min(sy/max*100,100):0;
+    if(Math.abs(pct-lastPct)>=0.5){bar.style.width=pct+'%';lastPct=pct;}
     var active='#';
-    allSecs.slice(1).forEach(function(s){
-      var sec=document.getElementById(s.id);
-      if(sec&&sy+140>=sec.offsetTop)active=s.href;
-    });
-    if(isMobile()){var cv=curView();active=(cv==='home')?'#':'#'+cv;}
+    if(mobile){
+      active=(view==='home')?'#':'#'+view;
+    }else{
+      allSecs.slice(1).forEach(function(s){
+        var sec=document.getElementById(s.id);
+        if(sec&&sy+140>=sec.offsetTop)active=s.href;
+      });
+    }
     allSecs.forEach(function(s){
       var a=getNavLink(s.href);var d=getDropLink(s.href);
       if(a)a.classList.toggle('nav-active',s.href===active);
       if(d)d.classList.toggle('nav-active',s.href===active);
     });
     var activeDropLink=document.querySelector('.nav-drop-link.nav-active');
-    if(navMenuLabel) navMenuLabel.textContent=activeDropLink?activeDropLink.textContent:'Menu';
+    var label=activeDropLink?activeDropLink.textContent:'Menu';
+    if(navMenuLabel&&label!==lastLabel){navMenuLabel.textContent=label;lastLabel=label;}
+  }
+  function onScroll(){
+    if(!ticking){ticking=true;requestAnimationFrame(runScroll);}
   }
   function isMobile(){return window.matchMedia('(max-width: 768px)').matches;}
   function curView(){var v=location.hash.replace('#','');return (v==='about'||v==='jobs')?v:'home';}

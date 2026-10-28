@@ -70,7 +70,7 @@
 
     size();
     frame(false);
-    if (reduce) return;
+    if (reduce || (cv.hasAttribute('data-static-mobile') && window.innerWidth <= 768)) return;
     kick();
 
     if (window.ResizeObserver) {
